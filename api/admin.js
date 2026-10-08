@@ -72,7 +72,7 @@ function page(orders, error) {
     .join('');
   return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
-<title>الطلبات - لوحة وكيلك</title>
+<title>الطلبات - لوحة لوز</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:'Tajawal',sans-serif;background:#F7F8F4;color:#121A2E}
@@ -85,7 +85,7 @@ th{background:#F3F5F9;font-size:14px;color:#4A5468}tr:last-child td{border-botto
 .d{white-space:pre-wrap;max-width:360px;line-height:1.7}.m{color:#9AA3B5}
 a{color:#0B6E4B;font-weight:700}.empty{padding:48px;text-align:center;color:#4A5468}.err{background:#FDECEA;color:#B42318;padding:14px 18px;border-radius:12px;margin-bottom:16px}
 </style></head><body>
-<header><b>وكيلك — لوحة الإدارة</b><span>الطلبات</span></header>
+<header><b>لوز — لوحة الإدارة</b><span>الطلبات</span></header>
 <main><h1>الطلبات</h1><p class="sub">إجمالي الطلبات: ${orders.length}</p>
 ${error ? `<div class="err">${esc(error)}</div>` : ''}
 <div class="box">${
