@@ -2,7 +2,7 @@
   "name": "wakeel",
   "version": "1.0.0",
   "private": true,
-  "description": "Lawz - landing page and order requests",
+  "description": "Hudhud - landing page and order requests",
   "engines": { "node": "22.x" },
   "dependencies": { "@vercel/blob": "^2.8.1" }
 }
