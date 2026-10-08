@@ -1,0 +1,8 @@
+{
+  "name": "wakeel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "وكيلك - landing page and order requests",
+  "engines": { "node": "22.x" },
+  "dependencies": { "@vercel/blob": "^2.8.1" }
+}
