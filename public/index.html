@@ -64,6 +64,7 @@ html{scroll-behavior:smooth}
 select{width:100%;min-height:52px;border-radius:12px;border:1.5px solid #D9DEE8;padding:0 16px;font-family:inherit;font-size:16px;background:#fff;color:#121A2E}
 select:focus{outline:2px solid #4B5BD6;outline-offset:1px}
 @media(max-width:640px){.btn{width:100%}.topnav{display:none!important}.navcta{width:auto!important;margin-inline-start:auto}}
+@media(max-width:920px){.conn{display:none!important}}
 </style>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -95,7 +96,7 @@ select:focus{outline:2px solid #4B5BD6;outline-offset:1px}
 <div class="wrap" style="display:flex;flex-wrap:wrap;align-items:center;gap:56px">
 <div style="flex:1 1 460px;min-width:0">
 <span class="tag">لكل مصلحة شغلها عالواتساب</span>
-<h1 style="font-size:clamp(40px,5.6vw,72px);line-height:1.15;font-weight:800;margin:22px 0 0"><span style="background:linear-gradient(120deg,#0B7F58,#4B5BD6);-webkit-background-clip:text;background-clip:text;color:transparent">ردود تلقائية،</span> وزباين ما بستَنّوا.</h1>
+<h1 style="font-size:clamp(40px,5.6vw,72px);line-height:1.4;font-weight:800;margin:30px 0 0"><span style="padding-block:.15em;background:linear-gradient(120deg,#0B7F58,#4B5BD6);-webkit-background-clip:text;background-clip:text;color:transparent">ردود تلقائية،</span> وزباين ما بستَنّوا.</h1>
 <p style="font-size:clamp(18px,2vw,22px);line-height:1.8;color:#4A5468;margin:22px 0 0;max-width:560px">عيادة، صالون، مطعم أو متجر؟ هُدهُد بيرد على زباينك، بحجز المواعيد وبستقبل الطلبات، ليل نهار وإنت مرتاح.</p>
 <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:34px">
 <a href="#order" class="btn btn-main">اطلب هُدهُد الآن</a>
@@ -216,7 +217,7 @@ select:focus{outline:2px solid #4B5BD6;outline-offset:1px}
 <div style="padding:16px 24px;background:#F3F1FD;color:#4B5BD6;font-weight:700;font-size:15px">من هون بجيب هُدهُد كل رد لزباينك.</div>
 </div>
 <!-- flowing connector -->
-<div style="flex:0 0 60px;display:flex;align-items:center;justify-content:center"><span class="line" style="height:4px;width:60px;flex:none"></span></div>
+<div class="conn" style="flex:0 0 60px;display:flex;align-items:center;justify-content:center"><span class="line" style="height:4px;width:60px;flex:none"></span></div>
 <!-- chat + order card -->
 <div style="flex:1.4 1 420px;display:flex;flex-wrap:wrap;gap:20px">
 <div style="flex:1 1 260px;border-radius:22px;background:#EEF2EC;padding:18px;display:flex;flex-direction:column;gap:10px;border:1px solid #E6E9F0">
@@ -338,10 +339,10 @@ var D={
 clinic:{av:'ع',name:'عيادة د. سلمى للأسنان',note:'بجاوب على أسئلة الأسعار والدوام، وبحجز للمرضى بالمواعيد الفاضية.',
  chat:[['me','مرحبا، الدكتورة بتداوم السبت؟'],['bot','أهلين! العيادة فاتحة السبت من 9 الصبح لـ 3 العصر.<br>في موعد فاضي الساعة 12:30، بتحب أحجزلك؟'],['me','آه لو سمحت، كشفية عامة']],
  card:['موعد جديد','كشفية عامة','السبت • 12:30<br>د. سلمى','محجوز']},
-barber:{av:'ح',name:'صالون أبو خليل',note:'بعرف خدماتك وقديش بتاخد كل وحدة، وبرتّب الدور وإنت شغّال.',
+barber:{av:'ح',name:'صالون أبو خليل',note:'بعرف خدماتك وقديش بتاخد كل خدمة، وبرتّب الدور وإنت شغّال.',
  chat:[['me','في دور اليوم لقصة؟'],['bot','أكيد! القصة بـ40 ₪.<br>أقرب دور فاضي الساعة 6 المسا، بحجزلك؟'],['me','آه احجزلي']],
  card:['موعد جديد','قصة شعر','اليوم • 6:00 المسا<br>السعر: 40 ₪','محجوز']},
-food:{av:'م',name:'مطبخ أم أحمد',note:'بعرف المنيو والأسعار ومناطق التوصيل، وبسجّل الطلبات والحجوزات وإنت مشغول بالمطبخ.',
+food:{av:'م',name:'مطبخ أم أحمد',note:'بعرف المنيو والأسعار ومناطق التوصيل، وبستقبل طلباتك وحجوزاتك حتى وإنت مشغول بالمطبخ.',
  chat:[['me','مرحبا، شو طبخة اليوم؟'],['bot','أهلين! اليوم عنا مقلوبة دجاج بـ45 ₪ للصحن، ومسخن رول بـ35 ₪.<br>التوصيل لرام الله بـ10 ₪. شو بتحب نجهّزلك؟'],['me','صحنين مقلوبة، توصيل الساعة 2']],
  card:['طلب جديد','مقلوبة دجاج × 2','توصيل • الساعة 2:00<br>المجموع: 100 ₪','طلب جديد']},
 shop:{av:'م',name:'متجر الأناقة',note:'بعرف منتجاتك وأسعارك وشو متوفر، وبحوّل المحادثة لطلب جاهز.',
