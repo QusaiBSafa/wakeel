@@ -1,18 +1,22 @@
-const { list, get } = require('@vercel/blob');
-const crypto = require('crypto');
+import { list, get } from '@vercel/blob';
+import crypto from 'node:crypto';
 
-const esc = (s) =>
-  String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// Ported from the old api/admin.js; served at /admin via a rewrite. Same basic auth and page.
 
-function sha(s) {
+type Order = { id: string; name: string; phone: string; description?: string; createdAt: string; status?: string };
+
+const esc = (s: unknown) =>
+  String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }) as Record<string, string>)[c]);
+
+function sha(s: string) {
   return crypto.createHash('sha256').update(String(s)).digest();
 }
 
-function authorized(req) {
+function authorized(req: Request) {
   const user = process.env.ADMIN_USER;
   const pass = process.env.ADMIN_PASSWORD;
   if (!user || !pass) return false;
-  const h = req.headers.authorization || '';
+  const h = req.headers.get('authorization') || '';
   if (!h.startsWith('Basic ')) return false;
   const decoded = Buffer.from(h.slice(6), 'base64').toString('utf8');
   const i = decoded.indexOf(':');
@@ -26,31 +30,31 @@ function authorized(req) {
 }
 
 async function readOrders() {
-  const orders = [];
-  let cursor;
+  const orders: Order[] = [];
+  let cursor: string | undefined;
   do {
     const page = await list({ prefix: 'orders/', limit: 1000, cursor });
     const items = await Promise.all(
       page.blobs.map(async (b) => {
         try {
           const r = await get(b.pathname, { access: 'private', useCache: false });
-          if (!r) return null;
+          if (!r || !r.stream) return null;
           const text = await new Response(r.stream).text();
-          return JSON.parse(text);
+          return JSON.parse(text) as Order;
         } catch (e) {
           console.error('read failed', b.pathname, e);
           return null;
         }
       })
     );
-    orders.push(...items.filter(Boolean));
+    orders.push(...items.filter((o): o is Order => !!o));
     cursor = page.hasMore ? page.cursor : undefined;
   } while (cursor);
   orders.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
   return orders;
 }
 
-function fmt(iso) {
+function fmt(iso: string) {
   try {
     return new Date(iso).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Jerusalem' });
   } catch {
@@ -58,7 +62,7 @@ function fmt(iso) {
   }
 }
 
-function page(orders, error) {
+function page(orders: Order[], error?: string) {
   const rows = orders
     .map(
       (o, i) => `<tr>
@@ -95,21 +99,21 @@ ${error ? `<div class="err">${esc(error)}</div>` : ''}
   }</div></main></body></html>`;
 }
 
-module.exports = async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+export async function GET(req: Request) {
+  const base = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' };
   if (!authorized(req)) {
-    res.setHeader('WWW-Authenticate', 'Basic realm="Hudhud Admin", charset="UTF-8"');
-    return res.status(401).send('يلزم تسجيل الدخول');
+    return new Response('يلزم تسجيل الدخول', {
+      status: 401,
+      headers: { ...base, 'WWW-Authenticate': 'Basic realm="Hudhud Admin", charset="UTF-8"', 'Content-Type': 'text/plain; charset=utf-8' },
+    });
   }
-  let orders = [];
-  let error;
+  let orders: Order[] = [];
+  let error: string | undefined;
   try {
     orders = await readOrders();
   } catch (e) {
     console.error(e);
     error = 'تعذّر تحميل الطلبات.';
   }
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  return res.status(200).send(page(orders, error));
-};
+  return new Response(page(orders, error), { status: 200, headers: { ...base, 'Content-Type': 'text/html; charset=utf-8' } });
+}
