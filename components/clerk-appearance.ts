@@ -19,7 +19,7 @@ export const clerkAppearance = {
     cardBox: { width: '100%', boxShadow: 'none', border: '0' },
     card: { boxShadow: 'none', border: '0', padding: '0', background: 'transparent' },
     header: { display: 'none' },
-    footer: { background: 'transparent', '& > div:last-child': { display: 'none' } },
+    footer: { background: 'transparent' },
     socialButtonsBlockButton: { minHeight: '48px', border: '1.5px solid #D9DEE8', borderRadius: '12px', fontWeight: 700, fontSize: '16px' },
     dividerText: { color: '#4A5468', fontSize: '14px' },
     formFieldLabel: { fontWeight: 700, fontSize: '15px', color: '#121A2E' },

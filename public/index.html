@@ -63,7 +63,7 @@ html{scroll-behavior:smooth}
 .biz i{font-style:normal;font-size:22px}
 select{width:100%;min-height:52px;border-radius:12px;border:1.5px solid #D9DEE8;padding:0 16px;font-family:inherit;font-size:16px;background:#fff;color:#121A2E}
 select:focus{outline:2px solid #4B5BD6;outline-offset:1px}
-@media(max-width:640px){.btn{width:100%}.topnav{display:none!important}.navcta{width:auto!important}.navauth{margin-inline-start:auto}}
+@media(max-width:640px){.btn{width:100%}.topnav{display:none!important}.navcta{width:auto!important;margin-inline-start:auto}}
 @media(max-width:920px){.conn{display:none!important}}
 </style>
 <script type="text/javascript">
@@ -85,8 +85,7 @@ select:focus{outline:2px solid #4B5BD6;outline-offset:1px}
 <nav class="topnav" style="display:flex;flex-wrap:wrap;gap:28px;margin-inline-start:32px;flex:1;font-weight:500;color:#4A5468">
 <a href="#top">الرئيسية</a><a href="#who">لمين هُدهُد؟</a><a href="#how">كيف بشتغل؟</a><a href="#features">شو بعمل؟</a><a href="#faq">أسئلة شائعة</a>
 </nav>
-<span class="navauth" style="display:inline-flex;align-items:center;gap:4px;font-weight:700;color:#4A5468"><a href="/sign-in" style="color:#0B6E4B;display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0 4px">دخول</a>/<a href="/sign-up" style="color:#0B6E4B;display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0 4px">ابدأ</a></span>
-<a href="#order" class="btn btn-main navcta" style="min-height:46px;padding:0 22px;font-size:16px">اطلب هُدهُد الآن</a>
+<a href="/sign-in" class="btn btn-main navcta" style="min-height:46px;padding:0 22px;font-size:16px">دخول</a>
 </div></div>
 
 <!-- HERO -->
@@ -100,7 +99,6 @@ select:focus{outline:2px solid #4B5BD6;outline-offset:1px}
 <h1 style="font-size:clamp(40px,5.6vw,72px);line-height:1.4;font-weight:800;margin:30px 0 0"><span style="padding-block:.15em;background:linear-gradient(120deg,#0B7F58,#4B5BD6);-webkit-background-clip:text;background-clip:text;color:transparent">ردود تلقائية،</span> وزباين ما بستَنّوا.</h1>
 <p style="font-size:clamp(18px,2vw,22px);line-height:1.8;color:#4A5468;margin:22px 0 0;max-width:560px">عيادة، صالون، مطعم أو متجر؟ هُدهُد بيرد على زباينك، بحجز المواعيد وبستقبل الطلبات، ليل نهار وإنت مرتاح.</p>
 <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:34px">
-<a href="#order" class="btn btn-main">اطلب هُدهُد الآن</a>
 <a href="#how" class="btn btn-ghost">
 <svg width="20" height="20" viewBox="0 0 24 24" fill="#0B7F58"><path d="M8 5v14l11-7z"/></svg>شوف كيف بشتغل</a>
 </div>
@@ -282,58 +280,17 @@ select:focus{outline:2px solid #4B5BD6;outline-offset:1px}
 </div></div>
 </section>
 
-<!-- FINAL CTA + ORDER REQUEST -->
-<section id="order" class="grad" style="padding:100px 0;color:#fff;position:relative">
-<span class="pt" style="width:12px;height:12px;top:60px;right:20%;background:#fff;opacity:.4"></span>
-<span class="pt" style="width:8px;height:8px;bottom:80px;left:30%;background:#fff;opacity:.4;animation-delay:-4s"></span>
-<div class="wrap" style="display:flex;flex-wrap:wrap;gap:48px;align-items:center">
-<div style="flex:1 1 400px;min-width:0">
-<h2 style="font-size:clamp(34px,4.6vw,56px);line-height:1.2;font-weight:800;margin:0">جاهز تخلّي هُدهُد يرد عنك؟</h2>
-<p style="font-size:20px;line-height:1.9;margin:20px 0 0;opacity:.95">عرّفه على شغلك، اربطه بواتسابك، وخلّيه يهتم بزباينك وإنت مرتاح.</p>
-<p style="margin:22px 0 0;opacity:.9">إعداد سهل • بدون خبرة تقنية • شغّال 24/7</p>
-</div>
-<form id="orderForm" novalidate style="flex:1 1 380px;min-width:0;background:#fff;color:#121A2E;border-radius:26px;padding:34px;box-shadow:0 40px 80px -30px rgba(0,0,0,.45)">
-<h3 style="margin:0 0 6px;font-size:26px">اطلب هُدهُد الآن</h3>
-<p style="margin:0 0 22px;color:#4A5468">اترك اسمك ورقمك، ومنحكي معك لنجهّزلك هُدهُد.</p>
-<div style="margin-bottom:16px"><label for="n">الاسم</label><input id="n" name="name" type="text" required maxlength="100" autocomplete="name" placeholder="اسمك الكامل"></div>
-<div style="margin-bottom:16px"><label for="p">رقم الجوال</label><input id="p" name="phone" type="tel" required maxlength="30" autocomplete="tel" placeholder="05xxxxxxxx" dir="ltr" style="text-align:right"></div>
-<div style="margin-bottom:16px"><label for="t">نوع مصلحتك</label><select id="t" name="btype"><option value="">اختار نوع مصلحتك</option><option>عيادة أو طبيب</option><option>حلاق أو صالون</option><option>مطعم أو مطبخ</option><option>متجر</option><option>غير هيك</option></select></div>
-<div style="margin-bottom:22px"><label for="d">شو حابب تحكيلنا؟ (اختياري)</label><textarea id="d" name="description" maxlength="1000" rows="3" placeholder="اسم مصلحتك، شو بتقدّم، أو أي إشي حابب نعرفه"></textarea></div>
-<input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
-<button id="sendBtn" type="submit" class="btn btn-main" style="width:100%;min-height:58px;font-size:19px">ابعت طلبي</button>
-<p id="msgBox" role="status" style="margin:14px 0 0;font-size:15px;text-align:center;min-height:22px;color:#4A5468"></p>
-</form>
-</div>
-</section>
 
 <!-- FOOTER -->
 <footer style="padding:56px 0 40px;background:#121A2E;color:#C3CAD9">
 <div class="wrap" style="display:flex;flex-wrap:wrap;gap:32px;justify-content:space-between;align-items:flex-start">
 <div><div style="font-size:26px;font-weight:800;color:#fff">هُدهُد</div><div style="margin-top:8px">ردود تلقائية، وزباين ما بستَنّوا</div></div>
-<nav style="display:flex;flex-wrap:wrap;gap:22px"><a href="#how">كيف بشتغل</a><a href="#features">شو بعمل</a><a href="#faq">أسئلة شائعة</a><a href="#order">احكي معنا</a><a href="#top">سياسة الخصوصية</a><a href="#top">شروط الاستخدام</a></nav>
+<nav style="display:flex;flex-wrap:wrap;gap:22px"><a href="#how">كيف بشتغل</a><a href="#features">شو بعمل</a><a href="#faq">أسئلة شائعة</a><a href="#top">سياسة الخصوصية</a><a href="#top">شروط الاستخدام</a></nav>
 </div>
 </footer>
 
 </div>
 
-<script>
-(function(){
-var f=document.getElementById('orderForm'),b=document.getElementById('sendBtn'),m=document.getElementById('msgBox');
-f.addEventListener('submit',function(e){
- e.preventDefault();
- var d={name:f.name.value.trim(),phone:f.phone.value.trim(),description:(f.btype.value?'نوع المصلحة: '+f.btype.value+(f.description.value.trim()?'\n':''):'')+f.description.value.trim(),website:f.website.value};
- if(!d.name||!d.phone){m.style.color='#B42318';m.textContent='اكتب اسمك ورقم جوالك لو سمحت.';return;}
- b.disabled=true;m.style.color='#4A5468';m.textContent='عم نبعت...';
- fetch('/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)})
- .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})})
- .then(function(x){
-  if(x.ok){m.style.color='#0B6E4B';m.textContent='وصلنا طلبك! منحكي معك قريباً.';f.reset();}
-  else{m.style.color='#B42318';m.textContent=x.j.error||'صار خطأ، جرّب كمان مرة.';}
- }).catch(function(){m.style.color='#B42318';m.textContent='ما زبط الإرسال، تأكد من النت وجرّب كمان مرة.';})
- .finally(function(){b.disabled=false;});
-});
-})();
-</script>
 <script>
 (function(){
 var D={
