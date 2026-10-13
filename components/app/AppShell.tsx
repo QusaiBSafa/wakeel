@@ -60,7 +60,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <header className="top">
-        <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 22, fontWeight: 800, color: '#121A2E', minHeight: 44 }}>
+        <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 22, fontWeight: 800, color: '#121A2E', minHeight: 44, textDecoration: 'none' }}>
           <Logo size={26} />
           هُدهُد
         </Link>

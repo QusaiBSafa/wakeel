@@ -5,7 +5,19 @@ const securityHeaders = [
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
 ];
 
+// Local testing only: the sandbox can't reach Clerk, so HUDHUD_E2E_AUTH=1 swaps in a cookie-based
+// stand-in (tests/e2e/clerk-mock). Never enabled on Vercel.
+const e2eAuth = process.env.HUDHUD_E2E_AUTH === '1' && !process.env.VERCEL;
+
 const nextConfig = {
+  ...(e2eAuth && {
+    turbopack: {
+      resolveAlias: {
+        '@clerk/nextjs/server': './tests/e2e/clerk-mock/server.ts',
+        '@clerk/nextjs': './tests/e2e/clerk-mock/client.tsx',
+      },
+    },
+  }),
   poweredByHeader: false,
   async rewrites() {
     return {

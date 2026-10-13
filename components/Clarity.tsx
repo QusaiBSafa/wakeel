@@ -24,15 +24,19 @@ export default function Clarity() {
 
   useEffect(() => {
     if (!CLARITY_ID) return;
+    // same queue stub the tag installs, so calls made before the tag loads are kept and replayed
+    if (typeof window.clarity !== 'function') {
+      const q: unknown[][] = [];
+      window.clarity = Object.assign((...args: unknown[]) => void q.push(args), { q });
+    }
     const c = window.clarity;
-    if (!c) return;
     c('set', 'environment', ENVIRONMENT);
     if (isLoaded && userId) c('identify', userId);
   }, [isLoaded, userId]);
 
   if (!CLARITY_ID) return null;
   return (
-    <Script id="clarity" strategy="afterInteractive">
+    <Script id="ms-clarity-tag" strategy="afterInteractive">
       {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script",${JSON.stringify(CLARITY_ID)});window.clarity("set","environment",${JSON.stringify(ENVIRONMENT)});`}
     </Script>
   );

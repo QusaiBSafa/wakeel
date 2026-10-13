@@ -15,7 +15,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "node scripts/migrate.mjs"
+    "db:migrate": "node scripts/migrate.mjs",
+    "e2e": "node tests/e2e/walkthrough.mjs"
   },
   "dependencies": {
     "@clerk/localizations": "^4.23.0",
@@ -38,6 +39,7 @@
     "drizzle-kit": "^0.31.11",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.4.0",
+    "playwright": "^1.56.1",
     "typescript": "^6.0.3",
     "vitest": "^5.0.4"
   }

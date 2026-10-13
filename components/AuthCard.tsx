@@ -14,7 +14,7 @@ export default function AuthCard({
   return (
     <main className="auth-wrap">
       <div className="card auth-card" data-clarity-mask="true">
-        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 24, fontWeight: 800, color: '#121A2E', alignSelf: 'flex-start', minHeight: 44 }}>
+        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 24, fontWeight: 800, color: '#121A2E', alignSelf: 'flex-start', minHeight: 44, textDecoration: 'none' }}>
           <Logo size={30} />
           هُدهُد
         </a>
