@@ -1,19 +1,13 @@
-import EmptyState from '@/components/ui/EmptyState';
+import { redirect } from 'next/navigation';
+import { loadAi } from '@/lib/server/loaders/ai';
+import { pageSession } from '@/lib/server/session';
+import AiClient from './AiClient';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'إعدادات هُدهُد · هُدهُد' };
 
-// Placeholder: replaced by the real page in a later phase.
-export default function Page() {
-  return (
-    <main className="page" id="main">
-      <div className="page-head">
-        <div className="t">
-          <h1>إعدادات هُدهُد</h1>
-          <p>حدّد كيف يرد هُدهُد على عملائك، وما الذي يُسمح له بفعله، ومتى يحوّل الأمر إليك.</p>
-        </div>
-      </div>
-      <EmptyState icon="info" tone="neutral" title="قيد التجهيز" />
-    </main>
-  );
+export default async function Page() {
+  const { business } = await pageSession();
+  if (!business) redirect('/onboarding');
+  return <AiClient data={await loadAi(business)} />;
 }
