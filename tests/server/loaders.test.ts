@@ -30,7 +30,7 @@ describe.skipIf(!HAS_DB)('server loaders (local Postgres)', () => {
       .returning();
     await d.insert(schema.orderItems).values({ orderId: o.id, itemId: productId, name: 'شامبو أرغان', unitPriceMinor: 4500, qty: 2 });
     await d.insert(schema.orderEvents).values({ orderId: o.id, kind: 'ai', text: 'سجّل هُدهُد الطلب من واتساب', actorName: 'هُدهُد' });
-    const start = new Date(Date.now() + 3600_000);
+    const start = new Date(Date.now() + 60_000); // upcoming = later today; one hour ahead would cross midnight late in the evening
     const [bk] = await d
       .insert(schema.bookings)
       .values({ businessId: b.id, number: 101, customerName: 'لينا', customerPhone: '+970 59 702 4418', itemId: serviceId, serviceName: 'قص وسشوار', priceMinor: 7000, durationMin: 45, memberId, startsAt: start, endsAt: new Date(start.getTime() + 45 * 60000), blockedUntil: new Date(start.getTime() + 45 * 60000), status: 'confirmed', source: 'ai' })
