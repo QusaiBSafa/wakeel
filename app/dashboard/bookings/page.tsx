@@ -1,19 +1,14 @@
-import EmptyState from '@/components/ui/EmptyState';
+import { redirect } from 'next/navigation';
+import { loadBookings } from '@/lib/server/loaders/bookings';
+import { pageSession } from '@/lib/server/session';
+import BookingsClient from './BookingsClient';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'الحجوزات · هُدهُد' };
 
-// Placeholder: replaced by the real page in a later phase.
-export default function Page() {
-  return (
-    <main className="page" id="main">
-      <div className="page-head">
-        <div className="t">
-          <h1>الحجوزات</h1>
-          <p>مواعيد اليوم والأسبوع، وأوقات العمل التي يحجز فيها هُدهُد.</p>
-        </div>
-      </div>
-      <EmptyState icon="info" tone="neutral" title="قيد التجهيز" />
-    </main>
-  );
+export default async function Page({ searchParams }: { searchParams: Promise<{ tab?: string; id?: string }> }) {
+  const { business } = await pageSession();
+  if (!business) redirect('/onboarding');
+  const { tab, id } = await searchParams;
+  return <BookingsClient data={await loadBookings(business)} initialTab={tab === 'settings' ? 'set' : 'cal'} initialId={id ?? null} />;
 }
