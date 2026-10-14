@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هُدهُد: إعدادات هُدهُد</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="hodhod.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Tajawal:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="hd" style="font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif; color: #121A2E; background: #F7F8F4">
+<dc-import name="Sidebar" active="ai" hint-size="0px,0px"></dc-import>
+
+<div class="content">
+<div class="rv" role="region" aria-label="أدوات المعاينة (ليست جزءاً من المنتج)">
+<b>معاينة</b><span>حالة الصفحة:</span>
+<div class="seg" role="group" aria-label="حالة الصفحة">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="4"><button type="button" class="{{v.cls}}" aria-pressed="{{v.aria}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for>
+</div>
+</div>
+
+<main class="page" id="main">
+<div class="page-head">
+<div class="t"><h1>إعدادات هُدهُد</h1><p>حدّد كيف يرد هُدهُد على عملائك، وما الذي يُسمح له بفعله، ومتى يحوّل الأمر إليك.</p></div>
+</div>
+
+<sc-if value="{{isLoading}}" hint-placeholder-val="{{false}}">
+<div class="split" aria-busy="true" aria-label="جارٍ التحميل"><div class="col" style="gap: 16px"><div class="sk" style="height: 96px; border-radius: 16px"></div><div class="sk" style="height: 220px; border-radius: 16px"></div><div class="sk" style="height: 260px; border-radius: 16px"></div></div><div class="sk" style="height: 480px; border-radius: 16px"></div></div>
+</sc-if>
+<sc-if value="{{isError}}" hint-placeholder-val="{{false}}">
+<div class="card empty" role="alert"><span class="ic danger" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg></span><h2>تعذّر تحميل الإعدادات</h2><p class="muted">لا يزال هُدهُد يعمل بآخر إعدادات محفوظة.</p><button type="button" class="btn btn-primary" onClick="{{retry}}">أعد المحاولة</button></div>
+</sc-if>
+
+<sc-if value="{{showBody}}" hint-placeholder-val="{{true}}">
+<div class="col" style="gap: 20px">
+
+<!-- master switch -->
+<section class="{{heroCls}}" aria-labelledby="ms-h">
+<span class="{{heroIc}}" style="display: grid; place-items: center; flex: none"><svg class="i i-lg" viewBox="0 0 24 24" aria-hidden="true"><path d="{{heroIcon}}"></path></svg></span>
+<div class="grow" style="min-width: 0"><h2 id="ms-h" style="font-size: 17px">{{heroTitle}}</h2><p class="muted" style="font-size: 14px">{{heroText}}</p></div>
+<label class="row" style="gap: 10px; font-weight: 600; min-height: 44px"><span class="hide-m">الردود التلقائية</span><button type="button" class="{{masterCls}}" role="switch" aria-checked="{{masterAria}}" aria-label="الردود التلقائية" onClick="{{toggleMaster}}"></button></label>
+</section>
+
+<sc-if value="{{dirty}}" hint-placeholder-val="{{false}}">
+<div class="alert warning" role="status" style="align-items: center; flex-wrap: wrap; position: sticky; top: 8px; z-index: 5"><span class="grow" style="flex: 1 1 200px"><b>لديك تغييرات غير محفوظة.</b> يستمر هُدهُد بالإعدادات السابقة حتى تحفظ.</span><button type="button" class="btn btn-ghost btn-sm" onClick="{{discard}}">تجاهل</button><button type="button" class="btn btn-primary btn-sm" onClick="{{save}}">احفظ التغييرات</button></div>
+</sc-if>
+
+<div class="split">
+<div class="col" style="gap: 20px; min-width: 0">
+
+<!-- mode -->
+<section class="card" aria-labelledby="md-h">
+<div class="card-head"><div><h2 id="md-h">طريقة العمل</h2><span class="subtle">يمكنك تغييرها في أي وقت</span></div></div>
+<div class="card-body col" style="gap: 8px" role="radiogroup" aria-labelledby="md-h">
+<sc-for list="{{modes}}" as="o" hint-placeholder-count="2"><label class="{{o.cls}}"><input type="radio" name="mode" checked="{{o.on}}" onChange="{{o.pick}}"><span><b>{{o.title}}</b><span class="subtle">{{o.desc}}</span></span></label></sc-for>
+</div>
+</section>
+
+<!-- language & tone -->
+<section class="card" aria-labelledby="lg-h">
+<div class="card-head"><div><h2 id="lg-h">اللغة والأسلوب</h2><span class="subtle">جرّب أثر كل خيار في نافذة التجربة</span></div></div>
+<div class="card-body col" style="gap: 18px">
+<fieldset class="field" style="border: 0; padding: 0; margin: 0"><legend class="lbl" style="margin-bottom: 8px">لغة الرد</legend>
+<div class="col" style="gap: 8px"><sc-for list="{{langs}}" as="o" hint-placeholder-count="3"><label class="{{o.cls}}"><input type="radio" name="lang" checked="{{o.on}}" onChange="{{o.pick}}"><span><b>{{o.title}}</b><span class="subtle">{{o.desc}}</span></span></label></sc-for></div>
+</fieldset>
+<div class="field"><span class="lbl" id="tn-l">الأسلوب</span>
+<div class="row" style="gap: 6px; flex-wrap: wrap" role="group" aria-labelledby="tn-l"><sc-for list="{{tones}}" as="t" hint-placeholder-count="3"><button type="button" class="{{t.cls}}" aria-pressed="{{t.aria}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for></div>
+<span class="hint">{{toneHint}}</span>
+</div>
+<div class="grid-2" style="gap: 12px">
+<div class="field"><label for="ai-name">الاسم الذي يعرّف به نفسه</label><input id="ai-name" class="input" value="{{name}}" onChange="{{setName}}" placeholder="هُدهُد"><span class="hint">مثلاً: «معكِ {{namePreview}} من مركز لمسة للتجميل»</span></div>
+<div class="row" style="justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid #E6E9F0; border-radius: 12px; align-self: start"><span><b style="display: block">استخدام الرموز التعبيرية</b><span class="subtle">باعتدال، مثل 🌸 أو 👍</span></span><button type="button" class="{{emojiCls}}" role="switch" aria-checked="{{emojiAria}}" aria-label="استخدام الرموز التعبيرية" onClick="{{toggleEmoji}}"></button></div>
+</div>
+</div>
+</section>
+
+<!-- permissions -->
+<section class="card" aria-labelledby="pm-h">
+<div class="card-head"><div><h2 id="pm-h">ما يُسمح لهُدهُد بفعله</h2><span class="subtle">ما لا تسمح به يُحوَّل إليك في «تحتاج تدخلك»</span></div></div>
+<ul>
+<sc-for list="{{perms}}" as="p" hint-placeholder-count="6">
+<li style="padding: 14px 20px; border-top: 1px solid #E6E9F0">
+<div class="row" style="justify-content: space-between; gap: 14px; align-items: flex-start"><span class="col" style="gap: 2px; min-width: 0"><b>{{p.title}}</b><span class="subtle">{{p.desc}}</span></span><button type="button" class="{{p.swCls}}" role="switch" aria-checked="{{p.aria}}" aria-label="{{p.title}}" onClick="{{p.toggle}}" style="margin-top: 2px"></button></div>
+<sc-if value="{{p.warn}}" hint-placeholder-val="{{false}}"><div class="alert info" style="margin-top: 10px; font-size: 13px; padding: 8px 12px">{{p.warnText}}</div></sc-if>
+</li>
+</sc-for>
+</ul>
+</section>
+
+<!-- handoff -->
+<section class="card" aria-labelledby="ho-h">
+<div class="card-head"><div><h2 id="ho-h">متى يحوّل هُدهُد المحادثة إليك؟</h2><span class="subtle">يتوقف هُدهُد عن الرد في هذه المحادثة حتى تردّ أو تعيدها إليه</span></div></div>
+<div class="card-body col" style="gap: 8px">
+<sc-for list="{{rules}}" as="r" hint-placeholder-count="6">
+<div class="{{r.cls}}" style="flex-wrap: wrap; height: auto; min-height: 44px; padding: 6px 12px">
+<label class="row grow" style="gap: 10px; min-height: 32px; cursor: pointer"><input type="checkbox" checked="{{r.on}}" disabled="{{r.locked}}" onChange="{{r.toggle}}"><span>{{r.label}}</span></label>
+<sc-if value="{{r.hasNum}}" hint-placeholder-val="{{false}}"><span class="row" style="gap: 6px"><label class="sr-only" for="{{r.nid}}">{{r.numLabel}}</label><input id="{{r.nid}}" class="input ltr" inputmode="numeric" value="{{r.num}}" onChange="{{r.setNum}}" style="width: 76px; min-height: 40px"><span class="muted" style="font-size: 14px">{{r.unit}}</span></span></sc-if>
+<sc-if value="{{r.hasHint}}" hint-placeholder-val="{{true}}"><span id="{{r.hid}}" class="subtle" style="flex-basis: 100%; padding-inline-start: 28px; font-size: 12.5px">{{r.hint}}</span></sc-if>
+</div>
+</sc-for>
+<div class="field" style="margin-top: 10px"><span class="lbl">كيف نبلغك؟</span>
+<div class="row" style="gap: 8px; flex-wrap: wrap"><sc-for list="{{notify}}" as="n" hint-placeholder-count="3"><label class="{{n.cls}}"><input type="checkbox" checked="{{n.on}}" disabled="{{n.locked}}" onChange="{{n.toggle}}"><span>{{n.label}}</span></label></sc-for></div>
+</div>
+</div>
+</section>
+
+<!-- unknown -->
+<section class="card" aria-labelledby="uk-h">
+<div class="card-head"><div><h2 id="uk-h">إذا لم يعرف هُدهُد الجواب</h2><span class="subtle">لن يخترع هُدهُد معلومات غير موجودة في صفحاتك</span></div></div>
+<div class="card-body col" style="gap: 8px" role="radiogroup" aria-labelledby="uk-h">
+<sc-for list="{{unknowns}}" as="o" hint-placeholder-count="3"><label class="{{o.cls}}"><input type="radio" name="unk" checked="{{o.on}}" onChange="{{o.pick}}"><span><b>{{o.title}}</b><span class="subtle">{{o.desc}}</span></span></label></sc-for>
+<sc-if value="{{unkCustom}}" hint-placeholder-val="{{false}}"><div class="field"><label for="unk-msg">نص الرسالة</label><textarea id="unk-msg" class="{{unkCls}}" value="{{unkMsg}}" onChange="{{setUnkMsg}}"></textarea><sc-if value="{{unkErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب نص الرسالة</span></sc-if></div></sc-if>
+</div>
+</section>
+</div>
+
+<!-- test panel -->
+<aside class="card" aria-labelledby="ts-h" style="position: sticky; top: 16px; overflow: hidden">
+<div class="card-head"><div><h2 id="ts-h">جرّب هُدهُد</h2><span class="subtle">بالإعدادات الحالية، قبل الحفظ</span></div><button type="button" class="btn btn-ghost btn-sm" onClick="{{resetChat}}">ابدأ من جديد</button></div>
+<div class="chat" style="background: #EFEAE2; padding: 14px; min-height: 300px; max-height: 420px; overflow-y: auto; flex-direction: column-reverse; justify-content: flex-start" aria-live="polite">
+<sc-for list="{{chat}}" as="m" hint-placeholder-count="3"><div class="{{m.cls}}"><sc-if value="{{m.ai}}" hint-placeholder-val="{{false}}"><div class="who">{{m.who}}</div></sc-if>{{m.text}}</div></sc-for>
+</div>
+<div class="card-body col" style="gap: 10px">
+<div class="row" style="gap: 6px; flex-wrap: wrap" role="group" aria-label="رسائل جاهزة للتجربة"><sc-for list="{{presets}}" as="p" hint-placeholder-count="4"><button type="button" class="chip sm" onClick="{{p.send}}">{{p.text}}</button></sc-for></div>
+<div class="row" style="gap: 8px"><label for="t-in" class="sr-only">اكتب رسالة تجريبية</label><input id="t-in" class="input" value="{{draft}}" onChange="{{setDraft}}" placeholder="اكتب كأنك عميل…" style="flex: 1 1 auto"><button type="button" class="btn btn-primary" onClick="{{sendDraft}}" aria-label="أرسل الرسالة التجريبية"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="transform: scaleX(-1)"><path d="M4 12l16-8-6 16-2-7z"></path></svg></button></div>
+<p class="subtle row" style="gap: 6px; align-items: flex-start; font-size: 12.5px"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"></path></svg><span>تجربة فقط: لا تُرسل إلى أي عميل، ولا تُحفظ بعد مغادرة الصفحة.</span></p>
+</div>
+</aside>
+</div>
+</div>
+</sc-if>
+</main>
+</div>
+
+<!-- pause dialog -->
+<sc-if value="{{pauseOpen}}" hint-placeholder-val="{{false}}">
+<div class="backdrop" onClick="{{closePause}}">
+<div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="pz-h" onClick="{{stop}}">
+<div class="dialog-body col" style="gap: 12px"><h2 id="pz-h">إيقاف الردود التلقائية؟</h2>
+<p class="muted">لن يرد هُدهُد على الرسائل الجديدة، وسيتعين عليك الرد على العملاء بنفسك من تطبيق واتساب. لا تتأثر الطلبات والحجوزات الحالية.</p>
+<fieldset class="col" style="gap: 8px; border: 0; padding: 0; margin: 0"><legend class="lbl" style="margin-bottom: 6px">مدة الإيقاف</legend>
+<sc-for list="{{pauseOpts}}" as="o" hint-placeholder-count="3"><label class="{{o.cls}}" style="padding: 10px 14px"><input type="radio" name="pz" checked="{{o.on}}" onChange="{{o.pick}}"><span><b>{{o.title}}</b></span></label></sc-for>
+</fieldset>
+</div>
+<div class="dialog-foot"><button type="button" class="btn btn-secondary" onClick="{{closePause}}">لا، أبقِه يعمل</button><button type="button" class="btn btn-danger" onClick="{{doPause}}">أوقف الردود</button></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+<div class="toast ok" role="status" aria-live="polite"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>{{toast}}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+const DEF = {
+  mode: 'auto', lang: 'match', tone: 'friendly', name: 'هُدهُد', emoji: true,
+  perms: { orders: true, bookings: true, resched: true, prices: true, alt: true, discount: false },
+  rules: { human: true, complaint: true, unknown: true, discount: true, big: false, group: true },
+  bigNum: '500', groupNum: '3',
+  notify: { dash: true, wa: true, email: false },
+  unk: 'handoff', unkMsg: 'شكراً لسؤالك! سيرد عليك أحد أفراد فريقنا خلال ساعات العمل.'
+};
+const PERMS = [
+  ['orders', 'تسجيل الطلبات', 'يجمع المنتجات والكميات والعنوان، ويحفظ الطلب في صفحة الطلبات', 'عند إيقافه، يحوّل هُدهُد كل طلب شراء إليك في «تحتاج تدخلك».'],
+  ['bookings', 'حجز المواعيد', 'يقترح الأوقات المتاحة فقط، حسب أوقات العمل وقواعد التأكيد في صفحة الحجوزات', 'عند إيقافه، يحوّل هُدهُد كل طلب حجز إليك.'],
+  ['resched', 'تغيير الموعد أو إلغاؤه بطلب العميل', 'ضمن سياسة الإلغاء المكتوبة في معلومات نشاطك', ''],
+  ['prices', 'ذكر الأسعار', 'من صفحة المنتجات والخدمات فقط', 'عند إيقافه، يخبر هُدهُد العميل بأن الفريق سيرسل له الأسعار.'],
+  ['alt', 'اقتراح بديل عند نفاد منتج', 'يقترح منتجاً مشابهاً متوفراً', ''],
+  ['discount', 'تقديم خصومات', 'عند إيقافه، لا يعرض هُدهُد أي خصم غير مذكور في منتجاتك أو أسئلتك الشائعة', '']
+];
+const RULES = [
+  ['human', 'يطلب العميل التحدث مع شخص من الفريق', 'دائماً مفعّل، لا يمكن إيقافه', true],
+  ['complaint', 'شكوى أو عميل غير راضٍ', 'يعتذر هُدهُد بلطف ويخبر العميل أن الفريق سيتواصل معه'],
+  ['unknown', 'سؤال لا يعرف هُدهُد جوابه', 'حسب ما تختاره في «إذا لم يعرف هُدهُد الجواب»'],
+  ['discount', 'طلب خصم أو تفاوض على السعر', ''],
+  ['big', 'طلب تزيد قيمته على', 'لتتأكد بنفسك من الطلبات الكبيرة', false, 'bigNum', '₪'],
+  ['group', 'حجز لعدد أشخاص أكبر من', 'مثل حجوزات العرائس والمجموعات', false, 'groupNum', 'أشخاص']
+];
+const NOTIFY = [['dash', 'إشعار في لوحة التحكم', true], ['wa', 'رسالة واتساب إلى +970 59 812 3344'], ['email', 'بريد إلكتروني إلى rana@lamsa.ps']];
+const MODES = [['auto', 'يرد ويسجّل تلقائياً', 'يرد على العملاء، ويسجّل الطلبات والحجوزات حسب الصلاحيات أدناه.'], ['approve', 'يرد تلقائياً، وأوافق أنا على الطلبات والحجوزات', 'يبقى كل طلب أو حجز بانتظار موافقتك في لوحة التحكم قبل تأكيده للعميل.']];
+const LANGS = [['match', 'حسب لغة العميل', 'يرد بالعربية الفصحى، أو بالإنجليزية إذا كتب العميل بها.'], ['fusha', 'العربية الفصحى دائماً', 'لغة واضحة ومهذبة لجميع العملاء.'], ['dialect', 'اللهجة الفلسطينية', 'أقرب إلى أسلوب الحديث اليومي مع العملاء.']];
+const TONES = [['friendly', 'ودود', 'يرحّب بالعميل بحرارة ويختم بعرض المساعدة.'], ['formal', 'رسمي', 'عبارات مهذبة ورسمية، دون مزاح.'], ['short', 'مختصر', 'يدخل في الجواب مباشرة بأقل عدد من الكلمات.']];
+const UNK = [['handoff', 'يعتذر ويحوّل المحادثة إليك', 'يخبر العميل أن الفريق سيرد قريباً، وتظهر المحادثة في «تحتاج تدخلك».'], ['call', 'يطلب من العميل الاتصال بالمركز', 'يرسل رقم الهاتف المكتوب في معلومات نشاطك.'], ['custom', 'يرسل رسالة أكتبها أنا', 'وتظهر المحادثة أيضاً في «تحتاج تدخلك».']];
+const PAUSE = [['1h', 'ساعة واحدة'], ['tmr', 'حتى صباح الغد (9:00 ص)'], ['manual', 'حتى أعيد تشغيله بنفسي']];
+const PRESETS = ['متى تفتحون؟', 'كم سعر صبغة الشعر؟', 'بدي أحجز مانيكير بكرا', 'في خصم إذا حجزت لثلاثة؟', 'Do you open on Friday?'];
+const START = [{ k: 'sys', text: 'اكتب رسالة أو اختر واحدة من الأسفل لترى كيف سيرد هُدهُد.' }];
+const clone = (x) => JSON.parse(JSON.stringify(x));
+
+class Component extends DCLogic {
+  state = { view: 'normal', cfg: clone(DEF), saved: clone(DEF), master: true, pausedUntil: '', pauseOpen: false, pausePick: 'tmr', chat: START.slice(), draft: '', unkErr: false, toast: '' };
+  flash(t) { clearTimeout(this._t); this.setState({ toast: t }); this._t = setTimeout(() => this.setState({ toast: '' }), 3200); }
+  upd(p) { this.setState({ cfg: Object.assign({}, this.state.cfg, p) }); }
+  reply(text) {
+    const c = this.state.cfg;
+    if (!this.state.master) return [{ k: 'sys', text: 'الردود التلقائية متوقفة، ولن يرد هُدهُد على هذه الرسالة.' }];
+    const d = c.lang === 'dialect';
+    const latin = /[a-z]/i.test(text) && !/[؀-ۿ]/.test(text);
+    const em = c.emoji ? ' 🌸' : '';
+    const pre = c.tone === 'friendly' ? (d ? 'أهلين فيكِ! ' : 'أهلاً بكِ! ') : c.tone === 'formal' ? 'مرحباً بكم. ' : '';
+    const post = c.tone === 'friendly' ? (d ? ' إذا بتحتاجي أي إشي ثاني أنا هون.' : ' هل يمكنني مساعدتك في شيء آخر؟') : '';
+    const hand = (why) => [{ k: 'ai', text: pre + (d ? 'رح أحوّل سؤالك لفريق المركز، وبيردّوا عليكِ بأقرب وقت.' : 'سأحوّل سؤالك إلى فريق المركز، وسيردّون عليك في أقرب وقت.') + em }, { k: 'sys', text: 'حُوّلت إلى «تحتاج تدخلك»: ' + why }];
+    if (latin && c.lang === 'match') {
+      if (/fri/i.test(text)) return [{ k: 'ai', text: (c.tone === 'short' ? '' : 'Hello! ') + 'We are closed on Fridays. We are open Saturday to Thursday, 9 AM to 7 PM.' + em }];
+      return [{ k: 'ai', text: 'Hello! We are open Saturday to Thursday, 9 AM to 7 PM. How can I help you?' + em }];
+    }
+    if (/خصم|تخفيض|عرض/.test(text)) {
+      if (c.rules.discount) return hand('طلب خصم');
+      return [{ k: 'ai', text: pre + (d ? 'للأسف ما في خصومات حالياً، بس الاستشارة قبل الصبغة مجانية.' : 'لا توجد خصومات حالياً، لكن الاستشارة قبل الصبغة مجانية.') + em }];
+    }
+    if (/احجز|أحجز|موعد|حجز/.test(text)) {
+      if (!c.perms.bookings) return hand('طلب حجز');
+      const base = d ? 'أكيد! بكرا عنّا موعدين للمانيكير: 10:30 الصبح أو 2:00 الظهر. أي واحد بناسبك؟' : 'يسعدنا ذلك! لدينا غداً موعدان متاحان للمانيكير: 10:30 صباحاً أو 2:00 ظهراً. أيهما يناسبك؟';
+      const out = [{ k: 'ai', text: (c.tone === 'short' ? '' : pre) + base + em }];
+      if (c.mode === 'approve') out.push({ k: 'sys', text: 'بعد اختيار الموعد: يبقى الحجز بانتظار موافقتك' });
+      return out;
+    }
+    if (/سعر|كم|بكم/.test(text)) {
+      if (!c.perms.prices) return [{ k: 'ai', text: pre + (d ? 'رح يبعتلك الفريق الأسعار بأقرب وقت.' : 'سيرسل لك فريقنا الأسعار في أقرب وقت.') + em }];
+      return [{ k: 'ai', text: pre + (d ? 'سعر الصبغة بيبلّش من 150 ₪ للشعر القصير، وبيختلف حسب الطول واللون.' : 'تبدأ أسعار صبغة الشعر من 150 ₪ للشعر القصير، ويختلف السعر حسب الطول واللون.') + post + em }];
+    }
+    if (/متى|تفتح|ساعات|دوام|مفتوح/.test(text)) return [{ k: 'ai', text: pre + (d ? 'إحنا فاتحين من السبت للخميس، من 9 الصبح لـ 7 المسا، والجمعة عطلة.' : 'نستقبلكم من السبت إلى الخميس، من 9 صباحاً حتى 7 مساءً. يوم الجمعة عطلة.') + post + em }];
+    if (c.unk === 'call') return [{ k: 'ai', text: pre + (d ? 'عشان أفيدك أكثر، اتصلي فينا على +970 59 812 3344.' : 'لمساعدتك بشكل أفضل، يرجى الاتصال بنا على الرقم +970 59 812 3344.') + em }];
+    if (c.unk === 'custom') return [{ k: 'ai', text: c.unkMsg }, { k: 'sys', text: 'حُوّلت إلى «تحتاج تدخلك»: سؤال بلا جواب' }];
+    return hand('سؤال بلا جواب');
+  }
+  send(text) {
+    const t = String(text || '').trim(); if (!t) return;
+    this.setState({ chat: this.state.chat.concat([{ k: 'in', text: t }], this.reply(t)), draft: '' });
+  }
+  renderVals() {
+    const s = this.state; const c = s.cfg; const set = (p) => this.setState(p);
+    const radio = (defs, key, name) => defs.map((o) => ({ title: o[1], desc: o[2], on: c[key] === o[0], cls: 'radio-card' + (c[key] === o[0] ? ' on' : ''), pick: () => this.upd({ [key]: o[0] }) }));
+    const dirty = JSON.stringify(c) !== JSON.stringify(s.saved);
+    const unkErr = s.unkErr && c.unk === 'custom' && !c.unkMsg.trim();
+    const tone = TONES.find((t) => t[0] === c.tone);
+    return {
+      views: [['normal', 'عادي'], ['paused', 'متوقف'], ['loading', 'تحميل'], ['error', 'خطأ']].map((v) => ({ label: v[1], cls: (v[0] === 'paused' ? (s.view === 'normal' && !s.master) : (s.view === v[0] && (v[0] !== 'normal' || s.master))) ? 'on' : '', aria: 'false', pick: () => {
+        if (v[0] === 'paused') set({ view: 'normal', master: false, pausedUntil: 'حتى صباح الغد (9:00 ص)' });
+        else if (v[0] === 'normal') set({ view: 'normal', master: true, cfg: clone(DEF), saved: clone(DEF) });
+        else set({ view: v[0] });
+      } })),
+      isLoading: s.view === 'loading', isError: s.view === 'error', showBody: s.view === 'normal',
+      retry: () => { set({ view: 'loading' }); setTimeout(() => this.setState({ view: 'normal' }), 900); },
+      heroCls: 'card row' + (s.master ? '' : ' paused'), heroIc: 'ic ' + (s.master ? 'brand' : 'warn'),
+      heroIcon: s.master ? 'M5 12.5l4.5 4.5L19 7' : 'M10 4H6v16h4zM18 4h-4v16h4z',
+      heroTitle: s.master ? 'هُدهُد يرد على عملائك الآن' : 'الردود التلقائية متوقفة',
+      heroText: s.master ? 'يرد على رسائل واتساب على مدار الساعة، ويحوّل إليك ما يحتاج تدخلك.' : 'متوقفة ' + s.pausedUntil + '. ردّ على العملاء من تطبيق واتساب مباشرة.',
+      masterCls: 'sw' + (s.master ? ' on' : ''), masterAria: s.master ? 'true' : 'false',
+      toggleMaster: () => { if (s.master) set({ pauseOpen: true }); else { set({ master: true, pausedUntil: '' }); this.flash('عاد هُدهُد للرد على العملاء'); } },
+      pauseOpen: s.pauseOpen, closePause: () => set({ pauseOpen: false }), stop: (e) => e.stopPropagation(),
+      pauseOpts: PAUSE.map((o) => ({ title: o[1], on: s.pausePick === o[0], cls: 'radio-card' + (s.pausePick === o[0] ? ' on' : ''), pick: () => set({ pausePick: o[0] }) })),
+      doPause: () => { const o = PAUSE.find((x) => x[0] === s.pausePick); set({ master: false, pauseOpen: false, pausedUntil: o[0] === '1h' ? 'لمدة ساعة (حتى 12:10 م)' : o[0] === 'tmr' ? 'حتى صباح الغد (9:00 ص)' : 'حتى تعيد تشغيلها' }); this.flash('أُوقفت الردود التلقائية'); },
+      dirty: dirty,
+      save: () => { if (c.unk === 'custom' && !c.unkMsg.trim()) { set({ unkErr: true }); return; } set({ saved: clone(c), unkErr: false }); this.flash('حُفظت الإعدادات، ويعمل بها هُدهُد الآن'); },
+      discard: () => { set({ cfg: clone(s.saved), unkErr: false }); this.flash('أُعيدت الإعدادات المحفوظة'); },
+      modes: radio(MODES, 'mode'), langs: radio(LANGS, 'lang'), unknowns: radio(UNK, 'unk'),
+      tones: TONES.map((t) => ({ label: t[1], cls: 'chip' + (c.tone === t[0] ? ' on' : ''), aria: c.tone === t[0] ? 'true' : 'false', pick: () => this.upd({ tone: t[0] }) })),
+      toneHint: tone ? tone[2] : '',
+      name: c.name, setName: (e) => this.upd({ name: e.target.value }), namePreview: c.name.trim() || 'هُدهُد',
+      emojiCls: 'sw' + (c.emoji ? ' on' : ''), emojiAria: c.emoji ? 'true' : 'false', toggleEmoji: () => this.upd({ emoji: !c.emoji }),
+      perms: PERMS.map((p) => ({ title: p[1], desc: p[2], swCls: 'sw' + (c.perms[p[0]] ? ' on' : ''), aria: c.perms[p[0]] ? 'true' : 'false', warn: !c.perms[p[0]] && !!p[3], warnText: p[3], toggle: () => this.upd({ perms: Object.assign({}, c.perms, { [p[0]]: !c.perms[p[0]] }) }) })),
+      rules: RULES.map((r) => ({ label: r[1], hint: r[2], hasHint: !!r[2], hid: 'rh-' + r[0], nid: 'rn-' + r[0], locked: !!r[3], on: !!c.rules[r[0]], cls: 'check' + (c.rules[r[0]] ? ' on' : ''),
+        toggle: () => { if (!r[3]) this.upd({ rules: Object.assign({}, c.rules, { [r[0]]: !c.rules[r[0]] }) }); },
+        hasNum: !!r[4], num: r[4] ? c[r[4]] : '', unit: r[5] || '', numLabel: r[1] + ' (' + (r[5] || '') + ')', setNum: (e) => this.upd({ [r[4]]: e.target.value.replace(/[^\d]/g, '') }) })),
+      notify: NOTIFY.map((n) => ({ label: n[1], locked: !!n[2], on: !!c.notify[n[0]], cls: 'check' + (c.notify[n[0]] ? ' on' : ''), toggle: () => { if (!n[2]) this.upd({ notify: Object.assign({}, c.notify, { [n[0]]: !c.notify[n[0]] }) }); } })),
+      unkCustom: c.unk === 'custom', unkMsg: c.unkMsg, setUnkMsg: (e) => this.upd({ unkMsg: e.target.value }), unkErr: unkErr, unkCls: 'input' + (unkErr ? ' bad' : ''),
+      chat: s.chat.slice().reverse().map((m) => ({ cls: m.k === 'in' ? 'msg in' : m.k === 'ai' ? 'msg ai' : 'sysn', ai: m.k === 'ai', who: c.name.trim() || 'هُدهُد', text: m.text })),
+      presets: PRESETS.map((p) => ({ text: p, send: () => this.send(p) })),
+      draft: s.draft, setDraft: (e) => set({ draft: e.target.value }), sendDraft: () => this.send(s.draft),
+      resetChat: () => set({ chat: START.slice() }),
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

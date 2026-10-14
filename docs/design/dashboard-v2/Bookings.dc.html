@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هُدهُد: الحجوزات</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="hodhod.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Tajawal:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="hd" style="font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif; color: #121A2E; background: #F7F8F4">
+<dc-import name="Sidebar" active="bookings" hint-size="0px,0px"></dc-import>
+
+<div class="content">
+<div class="rv" role="region" aria-label="أدوات المعاينة (ليست جزءاً من المنتج)">
+<b>معاينة</b><span>حالة الصفحة:</span>
+<div class="seg" role="group" aria-label="حالة الصفحة">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="4"><button type="button" class="{{v.cls}}" aria-pressed="{{v.aria}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for>
+</div>
+</div>
+
+<main class="page" id="main">
+<div class="page-head">
+<div class="t"><h1>الحجوزات</h1><p>مواعيد اليوم والأسبوع، وأوقات العمل التي يحجز فيها هُدهُد.</p></div>
+<button type="button" class="btn btn-primary" onClick="{{newBooking}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>حجز جديد</button>
+</div>
+
+<div class="tabs" role="tablist" aria-label="أقسام الحجوزات">
+<button type="button" role="tab" class="{{tabCalCls}}" aria-selected="{{tabCalAria}}" onClick="{{toCal}}">التقويم</button>
+<button type="button" role="tab" class="{{tabSetCls}}" aria-selected="{{tabSetAria}}" onClick="{{toSet}}">أوقات العمل والتوفّر</button>
+</div>
+
+<!-- ================= CALENDAR ================= -->
+<sc-if value="{{isCal}}" hint-placeholder-val="{{true}}">
+<div class="toolbar" style="justify-content: space-between">
+<div class="row" style="gap: 6px; flex-wrap: wrap">
+<button type="button" class="ib bd" onClick="{{prevDay}}" aria-label="اليوم السابق" disabled="{{atStart}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+<button type="button" class="ib bd" onClick="{{nextDay}}" aria-label="اليوم التالي" disabled="{{atEnd}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+<button type="button" class="btn btn-secondary btn-sm" onClick="{{goToday}}">اليوم</button>
+<h2 style="font-size: 18px; margin-inline-start: 6px" aria-live="polite">{{dateTitle}}</h2>
+</div>
+<div class="row" style="gap: 8px; flex-wrap: wrap">
+<div class="seg" role="group" aria-label="طريقة العرض"><sc-for list="{{modes}}" as="m" hint-placeholder-count="3"><button type="button" class="{{m.cls}}" aria-pressed="{{m.aria}}" onClick="{{m.pick}}">{{m.label}}</button></sc-for></div>
+<label class="sr-only" for="stf">الموظفة</label>
+<select id="stf" class="input" style="width: auto; min-width: 140px" value="{{staffFilter}}" onChange="{{setStaffFilter}}"><option value="all">كل الموظفات</option><option value="sara">سارة</option><option value="lian">ليان</option></select>
+</div>
+</div>
+
+<div class="row" style="gap: 14px; flex-wrap: wrap; font-size: 13px" aria-label="مفتاح الألوان">
+<span class="row" style="gap: 6px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #E6F5EC; border: 1px solid #A9DABF"></span>مؤكد</span>
+<span class="row" style="gap: 6px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #FFF4E2; border: 1px dashed #F3C886"></span>بانتظار التأكيد</span>
+<span class="row" style="gap: 6px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #EEF0F3; border: 1px solid #DADEE6"></span>مكتمل</span>
+<span class="row" style="gap: 6px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #fff; border: 1px solid #F8B4AD"></span>ملغي</span>
+<span class="row" style="gap: 6px"><span style="width: 14px; height: 14px; border-radius: 4px; background: repeating-linear-gradient(135deg,#F1F3EE 0 3px,#E0E4DC 3px 6px)"></span>استراحة أو مغلق</span>
+</div>
+
+<sc-if value="{{isLoading}}" hint-placeholder-val="{{false}}"><div class="sk" style="height: 520px; border-radius: 16px" aria-busy="true" aria-label="جاري التحميل"></div></sc-if>
+<sc-if value="{{isError}}" hint-placeholder-val="{{false}}">
+<div class="card empty" role="alert"><span class="ic danger" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg></span><h2>تعذّر تحميل التقويم</h2><p class="muted">الحجوزات محفوظة، ولا يزال هُدهُد يستقبل حجوزات العملاء.</p><button type="button" class="btn btn-primary" onClick="{{retry}}">أعد المحاولة</button></div>
+</sc-if>
+<sc-if value="{{isEmpty}}" hint-placeholder-val="{{false}}">
+<div class="card empty"><span class="ic accent" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v15H4zM4 10h16M9 3v4M15 3v4"></path></svg></span><h2>لا توجد حجوزات بعد</h2><p class="muted">حدّد أوقات عملك وخدماتك، ليبدأ هُدهُد بعرض المواعيد المتاحة وحجزها للعملاء.</p><div class="row" style="flex-wrap: wrap; justify-content: center"><button type="button" class="btn btn-primary btn-sm" onClick="{{toSet}}">إعداد أوقات العمل</button><button type="button" class="btn btn-secondary btn-sm" onClick="{{newBooking}}">أضف حجز</button></div></div>
+</sc-if>
+
+<sc-if value="{{showCal}}" hint-placeholder-val="{{true}}">
+<!-- day grid (desktop/tablet) -->
+<sc-if value="{{isDay}}" hint-placeholder-val="{{true}}">
+<sc-if value="{{dayClosed}}" hint-placeholder-val="{{false}}"><div class="card empty"><b>المركز مغلق في هذا اليوم</b><p class="muted" style="font-size: 14px">الجمعة يوم عطلة حسب أوقات العمل، ولا يعرض هُدهُد مواعيد فيه.</p></div></sc-if>
+<sc-if value="{{dayOpen}}" hint-placeholder-val="{{true}}">
+<div class="card hide-m" style="overflow: hidden">
+<div class="cal-wrap">
+<div class="cal" style="grid-template-columns: {{gridCols}}">
+<div class="cal-hd" style="background: #FAFBF8"></div>
+<sc-for list="{{cols}}" as="c" hint-placeholder-count="2"><div class="cal-hd" style="border-inline-start: 1px solid #E6E9F0"><span class="{{c.av}}" style="width: 26px; height: 26px; font-size: 12px" aria-hidden="true">{{c.initial}}</span>{{c.name}}<span class="subtle" style="font-weight: 500">{{c.role}}</span></div></sc-for>
+<div class="cal-times" style="height: 720px">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="10"><span class="cal-t num" style="top: {{h.top}}px">{{h.label}}</span></sc-for>
+</div>
+<sc-for list="{{cols}}" as="c" hint-placeholder-count="2">
+<div class="cal-col" style="height: 720px">
+<sc-for list="{{c.blocks}}" as="k" hint-placeholder-count="1"><div class="blk" style="top: {{k.top}}px; height: {{k.h}}px">{{k.label}}</div></sc-for>
+<sc-if value="{{showNow}}" hint-placeholder-val="{{false}}"><div class="now" style="top: {{nowTop}}px" aria-hidden="true"></div></sc-if>
+<sc-for list="{{c.events}}" as="ev" hint-placeholder-count="3">
+<button type="button" class="{{ev.cls}}" style="top: {{ev.top}}px; height: {{ev.h}}px" onClick="{{ev.open}}" aria-label="{{ev.aria}}"><b class="trunc">{{ev.name}}</b><span class="num trunc">{{ev.timeShort}}</span><sc-if value="{{ev.tall}}" hint-placeholder-val="{{true}}"><span class="trunc">{{ev.service}}</span></sc-if></button>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+<!-- day agenda (phones) -->
+<ul class="only-m col" style="gap: 10px">
+<sc-for list="{{agenda}}" as="ev" hint-placeholder-count="5">
+<li><button type="button" class="{{ev.wcls}}" onClick="{{ev.open}}" style="padding: 12px 14px; display: flex; gap: 12px; align-items: center; min-height: 64px"><span style="width: 62px; flex: none"><b class="num" style="display: block; font-size: 15px">{{ev.start}}</b><span class="num" style="font-size: 12px">{{ev.durText}}</span></span><span class="grow"><b style="display: block">{{ev.name}}</b><span>{{ev.service}} · {{ev.staff}}</span></span><span class="{{ev.stCls}}">{{ev.st}}</span></button></li>
+</sc-for>
+<sc-if value="{{agendaEmpty}}" hint-placeholder-val="{{false}}"><li class="card empty" style="padding: 24px"><b>لا توجد مواعيد في هذا اليوم</b></li></sc-if>
+</ul>
+</sc-if>
+</sc-if>
+
+<!-- week -->
+<sc-if value="{{isWeek}}" hint-placeholder-val="{{false}}">
+<div class="week">
+<sc-for list="{{week}}" as="w" hint-placeholder-count="7">
+<section class="{{w.cls}}" aria-label="{{w.label}}">
+<div class="wday-h"><b>{{w.name}}</b><span class="subtle num">{{w.date}}</span></div>
+<div class="col" style="padding: 8px; gap: 6px">
+<sc-for list="{{w.events}}" as="ev" hint-placeholder-count="2"><button type="button" class="{{ev.wcls}}" onClick="{{ev.open}}"><b class="num">{{ev.start}}</b> {{ev.name}}<span style="display: block; font-size: 11.5px">{{ev.service}} · {{ev.staff}}</span></button></sc-for>
+<sc-if value="{{w.closed}}" hint-placeholder-val="{{false}}"><span class="subtle" style="text-align: center; padding: 16px 0">مغلق</span></sc-if>
+<sc-if value="{{w.free}}" hint-placeholder-val="{{false}}"><span class="subtle" style="text-align: center; padding: 16px 0">لا توجد حجوزات</span></sc-if>
+</div>
+</section>
+</sc-for>
+</div>
+</sc-if>
+
+<!-- list -->
+<sc-if value="{{isList}}" hint-placeholder-val="{{false}}">
+<div class="col" style="gap: 16px">
+<sc-for list="{{upcoming}}" as="g" hint-placeholder-count="2">
+<section class="card" aria-label="{{g.label}}">
+<div class="card-head"><h2>{{g.label}}</h2><span class="subtle">{{g.count}} مواعيد</span></div>
+<ul>
+<sc-for list="{{g.events}}" as="ev" hint-placeholder-count="3">
+<li style="border-top: 1px solid #E6E9F0"><button type="button" onClick="{{ev.open}}" style="width: 100%; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 12px 20px; background: none; border: 0; text-align: start; cursor: pointer; font-family: inherit">
+<span style="width: 92px; flex: none"><b class="num">{{ev.start}}</b><span class="subtle num" style="display: block">{{ev.durText}}</span></span>
+<span class="grow" style="flex: 1 1 200px"><b style="display: block">{{ev.name}}</b><span class="subtle">{{ev.service}} · {{ev.staff}} · <span class="ltr num">{{ev.phone}}</span></span></span>
+<span class="{{ev.stCls}}">{{ev.st}}</span>
+</button></li>
+</sc-for>
+</ul>
+</section>
+</sc-for>
+</div>
+</sc-if>
+</sc-if>
+</sc-if>
+
+<!-- ================= AVAILABILITY SETTINGS ================= -->
+<sc-if value="{{isSet}}" hint-placeholder-val="{{false}}">
+<sc-if value="{{dirty}}" hint-placeholder-val="{{false}}">
+<div class="alert warning" role="status" style="align-items: center; flex-wrap: wrap; position: sticky; top: 8px; z-index: 5"><span class="grow" style="flex: 1 1 200px"><b>لديك تغييرات غير محفوظة.</b> سيستخدم هُدهُد الأوقات الجديدة بعد الحفظ.</span><button type="button" class="btn btn-ghost btn-sm" onClick="{{discard}}">تجاهل</button><button type="button" class="btn btn-primary btn-sm" onClick="{{save}}">احفظ التغييرات</button></div>
+</sc-if>
+
+<div class="split">
+<div class="col" style="gap: 20px">
+<section class="card" aria-labelledby="wh-h">
+<div class="card-head"><h2 id="wh-h">أوقات العمل والاستراحة</h2><span class="subtle">تظهر الأوقات نفسها في معلومات نشاطك</span></div>
+<ul>
+<sc-for list="{{hoursRows}}" as="r" hint-placeholder-count="7">
+<li style="display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; padding: 12px 20px; border-top: 1px solid #E6E9F0">
+<div class="row" style="flex: 0 0 140px; gap: 12px"><button type="button" class="{{r.swCls}}" role="switch" aria-checked="{{r.aria}}" aria-label="{{r.swLabel}}" onClick="{{r.toggle}}"></button><b>{{r.name}}</b></div>
+<sc-if value="{{r.on}}" hint-placeholder-val="{{true}}">
+<div class="row" style="flex: 1 1 380px; flex-wrap: wrap; gap: 8px">
+<span class="row t-row" style="gap: 6px"><input class="input t-in" type="time" value="{{r.open}}" onChange="{{r.setOpen}}" aria-label="{{r.openLabel}}"><span class="muted">–</span><input class="{{r.closeCls}} t-in" type="time" value="{{r.close}}" onChange="{{r.setClose}}" aria-label="{{r.closeLabel}}"></span>
+<span class="row subtle t-row" style="gap: 6px"><span style="width: 52px; flex: none">استراحة</span><input class="input t-in" type="time" value="{{r.bs}}" onChange="{{r.setBs}}" aria-label="{{r.bsLabel}}"><span>–</span><input class="input t-in" type="time" value="{{r.be}}" onChange="{{r.setBe}}" aria-label="{{r.beLabel}}"></span>
+<sc-if value="{{r.err}}" hint-placeholder-val="{{false}}"><span class="err" style="flex-basis: 100%">يجب أن يكون وقت الإغلاق بعد وقت الفتح</span></sc-if>
+</div>
+</sc-if>
+<sc-if value="{{r.off}}" hint-placeholder-val="{{false}}"><span class="muted">مغلق</span></sc-if>
+</li>
+</sc-for>
+</ul>
+</section>
+
+<section class="card" aria-labelledby="sv-h">
+<div class="card-head"><h2 id="sv-h">مدة الخدمات</h2><a href="Catalog.dc.html">الأسعار والتفاصيل</a></div>
+<div class="tbl-wrap">
+<table class="tbl">
+<thead><tr><th scope="col">الخدمة</th><th scope="col">المدة</th><th scope="col">وقت التجهيز بعدها</th><th scope="col">من يقدّمها</th></tr></thead>
+<tbody>
+<sc-for list="{{svcRows}}" as="v" hint-placeholder-count="6">
+<tr style="cursor: default"><td style="font-weight: 600">{{v.name}}</td>
+<td><label class="sr-only" for="{{v.durId}}">{{v.durLabel}}</label><select id="{{v.durId}}" class="input" value="{{v.dur}}" onChange="{{v.setDur}}" style="width: 120px"><option value="30">30 د</option><option value="45">45 د</option><option value="60">ساعة</option><option value="90">ساعة ونصف</option><option value="120">ساعتان</option><option value="150">ساعتان ونصف</option><option value="240">4 ساعات</option></select></td>
+<td><label class="sr-only" for="{{v.bufId}}">{{v.bufLabel}}</label><select id="{{v.bufId}}" class="input" value="{{v.buf}}" onChange="{{v.setBuf}}" style="width: 110px"><option value="0">بدون</option><option value="10">10 د</option><option value="15">15 د</option><option value="30">30 د</option></select></td>
+<td class="muted">{{v.staff}}</td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+
+<div class="col" style="gap: 20px">
+<section class="card" aria-labelledby="hol-h">
+<div class="card-head"><h2 id="hol-h">العطل والأيام المغلقة</h2></div>
+<div class="card-body col" style="gap: 10px">
+<ul class="col" style="gap: 8px">
+<sc-for list="{{holidays}}" as="x" hint-placeholder-count="2"><li class="row" style="gap: 10px; background: #FAFBF8; border: 1px solid #E6E9F0; border-radius: 12px; padding: 8px 10px"><div class="grow"><b style="display: block; font-size: 14px">{{x.date}}</b><span class="subtle">{{x.note}}</span></div><button type="button" class="ib sm danger" onClick="{{x.remove}}" aria-label="{{x.removeLabel}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></li></sc-for>
+</ul>
+<div class="field"><label for="h-d">التاريخ</label><input id="h-d" class="{{hDateCls}}" type="date" value="{{hDate}}" onChange="{{setHDate}}"></div>
+<div class="field"><label for="h-n">السبب <span class="opt">(اختياري)</span></label><input id="h-n" class="input" value="{{hNote}}" onChange="{{setHNote}}" placeholder="عيد، مناسبة…"></div>
+<sc-if value="{{hErr}}" hint-placeholder-val="{{false}}"><span class="err">{{hErr}}</span></sc-if>
+<button type="button" class="btn btn-soft" onClick="{{addHoliday}}">إضافة يوم مغلق</button>
+</div>
+</section>
+<section class="card" aria-labelledby="off-h">
+<div class="card-head"><h2 id="off-h">غياب الموظفات</h2></div>
+<ul>
+<sc-for list="{{leaves}}" as="x" hint-placeholder-count="1"><li class="row" style="gap: 10px; padding: 12px 20px; border-top: 1px solid #E6E9F0"><span class="{{x.av}}" aria-hidden="true">{{x.initial}}</span><div class="grow"><b style="display: block; font-size: 14px">{{x.name}}</b><span class="subtle">{{x.when}}</span></div><span class="bdg neutral">غير متاحة للحجز</span></li></sc-for>
+</ul>
+<div class="card-foot"><button type="button" class="btn btn-secondary btn-sm" onClick="{{addLeave}}">إضافة غياب</button></div>
+</section>
+<section class="card card-pad col" style="gap: 12px" aria-labelledby="rl-h">
+<h2 id="rl-h">قواعد الحجز</h2>
+<div class="field"><label for="r-lead">أقل مدة قبل الموعد</label><select id="r-lead" class="input" value="{{lead}}" onChange="{{setLead}}"><option value="0">بدون</option><option value="60">ساعة</option><option value="120">ساعتان</option><option value="1440">يوم</option></select></div>
+<div class="field"><label for="r-far">أبعد موعد يمكن للعميل حجزه</label><select id="r-far" class="input" value="{{far}}" onChange="{{setFar}}"><option value="7">أسبوع</option><option value="30">شهر</option><option value="90">3 شهور</option></select></div>
+<div class="field"><span class="lbl">تأكيد الحجوزات</span>
+<label class="{{autoCls}}"><input type="radio" name="cf" checked="{{autoConfirm}}" onChange="{{setAuto}}"><span><b>يؤكّد هُدهُد الحجز تلقائياً</b><span class="subtle">إذا كان الموعد متاحاً، يُحجز فوراً</span></span></label>
+<label class="{{manCls}}" style="margin-top: 8px"><input type="radio" name="cf" checked="{{manualConfirm}}" onChange="{{setManual}}"><span><b>أريد الموافقة على كل حجز</b><span class="subtle">يبقى الحجز «بانتظار التأكيد» حتى توافق عليه</span></span></label>
+</div>
+</section>
+</div>
+</div>
+</sc-if>
+</main>
+</div>
+
+<!-- ================= BOOKING DRAWER ================= -->
+<sc-if value="{{drawerOpen}}" hint-placeholder-val="{{false}}">
+<div class="scrim" onClick="{{close}}"></div>
+<aside class="drawer-r" role="dialog" aria-modal="true" aria-labelledby="bd-h">
+<div class="drawer-head">
+<div class="grow"><h2 id="bd-h" style="font-size: 19px">{{dTitle}}</h2><span class="subtle">{{dSub}}</span></div>
+<button type="button" class="ib" onClick="{{close}}" aria-label="إغلاق"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<div class="drawer-body">
+
+<!-- view -->
+<sc-if value="{{mView}}" hint-placeholder-val="{{true}}">
+<div class="row" style="gap: 8px; flex-wrap: wrap"><span class="{{b.stCls}}">{{b.st}}</span><span class="bdg outline">{{b.src}}</span></div>
+<section class="card card-pad" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+<span class="{{b.av}}" aria-hidden="true">{{b.initial}}</span>
+<div class="grow"><b style="display: block">{{b.name}}</b><a class="ltr num tap" href="{{b.tel}}" style="font-size: 14px">{{b.phone}}</a></div>
+<a class="btn btn-secondary btn-sm" href="{{b.wa}}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: #25D366"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3M12 21.8a9.9 9.9 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4a9.9 9.9 0 1 1 8.4 4.6m8.4-18.3A11.8 11.8 0 0 0 12 0C5.5 0 .2 5.3.2 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.7a11.9 11.9 0 0 0 5.7 1.5c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.5-8.4z"></path></svg>تواصل عبر واتساب</a>
+</section>
+<dl class="card card-pad kv"><dt>الخدمة</dt><dd>{{b.service}}</dd><dt>الموعد</dt><dd>{{b.when}}</dd><dt>المدة</dt><dd>{{b.durText}}</dd><dt>الموظفة</dt><dd>{{b.staff}}</dd><dt>السعر</dt><dd class="num">{{b.price}}</dd></dl>
+<sc-if value="{{b.isPending}}" hint-placeholder-val="{{false}}"><div class="alert warning"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4M12 16h.01M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"></path></svg><div>حجز هُدهُد الموعد مبدئياً وينتظر موافقتك. عند تأكيده، سنرسل إلى العميلة رسالة تأكيد.</div></div></sc-if>
+</sc-if>
+
+<!-- reschedule / new -->
+<sc-if value="{{mPick}}" hint-placeholder-val="{{false}}">
+<sc-if value="{{isNewMode}}" hint-placeholder-val="{{false}}">
+<div class="field"><label for="n-name">اسم العميل <span class="req" aria-hidden="true">*</span></label><input id="n-name" class="{{nNameCls}}" value="{{nName}}" onChange="{{setNName}}"><sc-if value="{{nNameErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب الاسم</span></sc-if></div>
+<div class="field"><label for="n-phone">رقم واتساب <span class="req" aria-hidden="true">*</span></label><input id="n-phone" class="{{nPhoneCls}}" type="tel" inputmode="tel" value="{{nPhone}}" onChange="{{setNPhone}}" placeholder="+970 59 123 4567"><sc-if value="{{nPhoneErr}}" hint-placeholder-val="{{false}}"><span class="err">الرقم غير صحيح</span></sc-if></div>
+<div class="field"><label for="n-svc">الخدمة</label><select id="n-svc" class="input" value="{{nSvc}}" onChange="{{setNSvc}}"><sc-for list="{{svcOptions}}" as="o" hint-placeholder-count="6"><option value="{{o.id}}">{{o.label}}</option></sc-for></select></div>
+</sc-if>
+<sc-if value="{{isResched}}" hint-placeholder-val="{{false}}"><div class="alert info"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v15H4zM4 10h16M9 3v4M15 3v4"></path></svg><div>الموعد الحالي: <b>{{b.when}}</b>. اختر وقتاً جديداً. الأوقات المحجوزة غير متاحة لتجنّب حجزين في الوقت نفسه.</div></div></sc-if>
+<div class="field"><span class="lbl">اليوم</span>
+<div class="row" style="gap: 6px; flex-wrap: wrap" role="radiogroup" aria-label="اختر اليوم"><sc-for list="{{pickDays}}" as="pd" hint-placeholder-count="6"><button type="button" class="{{pd.cls}}" role="radio" aria-checked="{{pd.aria}}" onClick="{{pd.pick}}" disabled="{{pd.disabled}}">{{pd.label}}</button></sc-for></div>
+</div>
+<div class="field"><span class="lbl">الوقت مع {{pickStaff}} ({{pickDur}})</span>
+<div class="slots" role="radiogroup" aria-label="الأوقات"><sc-for list="{{slots}}" as="sl" hint-placeholder-count="12"><button type="button" class="{{sl.cls}}" role="radio" aria-checked="{{sl.aria}}" onClick="{{sl.pick}}" disabled="{{sl.disabled}}" title="{{sl.why}}" aria-label="{{sl.aria2}}"><span class="num">{{sl.label}}</span></button></sc-for></div>
+<sc-if value="{{noSlots}}" hint-placeholder-val="{{false}}"><span class="hint">لا توجد أوقات متاحة لهذه الخدمة في هذا اليوم. جرّب يوماً آخر.</span></sc-if>
+</div>
+<sc-if value="{{hasPick}}" hint-placeholder-val="{{false}}"><div class="alert success"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><div>{{pickSummary}}</div></div></sc-if>
+<sc-if value="{{pickErr}}" hint-placeholder-val="{{false}}"><span class="err">اختر وقتاً أولاً</span></sc-if>
+</sc-if>
+</div>
+
+<div class="drawer-foot">
+<sc-if value="{{mView}}" hint-placeholder-val="{{true}}">
+<sc-if value="{{b.isPending}}" hint-placeholder-val="{{false}}"><button type="button" class="btn btn-primary" onClick="{{confirmB}}" style="flex: 1 1 auto">أكّد الحجز</button></sc-if>
+<sc-if value="{{b.canComplete}}" hint-placeholder-val="{{false}}"><button type="button" class="btn btn-primary" onClick="{{completeB}}" style="flex: 1 1 auto">تم الموعد</button></sc-if>
+<sc-if value="{{b.active}}" hint-placeholder-val="{{true}}"><button type="button" class="btn btn-secondary" onClick="{{startResched}}">تغيير الموعد</button><button type="button" class="btn btn-danger-soft" onClick="{{askCancel}}">إلغاء</button></sc-if>
+<sc-if value="{{b.inactive}}" hint-placeholder-val="{{false}}"><button type="button" class="btn btn-secondary" onClick="{{close}}" style="flex: 1 1 auto">إغلاق</button></sc-if>
+</sc-if>
+<sc-if value="{{mPick}}" hint-placeholder-val="{{false}}">
+<button type="button" class="btn btn-primary" onClick="{{commitPick}}" style="flex: 1 1 auto">{{commitLabel}}</button>
+<button type="button" class="btn btn-secondary" onClick="{{backFromPick}}">إلغاء</button>
+</sc-if>
+</div>
+</aside>
+</sc-if>
+
+<sc-if value="{{cancelOpen}}" hint-placeholder-val="{{false}}">
+<div class="backdrop" onClick="{{closeCancel}}">
+<div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="bc-h" onClick="{{stop}}">
+<div class="dialog-body"><h2 id="bc-h">هل تريد إلغاء حجز {{b.name}}؟</h2><p class="muted">{{b.when}} · {{b.service}}. سنرسل لها رسالة بإلغاء الموعد، ويصبح الوقت متاحاً ليحجزه هُدهُد.</p></div>
+<div class="dialog-foot"><button type="button" class="btn btn-secondary" onClick="{{closeCancel}}">لا، تراجع</button><button type="button" class="btn btn-danger" onClick="{{doCancel}}">ألغِ الحجز</button></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+<div class="toast ok" role="status" aria-live="polite"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>{{toast}}</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startMode":{"editor":"enum","options":["day","week","list"],"default":"day"},"startTab":{"editor":"enum","options":["cal","set"],"default":"cal"},"$preview":{"width":1440,"height":1000}}'>
+const STAFF = { sara: { name: 'سارة', role: 'شعر', av: 1 }, lian: { name: 'ليان', role: 'أظافر وبشرة', av: 4 } };
+const SVC = {
+  cut: { name: 'قص وسشوار', dur: 45, price: 70, staff: 'sara' }, color: { name: 'صبغة شعر', dur: 120, price: 180, staff: 'sara' },
+  ker: { name: 'كيراتين', dur: 150, price: 350, staff: 'sara' }, mani: { name: 'مناكير', dur: 45, price: 60, staff: 'lian' },
+  pedi: { name: 'باديكير', dur: 60, price: 80, staff: 'lian' }, facial: { name: 'تنظيف بشرة', dur: 60, price: 150, staff: 'lian' }
+};
+const WEEK = [
+  { name: 'السبت', date: '10 تشرين الأول' }, { name: 'الأحد', date: '11 تشرين الأول' }, { name: 'الاثنين', date: '12 تشرين الأول' },
+  { name: 'الثلاثاء', date: '13 تشرين الأول' }, { name: 'الأربعاء', date: '14 تشرين الأول' }, { name: 'الخميس', date: '15 تشرين الأول' }, { name: 'الجمعة', date: '16 تشرين الأول' }
+];
+const TODAY = 4; const NOW = 11 * 60 + 10; const OPEN0 = 9 * 60; const SCALE = 1.2;
+const hm = (m) => { const h = Math.floor(m / 60), mm = m % 60; return (h % 12 || 12) + ':' + String(mm).padStart(2, '0') + (h < 12 ? ' ص' : ' م'); };
+const toMin = (t) => { const p = String(t || '0:0').split(':'); return (+p[0] || 0) * 60 + (+p[1] || 0); };
+const toHM = (m) => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+const durText = (d) => d === 45 ? '45 د' : d === 60 ? 'ساعة' : d === 90 ? 'ساعة ونصف' : d === 120 ? 'ساعتان' : d === 150 ? 'ساعتان ونصف' : d === 240 ? '4 ساعات' : d + ' د';
+const ST = { confirmed: ['مؤكد', 'bdg success'], pending: ['بانتظار التأكيد', 'bdg warning'], done: ['مكتمل', 'bdg neutral'], cancelled: ['ملغي', 'bdg danger'] };
+const B = (id, day, start, svc, name, phone, st, src) => ({ id, day, start: toMin(start), svc, staff: SVC[svc].staff, name, phone, st, src: src || 'ai' });
+const SEED = [
+  B('b1', 4, '09:30', 'color', 'هبة زيدان', '+970 59 811 2093', 'done'), B('b2', 4, '10:00', 'facial', 'ريم عوض', '+970 56 330 7712', 'done', 'owner'),
+  B('b3', 4, '11:30', 'mani', 'لينا سمارة', '+970 59 702 4418', 'confirmed'), B('b4', 4, '12:00', 'cut', 'جنى خليفة', '+970 59 450 3307', 'confirmed'),
+  B('b5', 4, '14:00', 'ker', 'ميرا داود', '+970 59 621 9054', 'pending'), B('b6', 4, '15:00', 'pedi', 'سلمى حجازي', '+970 56 218 6640', 'confirmed'),
+  B('b9', 4, '16:30', 'mani', 'نورا شاهين', '+970 59 384 1176', 'confirmed'), B('b7', 4, '17:00', 'cut', 'رؤى الأحمد', '+970 59 905 2281', 'cancelled'),
+  B('b10', 4, '17:45', 'cut', 'تيما عيسى', '+970 59 160 7735', 'confirmed', 'owner'), B('b8', 4, '18:00', 'facial', 'شهد يوسف', '+970 59 247 8819', 'confirmed'),
+  B('b11', 5, '10:00', 'cut', 'ياسمين قرعان', '+970 59 530 6621', 'confirmed'), B('b12', 5, '12:00', 'ker', 'رهف الشيخ', '+970 59 877 0045', 'pending'),
+  B('b13', 5, '16:00', 'mani', 'دانا حمدان', '+970 59 318 7420', 'confirmed'),
+  B('b14', 3, '11:00', 'color', 'رنا مسعد', '+970 59 640 2219', 'done'), B('b15', 3, '15:00', 'pedi', 'ليلى ناصر', '+970 56 771 0938', 'done'), B('b16', 2, '13:00', 'facial', 'سما عودة', '+970 59 116 5523', 'done'),
+  B('b17', 0, '10:00', 'cut', 'جود الخطيب', '+970 59 821 4470', 'done'), B('b18', 1, '17:00', 'mani', 'هديل سليم', '+970 59 309 6618', 'done')
+];
+const HOURS0 = WEEK.map((w, i) => (i === 6 ? { on: false, open: '09:00', close: '19:00', bs: '13:00', be: '14:00' } : { on: true, open: '09:00', close: '19:00', bs: '13:00', be: '14:00' }));
+const AV = ['av c0', 'av c1', 'av c2', 'av c3', 'av c4', 'av c5', 'av c6', 'av c7'];
+
+class Component extends DCLogic {
+  state = { view: 'normal', tab: undefined, mode: undefined, day: TODAY, staffFilter: 'all', books: SEED.slice(), openId: null, dm: 'view', pickDay: TODAY, pickT: null, pickErr: false, cancelOpen: false, toast: '',
+    hours: HOURS0.map((h) => Object.assign({}, h)), savedHours: null, dirty: false, svcDur: { cut: 45, color: 120, ker: 150, mani: 45, pedi: 60, facial: 60 }, svcBuf: { cut: 0, color: 15, ker: 15, mani: 10, pedi: 10, facial: 15 },
+    holidays: [{ id: 'h1', date: 'الجمعة 30 تشرين الأول', note: 'مناسبة عائلية' }, { id: 'h2', date: 'الخميس 24 كانون الأول', note: 'عيد الميلاد' }], hDate: '', hNote: '', hErr: '',
+    lead: '120', far: '30', autoConfirm: true, nName: '', nPhone: '', nSvc: 'cut', nTouched: false, nextId: 30 };
+  flash(t) { clearTimeout(this._t); this.setState({ toast: t }); this._t = setTimeout(() => this.setState({ toast: '' }), 3200); }
+  mark(p) { this.setState(Object.assign({ dirty: true }, p)); }
+  busy(day, staff, from, to, exceptId) {
+    const h = this.state.hours[day];
+    if (!h.on) return 'مغلق';
+    if (from < toMin(h.open) || to > toMin(h.close)) return 'خارج أوقات العمل';
+    if (from < toMin(h.be) && to > toMin(h.bs)) return 'استراحة';
+    if (day === TODAY && from <= NOW) return 'انقضى الوقت';
+    if (day < TODAY) return 'انقضى الوقت';
+    const clash = this.state.books.find((b) => b.id !== exceptId && b.day === day && b.staff === staff && b.st !== 'cancelled' && from < b.start + SVC[b.svc].dur && to > b.start);
+    return clash ? 'محجوز' : '';
+  }
+  renderVals() {
+    const s = this.state; const P = this.props || {}; const set = (p) => this.setState(p);
+    const tab = s.tab !== undefined ? s.tab : (P.startTab || 'cal');
+    const mode = s.mode !== undefined ? s.mode : (P.startMode || 'day');
+    const books = s.view === 'empty' ? [] : s.books;
+    const staffIds = s.staffFilter === 'all' ? ['sara', 'lian'] : [s.staffFilter];
+    const ev = (b) => {
+      const sv = SVC[b.svc]; const st = ST[b.st];
+      return {
+        name: b.name, phone: b.phone, service: sv.name, staff: STAFF[b.staff].name, start: hm(b.start), time: hm(b.start) + ' – ' + hm(b.start + sv.dur), durText: durText(sv.dur),
+        top: Math.round((b.start - OPEN0) * SCALE), h: Math.max(30, Math.round(sv.dur * SCALE) - 3),
+        cls: 'evt ' + b.st + (sv.dur < 60 ? ' short' : '') + (b.id === s.openId ? ' sel' : ''), tall: sv.dur >= 60, timeShort: sv.dur < 60 ? hm(b.start) + ' · ' + sv.name : hm(b.start) + ' – ' + hm(b.start + sv.dur), wcls: 'wevt ' + b.st, st: st[0], stCls: st[1],
+        aria: b.name + '، ' + sv.name + '، ' + hm(b.start) + '، ' + st[0],
+        open: () => set({ openId: b.id, dm: 'view', pickT: null, pickErr: false })
+      };
+    };
+    const dayBooks = books.filter((b) => b.day === s.day && staffIds.indexOf(b.staff) >= 0).sort((a, c) => a.start - c.start);
+    const h = s.hours[s.day];
+    const cols = staffIds.map((id) => {
+      const blocks = [];
+      if (h.on) {
+        blocks.push({ top: Math.round((toMin(h.bs) - OPEN0) * SCALE), h: Math.round((toMin(h.be) - toMin(h.bs)) * SCALE), label: 'استراحة' });
+        if (toMin(h.close) < 19 * 60) blocks.push({ top: Math.round((toMin(h.close) - OPEN0) * SCALE), h: Math.round((19 * 60 - toMin(h.close)) * SCALE), label: 'مغلق' });
+      }
+      return { name: STAFF[id].name, role: STAFF[id].role, initial: STAFF[id].name.charAt(0), av: 'av sm c' + STAFF[id].av, blocks: blocks, events: dayBooks.filter((b) => b.staff === id).map(ev) };
+    });
+    const hours = []; for (let m = OPEN0; m <= 19 * 60; m += 60) hours.push({ top: Math.round((m - OPEN0) * SCALE) + (m === OPEN0 ? 8 : 0), label: hm(m) });
+
+    // drawer
+    const ob = s.books.find((x) => x.id === s.openId);
+    const isNew = s.dm === 'new';
+    let bd = {};
+    if (ob) {
+      const sv = SVC[ob.svc];
+      bd = {
+        name: ob.name, phone: ob.phone, initial: ob.name.charAt(0), av: 'av c' + (ob.name.length % 8), tel: 'tel:' + ob.phone.replace(/\s/g, ''), wa: 'https://wa.me/' + ob.phone.replace(/[^\d]/g, ''),
+        service: sv.name, when: WEEK[ob.day].name + ' ' + WEEK[ob.day].date + ' · ' + hm(ob.start) + ' – ' + hm(ob.start + sv.dur), durText: durText(sv.dur), staff: STAFF[ob.staff].name, price: sv.price + ' ₪',
+        st: ST[ob.st][0], stCls: ST[ob.st][1], src: ob.src === 'ai' ? 'حجزه هُدهُد' : 'حجز يدوي',
+        isPending: ob.st === 'pending', canComplete: ob.st === 'confirmed' && (ob.day < TODAY || (ob.day === TODAY && ob.start <= NOW)),
+        active: ob.st === 'pending' || ob.st === 'confirmed', inactive: ob.st === 'done' || ob.st === 'cancelled'
+      };
+    }
+    const pickSvc = isNew ? s.nSvc : (ob ? ob.svc : 'cut');
+    const pickStaff = SVC[pickSvc].staff; const pdur = SVC[pickSvc].dur;
+    const slots = [];
+    const ph = s.hours[s.pickDay];
+    if (ph.on) for (let t = toMin(ph.open); t + pdur <= toMin(ph.close); t += 30) {
+      const why = this.busy(s.pickDay, pickStaff, t, t + pdur, ob && !isNew ? ob.id : null);
+      slots.push({ label: hm(t), disabled: !!why, why: why, aria2: hm(t) + (why ? '، ' + why : '، متاح'), cls: 'slot-btn' + (s.pickT === t ? ' on' : ''), aria: s.pickT === t ? 'true' : 'false', pick: () => set({ pickT: t, pickErr: false }) });
+    }
+    const nNameErr = s.nTouched && !s.nName.trim();
+    const nPhoneErr = s.nTouched && !/^\+?[\d][\d\s\-()]{7,18}$/.test(s.nPhone.trim());
+    const startPick = (dm) => set({ dm: dm, pickDay: ob && dm === 'resched' ? Math.max(ob.day, TODAY) : TODAY, pickT: null, pickErr: false });
+
+    const views = [['normal', 'عادي'], ['empty', 'فارغ'], ['loading', 'تحميل'], ['error', 'خطأ']];
+    return {
+      views: views.map((v) => ({ label: v[1], cls: s.view === v[0] ? 'on' : '', aria: s.view === v[0] ? 'true' : 'false', pick: () => set({ view: v[0] }) })),
+      tabCalCls: 'tab' + (tab === 'cal' ? ' on' : ''), tabSetCls: 'tab' + (tab === 'set' ? ' on' : ''), tabCalAria: tab === 'cal' ? 'true' : 'false', tabSetAria: tab === 'set' ? 'true' : 'false',
+      toCal: () => set({ tab: 'cal' }), toSet: () => set({ tab: 'set' }), isCal: tab === 'cal', isSet: tab === 'set',
+      prevDay: () => set({ day: Math.max(0, s.day - 1) }), nextDay: () => set({ day: Math.min(6, s.day + 1) }), atStart: s.day === 0, atEnd: s.day === 6, goToday: () => set({ day: TODAY }),
+      dateTitle: mode === 'day' ? WEEK[s.day].name + ' ' + WEEK[s.day].date + (s.day === TODAY ? ' · اليوم' : '') : (mode === 'week' ? 'أسبوع 10 – 16 تشرين الأول' : 'المواعيد القادمة'),
+      modes: [['day', 'يوم'], ['week', 'أسبوع'], ['list', 'قائمة']].map((m) => ({ label: m[1], cls: mode === m[0] ? 'on' : '', aria: mode === m[0] ? 'true' : 'false', pick: () => set({ mode: m[0] }) })),
+      staffFilter: s.staffFilter, setStaffFilter: (e) => set({ staffFilter: e.target.value }),
+      isLoading: s.view === 'loading', isError: s.view === 'error', isEmpty: s.view === 'empty', showCal: s.view === 'normal',
+      retry: () => { set({ view: 'loading' }); setTimeout(() => this.setState({ view: 'normal' }), 900); },
+      isDay: mode === 'day', isWeek: mode === 'week', isList: mode === 'list',
+      dayClosed: !h.on, dayOpen: h.on,
+      gridCols: '72px repeat(' + cols.length + ', minmax(0, 1fr))', cols: cols, hours: hours,
+      showNow: s.day === TODAY, nowTop: Math.round((NOW - OPEN0) * SCALE),
+      agenda: dayBooks.map(ev), agendaEmpty: dayBooks.length === 0,
+      week: WEEK.map((w, i) => {
+        const evs = books.filter((b) => b.day === i && staffIds.indexOf(b.staff) >= 0).sort((a, c) => a.start - c.start).map(ev);
+        const closed = !s.hours[i].on;
+        return { name: w.name, date: w.date.split(' ')[0], label: w.name + ' ' + w.date, cls: 'wday' + (i === TODAY ? ' today' : '') + (closed ? ' closed' : ''), events: evs, closed: closed, free: !closed && evs.length === 0 };
+      }),
+      upcoming: [TODAY, TODAY + 1].map((d) => {
+        const evs = books.filter((b) => b.day === d && staffIds.indexOf(b.staff) >= 0 && b.st !== 'cancelled' && (d > TODAY || b.start + SVC[b.svc].dur > NOW)).sort((a, c) => a.start - c.start).map(ev);
+        return { label: (d === TODAY ? 'اليوم · ' : 'غداً · ') + WEEK[d].name + ' ' + WEEK[d].date, count: evs.length, events: evs };
+      }),
+
+      // settings
+      dirty: s.dirty,
+      save: () => { set({ dirty: false }); this.flash('تم حفظ أوقات العمل، ويستخدمها هُدهُد الآن'); },
+      discard: () => { set({ dirty: false, hours: HOURS0.map((x) => Object.assign({}, x)) }); this.flash('أُعيدت الأوقات كما كانت'); },
+      hoursRows: s.hours.map((r, i) => {
+        const upd = (p) => this.mark({ hours: s.hours.map((x, j) => (j === i ? Object.assign({}, x, p) : x)) });
+        const err = r.on && toMin(r.close) <= toMin(r.open);
+        return {
+          name: WEEK[i].name, on: r.on, off: !r.on, swCls: r.on ? 'sw on' : 'sw', aria: r.on ? 'true' : 'false', swLabel: 'العمل يوم ' + WEEK[i].name, toggle: () => upd({ on: !r.on }),
+          open: r.open, close: r.close, bs: r.bs, be: r.be, err: err, closeCls: err ? 'input bad' : 'input',
+          setOpen: (e) => upd({ open: e.target.value }), setClose: (e) => upd({ close: e.target.value }), setBs: (e) => upd({ bs: e.target.value }), setBe: (e) => upd({ be: e.target.value }),
+          openLabel: 'فتح يوم ' + WEEK[i].name, closeLabel: 'إغلاق يوم ' + WEEK[i].name, bsLabel: 'بداية الاستراحة يوم ' + WEEK[i].name, beLabel: 'نهاية الاستراحة يوم ' + WEEK[i].name
+        };
+      }),
+      svcRows: Object.keys(SVC).map((k) => ({
+        name: SVC[k].name, staff: STAFF[SVC[k].staff].name, dur: String(s.svcDur[k]), buf: String(s.svcBuf[k]),
+        durId: 'dur-' + k, bufId: 'buf-' + k, durLabel: 'مدة ' + SVC[k].name, bufLabel: 'وقت التجهيز بعد ' + SVC[k].name,
+        setDur: (e) => this.mark({ svcDur: Object.assign({}, s.svcDur, { [k]: +e.target.value }) }), setBuf: (e) => this.mark({ svcBuf: Object.assign({}, s.svcBuf, { [k]: +e.target.value }) })
+      })),
+      holidays: s.holidays.map((x) => ({ date: x.date, note: x.note || 'مغلق طوال اليوم', removeLabel: 'إزالة ' + x.date, remove: () => this.mark({ holidays: s.holidays.filter((y) => y.id !== x.id) }) })),
+      hDate: s.hDate, setHDate: (e) => set({ hDate: e.target.value, hErr: '' }), hNote: s.hNote, setHNote: (e) => set({ hNote: e.target.value }), hErr: s.hErr, hDateCls: s.hErr ? 'input bad' : 'input',
+      addHoliday: () => { if (!s.hDate) { set({ hErr: 'اختر التاريخ' }); return; } this.mark({ holidays: s.holidays.concat([{ id: 'h' + Date.now(), date: s.hDate, note: s.hNote.trim() }]), hDate: '', hNote: '' }); },
+      leaves: [{ name: 'ليان', initial: 'ل', av: 'av sm c4', when: 'إجازة من 20 إلى 22 تشرين الأول' }],
+      addLeave: () => this.flash('هنا تختار الموظفة والأيام'),
+      lead: s.lead, setLead: (e) => this.mark({ lead: e.target.value }), far: s.far, setFar: (e) => this.mark({ far: e.target.value }),
+      autoConfirm: s.autoConfirm, manualConfirm: !s.autoConfirm, autoCls: 'radio-card' + (s.autoConfirm ? ' on' : ''), manCls: 'radio-card' + (s.autoConfirm ? '' : ' on'),
+      setAuto: () => this.mark({ autoConfirm: true }), setManual: () => this.mark({ autoConfirm: false }),
+
+      // drawer
+      drawerOpen: !!ob || isNew, close: () => set({ openId: null, dm: 'view' }),
+      dTitle: isNew ? 'حجز جديد' : (s.dm === 'resched' ? 'تغيير موعد ' + (ob ? ob.name : '') : (ob ? ob.name : '')),
+      dSub: isNew ? 'تظهر الأوقات المتاحة فقط' : (ob ? bd.service + ' · ' + bd.when : ''),
+      b: bd, mView: s.dm === 'view' && !!ob, mPick: s.dm === 'resched' || isNew, isNewMode: isNew, isResched: s.dm === 'resched',
+      confirmB: () => { this.setState({ books: s.books.map((x) => (x.id === ob.id ? Object.assign({}, x, { st: 'confirmed' }) : x)) }); this.flash('تم تأكيد الحجز وأُرسلت رسالة إلى ' + ob.name.split(' ')[0]); },
+      completeB: () => { this.setState({ books: s.books.map((x) => (x.id === ob.id ? Object.assign({}, x, { st: 'done' }) : x)) }); this.flash('سُجّل الموعد كمكتمل'); },
+      startResched: () => startPick('resched'),
+      newBooking: () => set({ openId: null, dm: 'new', pickDay: TODAY, pickT: null, nName: '', nPhone: '', nSvc: 'cut', nTouched: false, pickErr: false }),
+      backFromPick: () => (isNew ? set({ dm: 'view' }) : set({ dm: 'view', pickT: null })),
+      pickDays: WEEK.map((w, i) => ({ label: (i === TODAY ? 'اليوم' : (i === TODAY + 1 ? 'غداً' : w.name)) + ' ' + w.date.split(' ')[0], disabled: i < TODAY || !s.hours[i].on, cls: 'chip' + (s.pickDay === i ? ' on' : ''), aria: s.pickDay === i ? 'true' : 'false', pick: () => set({ pickDay: i, pickT: null }) })).filter((x, i) => i >= TODAY),
+      pickStaff: STAFF[pickStaff].name, pickDur: durText(pdur), slots: slots, noSlots: slots.every((x) => x.disabled),
+      hasPick: s.pickT !== null, pickErr: s.pickErr,
+      pickSummary: s.pickT !== null ? STAFF[pickStaff].name + ' متاحة يوم ' + WEEK[s.pickDay].name + ' من ' + hm(s.pickT) + ' إلى ' + hm(s.pickT + pdur) + '، ولا يوجد تعارض مع حجوزات أخرى.' : '',
+      commitLabel: isNew ? 'تأكيد الحجز' : 'تأكيد الموعد الجديد',
+      commitPick: () => {
+        if (isNew) {
+          const bad = !s.nName.trim() || !/^\+?[\d][\d\s\-()]{7,18}$/.test(s.nPhone.trim());
+          if (bad || s.pickT === null) { set({ nTouched: true, pickErr: s.pickT === null }); return; }
+          if (this.busy(s.pickDay, pickStaff, s.pickT, s.pickT + pdur, null)) { set({ pickT: null, pickErr: true }); return; }
+          const id = 'n' + s.nextId;
+          set({ books: s.books.concat([{ id: id, day: s.pickDay, start: s.pickT, svc: s.nSvc, staff: pickStaff, name: s.nName.trim(), phone: s.nPhone.trim(), st: 'confirmed', src: 'owner' }]), dm: 'view', openId: id, nextId: s.nextId + 1, day: s.pickDay });
+          this.flash('تم الحجز وأُرسلت رسالة تأكيد إلى العميلة');
+          return;
+        }
+        if (s.pickT === null) { set({ pickErr: true }); return; }
+        if (this.busy(s.pickDay, pickStaff, s.pickT, s.pickT + pdur, ob.id)) { set({ pickT: null, pickErr: true }); return; }
+        set({ books: s.books.map((x) => (x.id === ob.id ? Object.assign({}, x, { day: s.pickDay, start: s.pickT }) : x)), dm: 'view', day: s.pickDay });
+        this.flash('تم تغيير الموعد وأُرسل الموعد الجديد إلى العميلة');
+      },
+      nName: s.nName, setNName: (e) => set({ nName: e.target.value }), nNameErr: nNameErr, nNameCls: nNameErr ? 'input bad' : 'input',
+      nPhone: s.nPhone, setNPhone: (e) => set({ nPhone: e.target.value }), nPhoneErr: nPhoneErr, nPhoneCls: nPhoneErr ? 'input bad' : 'input',
+      nSvc: s.nSvc, setNSvc: (e) => set({ nSvc: e.target.value, pickT: null }),
+      svcOptions: Object.keys(SVC).map((k) => ({ id: k, label: SVC[k].name + ' · ' + durText(SVC[k].dur) + ' · ' + SVC[k].price + ' ₪' })),
+      askCancel: () => set({ cancelOpen: true }), closeCancel: () => set({ cancelOpen: false }), cancelOpen: s.cancelOpen && !!ob,
+      doCancel: () => { set({ cancelOpen: false, books: s.books.map((x) => (x.id === ob.id ? Object.assign({}, x, { st: 'cancelled' }) : x)) }); this.flash('أُلغي الحجز وأُرسل إشعار إلى العميلة'); },
+      stop: (e) => { if (e && e.stopPropagation) e.stopPropagation(); },
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>
