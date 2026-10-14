@@ -19,6 +19,9 @@ const nextConfig = {
     },
   }),
   poweredByHeader: false,
+  distDir: process.env.NEXT_DIST_DIR || '.next',
+  // the dev-only floating badge sits over the drawer footer in RTL and breaks click-through in e2e runs
+  devIndicators: false,
   async rewrites() {
     return {
       // the landing page stays a static file

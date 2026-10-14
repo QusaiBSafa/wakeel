@@ -1,19 +1,14 @@
-import EmptyState from '@/components/ui/EmptyState';
+import { redirect } from 'next/navigation';
+import { loadCatalog } from '@/lib/server/loaders/catalog';
+import { pageSession } from '@/lib/server/session';
+import CatalogClient from './CatalogClient';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'المنتجات والخدمات · هُدهُد' };
 
-// Placeholder: replaced by the real page in a later phase.
-export default function Page() {
-  return (
-    <main className="page" id="main">
-      <div className="page-head">
-        <div className="t">
-          <h1>المنتجات والخدمات</h1>
-          <p>يجيب هُدهُد العملاء عن الأسعار والتوفّر من هذه القائمة، ويسجّل منها الطلبات والحجوزات.</p>
-        </div>
-      </div>
-      <EmptyState icon="info" tone="neutral" title="قيد التجهيز" />
-    </main>
-  );
+export default async function Page({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+  const { business } = await pageSession();
+  if (!business) redirect('/onboarding');
+  const { tab } = await searchParams;
+  return <CatalogClient data={await loadCatalog(business)} initialTab={tab === 'services' ? 'service' : 'product'} />;
 }
