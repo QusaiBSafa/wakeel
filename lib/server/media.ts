@@ -18,22 +18,22 @@ export function mediaPrefix(kind: MediaKind, userId: string) {
  */
 export async function verifyOwnedBlob(kind: MediaKind, userId: string, image: { url: string; pathname: string }) {
   const prefix = mediaPrefix(kind, userId);
-  if (!image.pathname.startsWith(prefix) || image.pathname.includes('..')) throw new HttpError(403, 'الصورة مش إلك');
+  if (!image.pathname.startsWith(prefix) || image.pathname.includes('..')) throw new HttpError(403, 'هذه الصورة لا تخصّك');
   let u: URL;
   try {
     u = new URL(image.url);
   } catch {
-    throw new HttpError(400, 'رابط الصورة مش صحيح');
+    throw new HttpError(400, 'رابط الصورة غير صحيح');
   }
   if (u.protocol !== 'https:' || !/\.blob\.vercel-storage\.com$/.test(u.hostname) || decodeURIComponent(u.pathname) !== '/' + image.pathname) {
-    throw new HttpError(403, 'الصورة مش إلك');
+    throw new HttpError(403, 'هذه الصورة لا تخصّك');
   }
   try {
     const meta = await head(image.url);
-    if (!MEDIA_TYPES.includes(meta.contentType) || meta.size > MEDIA_MAX_BYTES) throw new HttpError(400, 'الصورة مش مدعومة');
+    if (!MEDIA_TYPES.includes(meta.contentType) || meta.size > MEDIA_MAX_BYTES) throw new HttpError(400, 'الصورة غير مدعومة');
   } catch (e) {
     if (e instanceof HttpError) throw e;
-    throw new HttpError(400, 'الصورة ما انرفعت، جرّب كمان مرة');
+    throw new HttpError(400, 'تعذّر رفع الصورة، أعد المحاولة');
   }
 }
 

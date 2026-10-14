@@ -34,6 +34,6 @@ export async function POST(request: Request): Promise<NextResponse> {
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'upload failed';
     const status = msg === 'unauthorized' ? 401 : msg === 'forbidden path' ? 403 : 400;
-    return NextResponse.json({ error: 'ما قدرنا نرفع الصورة' }, { status });
+    return NextResponse.json({ error: 'تعذّر رفع الصورة' }, { status });
   }
 }

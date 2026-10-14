@@ -8,6 +8,27 @@
       "when": 1791926380008,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792003610140,
+      "tag": "0001_v2_add",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792003626289,
+      "tag": "0002_v2_data",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792003652037,
+      "tag": "0003_v2_drop",
+      "breakpoints": true
     }
   ]
 }

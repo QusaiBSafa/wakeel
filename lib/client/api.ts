@@ -17,9 +17,9 @@ export async function api<T = unknown>(method: string, url: string, body?: unkno
       cache: 'no-store',
     });
   } catch {
-    throw new ApiError('صار خلل بالاتصال', 0);
+    throw new ApiError('تعذّر الاتصال، تحقّق من الإنترنت', 0);
   }
   const data = (await res.json().catch(() => ({}))) as { error?: string };
-  if (!res.ok) throw new ApiError(data.error || 'صار خلل، جرّب كمان مرة', res.status);
+  if (!res.ok) throw new ApiError(data.error || 'حدث خطأ، أعد المحاولة', res.status);
   return data as T;
 }

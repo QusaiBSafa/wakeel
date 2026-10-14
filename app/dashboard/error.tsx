@@ -2,18 +2,20 @@
 
 import { useRouter } from 'next/navigation';
 import { startTransition } from 'react';
-import { ErrorState } from '@/components/app/States';
+import ErrorCard from '@/components/ui/ErrorCard';
 
 export default function DashboardError({ reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   return (
-    <ErrorState
-      onRetry={() =>
-        startTransition(() => {
-          router.refresh();
-          reset();
-        })
-      }
-    />
+    <main className="page" id="main">
+      <ErrorCard
+        onRetry={() =>
+          startTransition(() => {
+            router.refresh();
+            reset();
+          })
+        }
+      />
+    </main>
   );
 }
