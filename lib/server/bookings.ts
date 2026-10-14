@@ -89,7 +89,8 @@ async function guarded<T>(fn: () => Promise<T>): Promise<T> {
 
 const fail = (r: SlotReason) => new HttpError(409, MSG[r] ?? `هذا الوقت غير متاح (${r})`);
 
-export async function createBooking(business: BusinessRow, b: { customer: string; phone: string; itemId: string; date: string; startMin: number }) {
+/** `source: 'ai'` (ingest) follows the business's auto-confirm setting; an owner's manual booking is always confirmed. */
+export async function createBooking(business: BusinessRow, b: { customer: string; phone: string; itemId: string; date: string; startMin: number }, source: 'owner' | 'ai' = 'owner') {
   const row = await guarded(() => db().transaction(async (tx) => {
     const c = await context(tx, business, b.itemId, b.date);
     const { member, reason } = pickMember(c, b.startMin);
@@ -117,8 +118,8 @@ export async function createBooking(business: BusinessRow, b: { customer: string
         startsAt,
         endsAt,
         blockedUntil: new Date(endsAt.getTime() + c.item.bufferMin * 60000),
-        status: 'confirmed', // an owner's manual booking is always confirmed
-        source: 'owner',
+        status: source === 'owner' || c.autoConfirm ? 'confirmed' : 'pending',
+        source,
       })
       .returning();
     return r;

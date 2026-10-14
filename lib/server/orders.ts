@@ -46,7 +46,17 @@ export async function orderFull(businessId: string, id: string) {
   return orderDTO(o, items, events);
 }
 
-export async function createOrder(business: BusinessRow, b: OrderBody) {
+/** Fixed, text-free timeline entries the bot may attach to an order it logs. */
+export const AI_EVENTS = {
+  logged: { kind: 'ai', text: 'سجّل هُدهُد الطلب من واتساب' },
+  customer_confirmed: { kind: 'cust', text: 'أكّد العميل الطلب' },
+  awaiting_address: { kind: 'wait', text: 'بانتظار تأكيد العميل للعنوان' },
+} as const;
+export type AiEventKey = keyof typeof AI_EVENTS;
+
+/** `opts` is used by the ingest endpoint (source 'ai', draft flag, fixed timeline entries); owners pass nothing. */
+export async function createOrder(business: BusinessRow, b: OrderBody, opts: { source?: 'owner' | 'ai'; isDraft?: boolean; events?: AiEventKey[] } = {}) {
+  const source = opts.source ?? 'owner';
   const who = await ownerName(business.id);
   const id = await db().transaction(async (tx) => {
     const lines = await priceLines(tx, business.id, b.lines);
@@ -60,7 +70,8 @@ export async function createOrder(business: BusinessRow, b: OrderBody) {
         number: n.next - 1,
         customerName: b.customer,
         customerPhone: b.phone,
-        source: 'owner',
+        source,
+        isDraft: !!opts.isDraft,
         pickup,
         areaId: area?.id ?? null,
         areaName: area?.name ?? '',
@@ -72,7 +83,13 @@ export async function createOrder(business: BusinessRow, b: OrderBody) {
       })
       .returning({ id: t.orders.id });
     await tx.insert(t.orderItems).values(lines.map((l) => ({ ...l, orderId: o.id })));
-    await tx.insert(t.orderEvents).values({ orderId: o.id, kind: 'owner', text: `${who} أضاف الطلب`, actorName: who });
+    if (source === 'ai') {
+      const keys: AiEventKey[] = opts.events?.length ? opts.events : ['logged'];
+      const base = Date.now();
+      await tx.insert(t.orderEvents).values(keys.map((k, i) => ({ orderId: o.id, kind: AI_EVENTS[k].kind, text: AI_EVENTS[k].text, actorName: k === 'customer_confirmed' ? 'العميل' : 'هُدهُد', createdAt: new Date(base + i * 1000) })));
+    } else {
+      await tx.insert(t.orderEvents).values({ orderId: o.id, kind: 'owner', text: `${who} أضاف الطلب`, actorName: who });
+    }
     return o.id;
   });
   return orderFull(business.id, id);
