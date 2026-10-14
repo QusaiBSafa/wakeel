@@ -94,3 +94,32 @@ describe('links and patterns', () => {
     expect(URL_RE.test('maps.google.com')).toBe(false);
   });
 });
+
+import { doneCount, generatedFaqs, hoursSentence, stepDone } from '../lib/onboarding';
+
+describe('onboarding helpers', () => {
+  const day = (on: boolean, from = '09:00', to = '19:00') => ({ on, from, to });
+  it('hours sentence matches the prototype wording', () => {
+    const w = [day(true), day(true), day(true), day(true), day(true), day(true), day(false)];
+    expect(hoursSentence(w)).toBe('نستقبلكم من السبت إلى الخميس، من 9 صباحاً حتى 7 مساءً. يوم الجمعة عطلة.');
+  });
+  it('non-contiguous days and mixed hours', () => {
+    expect(hoursSentence([day(true), day(false), day(true), day(false), day(false), day(false), day(false)])).toBe('نستقبلكم أيام السبت والاثنين، من 9 صباحاً حتى 7 مساءً. نغلق أيام الأحد والثلاثاء والأربعاء والخميس والجمعة.');
+    expect(hoursSentence([day(true, '08:30', '16:00'), day(true), ...Array(5).fill(day(false))])).toContain('السبت من 8:30 صباحاً حتى 4 مساءً، الأحد من 9 صباحاً حتى 7 مساءً');
+  });
+  it('generated FAQs: hours and location on, two suggestions off and empty', () => {
+    const rows = generatedFaqs('salon', { hours: Array(7).fill(day(true)), city: 'نابلس', address: 'شارع رفيديا' });
+    expect(rows.map((r) => [r.key, r.on])).toEqual([['common.hours', true], ['common.location', true], ['salon.0', false], ['salon.1', false]]);
+    expect(rows[1].a).toBe('في نابلس، شارع رفيديا.');
+    expect(rows[2].a).toBe('');
+  });
+  it('step done logic', () => {
+    const c = { maxStep: 4, skipped: [3], waConnected: false, delivery: false, activated: false };
+    expect(stepDone(1, c)).toBe(true);
+    expect(stepDone(3, c)).toBe(false); // skipped
+    expect(stepDone(4, c)).toBe(false);
+    expect(doneCount(c)).toBe(2);
+    expect(doneCount({ ...c, maxStep: 6 })).toBe(4); // 1, 2, 4 and 5 (not applicable but passed); 3 was skipped
+    expect(doneCount({ ...c, activated: true })).toBe(8);
+  });
+});

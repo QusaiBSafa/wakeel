@@ -1,16 +1,20 @@
 import { redirect } from 'next/navigation';
-import { pageSession } from '@/lib/server/session';
+import AppProviders from '@/components/AppProviders';
+import { loadOnboarding } from '@/lib/server/loaders/onboarding';
+import { pageOwner, pageSession } from '@/lib/server/session';
+import OnboardingClient from './OnboardingClient';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'إعداد الحساب · هُدهُد' };
 
-// Placeholder until P5 builds the 8-step wizard.
 export default async function OnboardingPage() {
   const { business } = await pageSession();
   if (business?.onboardedAt) redirect('/dashboard');
+  const { business: data } = await loadOnboarding(business);
+  const owner = business ? await pageOwner() : null;
   return (
-    <main className="page" id="main">
-      <h1>قيد التجهيز</h1>
-    </main>
+    <AppProviders>
+      <OnboardingClient business={data} firstName={(owner?.name || '').split(' ')[0]} />
+    </AppProviders>
   );
 }
