@@ -9,6 +9,8 @@ export default function DashboardError({ reset }: { error: Error; reset: () => v
   return (
     <main className="page" id="main">
       <ErrorCard
+        title="تعذّر تحميل الصفحة"
+        text="حدثت مشكلة في الاتصال. لا يزال هُدهُد يعمل ويرد على عملائك، لكن الأرقام غير متاحة حالياً."
         onRetry={() =>
           startTransition(() => {
             router.refresh();

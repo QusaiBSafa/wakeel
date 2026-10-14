@@ -196,3 +196,10 @@ describe('onboarding steps', () => {
     expect(stepSchemas[6].safeParse({ faqs: [{ key: 'a', question: 'س؟', answer: '', on: false }] }).success).toBe(true);
   });
 });
+
+describe('default error language', () => {
+  it('reports enum and unknown-key errors in Arabic', () => {
+    const r = aiPauseSchema.safeParse({ duration: '5m' });
+    expect(!r.success && firstError(r.error)).toBe('البيانات غير صحيحة');
+  });
+});

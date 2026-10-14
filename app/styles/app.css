@@ -32,3 +32,9 @@ body.hd{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
   .seg button{min-height:40px;min-width:40px}
   .tab{min-height:46px}
 }
+
+@media (max-width:1023px){
+  .staging-bar .btn{min-height:40px}
+  .btn-sm{min-width:40px}
+  .tbl td>a{display:inline-flex;align-items:center;min-height:40px;min-width:40px}
+}

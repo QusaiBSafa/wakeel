@@ -29,6 +29,13 @@ const nextConfig = {
       ],
     };
   },
+  async redirects() {
+    return [
+      { source: '/dashboard/products', destination: '/dashboard/catalog', permanent: false },
+      { source: '/dashboard/booking', destination: '/dashboard/bookings', permanent: false },
+      { source: '/dashboard/info', destination: '/dashboard/business', permanent: false },
+    ];
+  },
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },

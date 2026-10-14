@@ -7,14 +7,14 @@ import { aiEffective } from '../ai';
 import { bookingDTO, statsDTO, waDTO } from '../dto';
 import { attentionFor } from './shared';
 
-const { orders, orderItems, bookings, dailyStats, aiSettings, whatsappConnections } = schema;
+const { orders, orderItems, bookings, dailyStats, aiSettings, whatsappConnections, teamMembers } = schema;
 
 export async function loadHome(business: BusinessRow) {
   const d = db();
   const now = new Date();
   const today = ymd(now);
   const dayEnd = atMinutes(today, 1440);
-  const [attention, [stats], [ai], [wa], newOrders, recent, upcoming, todayCount] = await Promise.all([
+  const [attention, [stats], [ai], [wa], newOrders, recent, upcoming, todayCount, members] = await Promise.all([
     attentionFor(business.id),
     d.select().from(dailyStats).where(and(eq(dailyStats.businessId, business.id), eq(dailyStats.day, today))).limit(1),
     d.select().from(aiSettings).where(eq(aiSettings.businessId, business.id)).limit(1),
@@ -34,7 +34,9 @@ export async function loadHome(business: BusinessRow) {
       .select({ n: sql<number>`count(*)::int` })
       .from(bookings)
       .where(and(eq(bookings.businessId, business.id), ne(bookings.status, 'cancelled'), sql`${bookings.startsAt} >= ${dayStart(today)}`, sql`${bookings.startsAt} < ${dayEnd}`)),
+    d.select({ id: teamMembers.id, name: teamMembers.name }).from(teamMembers).where(eq(teamMembers.businessId, business.id)),
   ]);
+  const names = new Map(members.map((m) => [m.id, m.name]));
 
   const ids = recent.map((o) => o.id);
   const items = ids.length ? await d.select().from(orderItems).where(inArray(orderItems.orderId, ids)).orderBy(asc(orderItems.position)) : [];
@@ -46,6 +48,7 @@ export async function loadHome(business: BusinessRow) {
 
   const open = attention;
   return {
+    now: now.toISOString(),
     today,
     stats: statsDTO(stats),
     attention: open.slice(0, 3),
@@ -62,7 +65,7 @@ export async function loadHome(business: BusinessRow) {
       createdAt: o.createdAt.toISOString(),
       itemsText: itemsText(o.id),
     })),
-    upcoming: upcoming.map(bookingDTO),
+    upcoming: upcoming.map((b) => ({ ...bookingDTO(b), memberName: (b.memberId && names.get(b.memberId)) || '' })),
     bookingsToday: todayCount[0]?.n ?? 0,
     wa: waDTO(wa),
     aiEnabled: aiEffective(ai),

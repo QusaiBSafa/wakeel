@@ -6,6 +6,9 @@ import { DATE_RE, isHHMM, toMin } from '../time';
 
 export { clean };
 
+// Any issue without its own message (bad enum, wrong type, unknown key …) is reported in Arabic.
+z.config({ localeError: () => ({ message: 'البيانات غير صحيحة' }) });
+
 export const MSG = {
   required: 'هذا الحقل مطلوب',
   phone: 'الرقم غير صحيح، اكتبه مع رمز الدولة',

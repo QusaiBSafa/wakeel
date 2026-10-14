@@ -26,7 +26,7 @@ export default function Dialog({
   const ref = useFocusTrap<HTMLDivElement>(open, onClose);
   if (!open) return null;
   return createPortal(
-    <div className="hd backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div ref={ref} className={wide ? 'dialog wide' : 'dialog'} role={role} aria-modal="true" aria-labelledby={labelledBy} aria-describedby={describedBy}>
         <div className="dialog-body">{body}</div>
         {foot && <div className="dialog-foot">{foot}</div>}
