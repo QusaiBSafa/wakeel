@@ -1,19 +1,13 @@
-import EmptyState from '@/components/ui/EmptyState';
+import { redirect } from 'next/navigation';
+import { loadBusiness } from '@/lib/server/loaders/business';
+import { pageSession } from '@/lib/server/session';
+import BusinessClient from './BusinessClient';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'معلومات نشاطك · هُدهُد' };
 
-// Placeholder: replaced by the real page in a later phase.
-export default function Page() {
-  return (
-    <main className="page" id="main">
-      <div className="page-head">
-        <div className="t">
-          <h1>معلومات نشاطك</h1>
-          <p>يستخدم هُدهُد هذه المعلومات للإجابة عن أسئلة العملاء. كلما كانت أدق، كانت ردوده أفضل.</p>
-        </div>
-      </div>
-      <EmptyState icon="info" tone="neutral" title="قيد التجهيز" />
-    </main>
-  );
+export default async function Page() {
+  const { business } = await pageSession();
+  if (!business) redirect('/onboarding');
+  return <BusinessClient data={await loadBusiness(business)} />;
 }
