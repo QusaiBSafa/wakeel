@@ -84,7 +84,7 @@ export function aiReply(text: string, c: AiChatCtx): ChatMsg[] {
     return [{ k: 'ai', text: pre + (d ? `سعر ${c.item.name} ${p}.` : `سعر ${c.item.name} ${p}.`) + post + em }];
   }
   if (/متى|تفتح|ساعات|دوام|مفتوح/.test(text)) return [{ k: 'ai', text: pre + hoursAr + post + em }];
-  if (cfg.unk === 'call') return [{ k: 'ai', text: pre + (d ? `عشان أفيدك أكثر، اتصل فينا على ${c.business.phone}.` : `لمساعدتك بشكل أفضل، يرجى الاتصال بنا على الرقم ${c.business.phone}.`) + em }];
+  if (cfg.unk === 'call') return [{ k: 'ai', text: pre + (d ? `حتى أفيدك أكثر، اتصل فينا على ${c.business.phone}.` : `لمساعدتك بشكل أفضل، يرجى الاتصال بنا على الرقم ${c.business.phone}.`) + em }];
   if (cfg.unk === 'custom') return [{ k: 'ai', text: cfg.unkMsg }, { k: 'sys', text: 'حُوّلت إلى «تحتاج تدخلك»: سؤال بلا جواب' }];
   return hand('سؤال بلا جواب');
 }

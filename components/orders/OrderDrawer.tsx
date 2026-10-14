@@ -380,7 +380,7 @@ export default function OrderDrawer({ order, data, onClose, onSaved }: { order: 
           <section className="col" style={{ gap: 10 }} aria-labelledby="tl-h">
             <h3 id="tl-h">سجل الطلب</h3>
             <ol className="card card-pad col" style={{ gap: 14 }}>
-              {(order?.events ?? [{ id: 'n', kind: 'owner', text: `${shell.owner.name} تضيف الطلب`, actorName: shell.owner.name, createdAt: data.now }]).map((ev) => {
+              {(order?.events ?? [{ id: 'n', kind: 'owner', text: `${shell.owner.name} أضاف الطلب`, actorName: shell.owner.name, createdAt: data.now }]).map((ev) => {
                 const ic = TL_IC[ev.kind] ?? TL_IC.owner;
                 return (
                   <li key={ev.id} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>

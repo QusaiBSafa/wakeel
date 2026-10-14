@@ -43,7 +43,7 @@ function Card({ a, now, onResolve, onReplied }: { a: Item; now: number; onResolv
       setInstr('');
       setOpen(false);
       onReplied(resume);
-      toast(resume ? `تم إرسال الرد إلى ${first}، وسيتابع هُدهُد معه` : 'تم إرسال الرد. هُدهُد متوقف مع هذا العميل لحد ما تحل الطلب');
+      toast(resume ? `تم إرسال الرد إلى ${first}، وسيتابع هُدهُد معه` : 'تم إرسال الرد. هُدهُد متوقف مع هذا العميل إلى أن تحلّ الطلب');
     } catch (e) {
       toast(e instanceof ApiError ? e.message : 'حدث خطأ، أعد المحاولة', { kind: 'bad' });
     } finally {
