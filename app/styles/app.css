@@ -38,3 +38,6 @@ body.hd{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
   .btn-sm{min-width:40px}
   .tbl td>a{display:inline-flex;align-items:center;min-height:40px;min-width:40px}
 }
+@media (max-width:1023px){
+  .tap,a.bdg{min-height:40px;display:inline-flex;align-items:center}
+}

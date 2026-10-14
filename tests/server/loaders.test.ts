@@ -80,11 +80,11 @@ describe.skipIf(!HAS_DB)('server loaders (local Postgres)', () => {
     expect(h.wa?.status).toBe('connected');
   });
 
-  it('attention resolves refs to #number / B-number and carries no text fields', async () => {
+  it('attention resolves refs to a readable label and carries no text fields', async () => {
     const { loadAttention } = await import('@/lib/server/loaders/attention');
     const a = await loadAttention(b);
     out.attention = a;
-    expect(a.items.map((i) => i.refLabel).sort()).toEqual(['#1043', 'B-101']);
+    expect(a.items.map((i) => i.refLabel).sort()).toEqual(['الطلب #1043 · جديد', 'حجز B-101 · قص وسشوار']);
     for (const i of a.items) expect(Object.keys(i).join()).not.toMatch(/text|message|reply|transcript/i);
   });
 

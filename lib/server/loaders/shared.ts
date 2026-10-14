@@ -1,6 +1,7 @@
 import 'server-only';
 import { and, asc, eq, inArray, isNull } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+import { ORDER_STATUS } from '@/lib/constants';
 import { attentionDTO, itemDTO, memberDTO } from '../dto';
 
 const { attentionItems, orders, bookings, catalogItems, serviceStaff, teamMembers } = schema;
@@ -15,11 +16,12 @@ export async function attentionFor(businessId: string, limit?: number) {
   const orderIds = rows.filter((r) => r.refKind === 'order' && r.refId).map((r) => r.refId!);
   const bookingIds = rows.filter((r) => r.refKind === 'booking' && r.refId).map((r) => r.refId!);
   const [os, bs] = await Promise.all([
-    orderIds.length ? d.select({ id: orders.id, number: orders.number }).from(orders).where(and(eq(orders.businessId, businessId), inArray(orders.id, orderIds))) : [],
-    bookingIds.length ? d.select({ id: bookings.id, number: bookings.number }).from(bookings).where(and(eq(bookings.businessId, businessId), inArray(bookings.id, bookingIds))) : [],
+    orderIds.length ? d.select({ id: orders.id, number: orders.number, status: orders.status }).from(orders).where(and(eq(orders.businessId, businessId), inArray(orders.id, orderIds))) : [],
+    bookingIds.length ? d.select({ id: bookings.id, number: bookings.number, serviceName: bookings.serviceName }).from(bookings).where(and(eq(bookings.businessId, businessId), inArray(bookings.id, bookingIds))) : [],
   ]);
-  const on = new Map(os.map((o) => [o.id, `#${o.number}`]));
-  const bn = new Map(bs.map((b) => [b.id, `B-${b.number}`]));
+  // «الطلب #1038 · خرج للتوصيل» / «حجز B-208 · باقة العروس»
+  const on = new Map(os.map((o) => [o.id, `الطلب #${o.number} · ${ORDER_STATUS[o.status].label}`]));
+  const bn = new Map(bs.map((b) => [b.id, `حجز B-${b.number} · ${b.serviceName}`]));
   return rows.map((r) => attentionDTO(r, r.refKind === 'order' ? on.get(r.refId ?? '') ?? null : r.refKind === 'booking' ? bn.get(r.refId ?? '') ?? null : null));
 }
 
