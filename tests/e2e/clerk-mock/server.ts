@@ -19,3 +19,16 @@ auth.protect = async () => {
 export function clerkMiddleware() {
   return () => NextResponse.next();
 }
+
+export async function currentUser() {
+  const { userId } = await auth();
+  if (!userId) return null;
+  return {
+    id: userId,
+    firstName: 'سامي',
+    lastName: 'ناصر',
+    fullName: 'سامي ناصر',
+    primaryEmailAddress: { emailAddress: 'owner@example.com' },
+    emailAddresses: [{ emailAddress: 'owner@example.com' }],
+  };
+}

@@ -1,9 +1,6 @@
-/** Stable colour index 0..7 from any string. */
-export function colorOf(seed: string) {
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  return h % 8;
-}
+import { colorOf } from '@/lib/color';
+
+export { colorOf };
 
 export default function Avatar({ name, color, size }: { name: string; color?: number; size?: 'sm' | 'lg' }) {
   const c = color ?? colorOf(name);
