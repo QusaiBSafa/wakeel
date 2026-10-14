@@ -2,6 +2,7 @@
 
 import { createPortal } from 'react-dom';
 import { useFocusTrap } from './useFocusTrap';
+import { useMounted } from './useMounted';
 
 /** Side drawer: `.scrim` + `aside.drawer-r` with head / body / foot slots. */
 export default function Drawer({
@@ -20,7 +21,8 @@ export default function Drawer({
   foot?: React.ReactNode;
 }) {
   const ref = useFocusTrap<HTMLElement>(open, onClose);
-  if (!open) return null;
+  const mounted = useMounted();
+  if (!open || !mounted) return null;
   return createPortal(
     <>
       <div className="scrim" onClick={onClose} />

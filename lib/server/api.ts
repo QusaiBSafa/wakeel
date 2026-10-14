@@ -14,6 +14,14 @@ export class HttpError extends Error {
   }
 }
 
+/** Postgres error code, also when Drizzle wrapped the driver error (DrizzleQueryError.cause). */
+export function pgCode(e: unknown): string | undefined {
+  const o = e as { code?: unknown; cause?: unknown } | null;
+  if (o && typeof o.code === 'string') return o.code;
+  if (o && o.cause) return pgCode(o.cause);
+  return undefined;
+}
+
 export function json(data: unknown, status = 200) {
   return NextResponse.json(data, { status, headers: { 'Cache-Control': 'no-store' } });
 }
@@ -61,7 +69,7 @@ export function handler<A extends unknown[]>(fn: (...args: A) => Promise<Respons
     } catch (e) {
       if (e instanceof HttpError) return json({ error: e.message }, e.status);
       // unique violations from Postgres
-      const code = typeof e === 'object' && e && 'code' in e ? (e as { code?: string }).code : undefined;
+      const code = pgCode(e);
       if (code === '23505') return json({ error: 'هذه القيمة مستخدمة من قبل' }, 409);
       // exclusion violation: the member already holds an overlapping booking
       if (code === '23P01') return json({ error: 'هذا الوقت محجوز، اختر وقتاً آخر' }, 409);
