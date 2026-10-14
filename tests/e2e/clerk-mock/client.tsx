@@ -26,7 +26,15 @@ export function useUser() {
   const unverified = typeof document !== 'undefined' && document.cookie.includes('e2e_unverified=1');
   return {
     isLoaded,
-    user: userId ? { id: userId, primaryEmailAddress: { verification: { status: unverified ? 'unverified' : 'verified' } } } : null,
+    user: userId
+      ? {
+          id: userId,
+          firstName: 'سامي',
+          lastName: 'ناصر',
+          fullName: 'سامي ناصر',
+          primaryEmailAddress: { emailAddress: 'owner@example.com', verification: { status: unverified ? 'unverified' : 'verified' } },
+        }
+      : null,
   };
 }
 
@@ -36,8 +44,8 @@ export function ClerkProvider({ children }: { children: React.ReactNode }) {
 
 export function UserButton() {
   return (
-    <button type="button" aria-label="حسابي" style={{ width: 44, height: 44, borderRadius: '50%', border: 0, background: '#4B5BD6', color: '#fff', fontWeight: 800 }}>
-      ق
+    <button type="button" aria-label="حسابي" style={{ width: 40, height: 40, borderRadius: '50%', border: 0, background: '#4B5BD6', color: '#fff', fontWeight: 800 }}>
+      س
     </button>
   );
 }

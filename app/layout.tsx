@@ -1,13 +1,18 @@
 import type { Metadata, Viewport } from 'next';
+import { IBM_Plex_Sans_Arabic, Tajawal } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { arSA } from '@clerk/localizations';
 import Clarity from '@/components/Clarity';
 import { clerkAppearance } from '@/components/clerk-appearance';
-import './globals.css';
+import './styles/hodhod.css';
+import './styles/app.css';
+
+const plex = IBM_Plex_Sans_Arabic({ weight: ['400', '500', '600', '700'], subsets: ['arabic'], display: 'swap', variable: '--font-plex' });
+const tajawal = Tajawal({ weight: ['500', '700', '800'], subsets: ['arabic'], display: 'swap', variable: '--font-tajawal' });
 
 export const metadata: Metadata = {
   title: 'هُدهُد: لوحة التحكم',
-  description: 'جهّز هُدهُد ليرد على زباينك على واتساب',
+  description: 'جهّز هُدهُد ليرد على عملائك عبر واتساب',
   robots: { index: false, follow: false },
   icons: { icon: '/favicon-32.png', apple: '/apple-touch-icon.png' },
 };
@@ -30,14 +35,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       signUpFallbackRedirectUrl="/onboarding"
       afterSignOutUrl="/"
     >
-      <html lang="ar" dir="rtl">
-        <head>
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-          {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-          <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
-        </head>
-        <body className="hh">
+      <html lang="ar" dir="rtl" className={`${plex.variable} ${tajawal.variable}`}>
+        <body className="hd">
           {children}
           <Clarity />
         </body>

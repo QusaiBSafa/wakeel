@@ -1,16 +1,13 @@
-import { PageSkeleton } from '@/components/app/States';
+import { Busy } from '@/components/ui/Skeleton';
+import Skeleton from '@/components/ui/Skeleton';
 
 export default function Loading() {
   return (
-    <>
-      <div className="top" style={{ minHeight: 66 }}>
-        <div className="skel" style={{ height: 34, width: 120 }} />
-      </div>
-      <div className="shell">
-        <div className="main">
-          <PageSkeleton />
-        </div>
-      </div>
-    </>
+    <main className="auth-wrap">
+      <Busy style={{ width: '100%', maxWidth: 440, gap: 12 }}>
+        <Skeleton h={34} w={140} />
+        <Skeleton h={120} />
+      </Busy>
+    </main>
   );
 }

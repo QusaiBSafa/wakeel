@@ -2,20 +2,22 @@
 
 import { useRouter } from 'next/navigation';
 import { startTransition } from 'react';
-import { ErrorState } from '@/components/app/States';
+import ErrorCard from '@/components/ui/ErrorCard';
 
 export default function RootError({ reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   return (
-    <main className="shell" style={{ flexDirection: 'column' }}>
-      <ErrorState
-        onRetry={() =>
-          startTransition(() => {
-            router.refresh();
-            reset();
-          })
-        }
-      />
+    <main className="auth-wrap">
+      <div style={{ width: '100%', maxWidth: 480 }}>
+        <ErrorCard
+          onRetry={() =>
+            startTransition(() => {
+              router.refresh();
+              reset();
+            })
+          }
+        />
+      </div>
     </main>
   );
 }

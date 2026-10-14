@@ -14,12 +14,12 @@ export default function AuthCard({
   return (
     <main className="auth-wrap">
       <div className="card auth-card" data-clarity-mask="true">
-        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 24, fontWeight: 800, color: '#121A2E', alignSelf: 'flex-start', minHeight: 44, textDecoration: 'none' }}>
+        <a className="wordmark" href="/" style={{ alignSelf: 'flex-start' }}>
           <Logo size={30} />
           هُدهُد
         </a>
         <div>
-          <h1 style={{ fontSize: 26, fontWeight: 800 }}>{title}</h1>
+          <h1>{title}</h1>
           <p className="muted" style={{ marginTop: 4 }}>
             {sub}
           </p>
@@ -27,7 +27,7 @@ export default function AuthCard({
         {children}
         {footer}
         <p className="hint" style={{ textAlign: 'center' }}>
-          الحسابات محميّة عبر Clerk
+          الحسابات محمية عبر Clerk
         </p>
       </div>
     </main>

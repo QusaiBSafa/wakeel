@@ -5,7 +5,7 @@ export const metadata = { title: 'تسجيل الدخول · هُدهُد' };
 
 export default function Page() {
   return (
-    <AuthCard title="أهلاً فيك من جديد" sub="سجّل دخول لتكمّل تجهيز هُدهُد.">
+    <AuthCard title="أهلاً بعودتك" sub="سجّل الدخول لمتابعة إدارة نشاطك.">
       <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" fallbackRedirectUrl="/dashboard" />
     </AuthCard>
   );
