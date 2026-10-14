@@ -505,7 +505,7 @@ try {
     await toast('حُفظت الإعدادات');
     await page.reload();
     await page.waitForLoadState('networkidle');
-    ok((await page.locator('label.radio-card.on').filter({ hasText: 'رسمي' }).count()) > 0, 'tone «رسمي» did not persist after reload');
+    ok((await page.locator('.chip.on').filter({ hasText: 'رسمي' }).count()) > 0, 'tone «رسمي» did not persist after reload');
     apiCalls = [];
     await click(page.locator('[aria-label="رسائل جاهزة للتجربة"] button').first());
     await page.waitForTimeout(1200);
