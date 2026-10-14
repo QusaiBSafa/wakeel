@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هُدهُد: تحتاج تدخلك</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="hodhod.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Tajawal:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="hd" style="font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif; color: #121A2E; background: #F7F8F4">
+<dc-import name="Sidebar" active="attention" hint-size="0px,0px"></dc-import>
+
+<div class="content">
+<div class="rv" role="region" aria-label="أدوات المعاينة (ليست جزءاً من المنتج)">
+<b>معاينة</b><span>حالة الصفحة:</span>
+<div class="seg" role="group" aria-label="حالة الصفحة">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="4"><button type="button" class="{{v.cls}}" aria-pressed="{{v.aria}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for>
+</div>
+</div>
+
+<main class="page" id="main" style="max-width: 980px">
+<div class="page-head">
+<div class="t">
+<h1>تحتاج تدخلك</h1>
+<p>يتوقف هُدهُد ويطلب رأيك عند الحاجة فقط. ردّ على العميل من هنا، أو افتح المحادثة في واتساب.</p>
+</div>
+</div>
+
+<div class="row" style="gap: 10px; padding: 10px 14px; border-radius: 12px; background: #EEF0F3; color: #4A5468; font-size: 13.5px; align-items: flex-start">
+<svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true" style="margin-top: 3px"><path d="M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+<span>حمايةً لخصوصية عملائك، لا يحفظ هُدهُد محتوى المحادثات ولا يعرضه. يظهر لك سبب التحويل ورقم العميل فقط، ويُحذف الطلب من هنا عند حلّه.</span>
+</div>
+
+<div class="toolbar" role="tablist" aria-label="فلترة الطلبات">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="2"><button type="button" role="tab" class="{{t.cls}}" aria-selected="{{t.aria}}" onClick="{{t.pick}}">{{t.label}}<span class="{{t.countCls}}" style="height: 20px; min-width: 20px; font-size: 11.5px">{{t.count}}</span></button></sc-for>
+</div>
+
+<!-- loading -->
+<sc-if value="{{isLoading}}" hint-placeholder-val="{{false}}">
+<div class="col" style="gap: 12px" aria-busy="true" aria-label="جاري التحميل">
+<sc-for list="{{three}}" as="x" hint-placeholder-count="3"><div class="card card-pad" style="display: flex; gap: 12px"><div class="sk" style="width: 44px; height: 44px; border-radius: 50%"></div><div class="col grow" style="gap: 10px"><div class="sk" style="height: 16px; width: 40%"></div><div class="sk" style="height: 14px; width: 70%"></div><div class="sk" style="height: 36px; width: 50%"></div></div></div></sc-for>
+</div>
+</sc-if>
+
+<!-- error -->
+<sc-if value="{{isError}}" hint-placeholder-val="{{false}}">
+<div class="card empty" role="alert"><span class="ic danger" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg></span><h2>تعذّر تحميل الطلبات</h2><p class="muted">حدثت مشكلة في الاتصال. إذا طال انتظار أي عميل، يعتذر له هُدهُد ويبلغه بأنك سترد قريباً.</p><button type="button" class="btn btn-primary" onClick="{{retry}}">أعد المحاولة</button></div>
+</sc-if>
+
+<!-- all clear -->
+<sc-if value="{{allClear}}" hint-placeholder-val="{{false}}">
+<div class="card empty"><span class="ic brand" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span><h2>لا يوجد ما ينتظرك</h2><p class="muted">لا يوجد عميل بانتظارك الآن. عندما يحتاج هُدهُد إلى رأيك، سيظهر الطلب هنا وسيصلك تنبيه.</p><a class="btn btn-secondary btn-sm" href="AISettings.dc.html">متى يحوّل هُدهُد المحادثات إليك؟</a></div>
+</sc-if>
+
+<!-- resolved today: counts only, details are deleted -->
+<sc-if value="{{showResolved}}" hint-placeholder-val="{{false}}">
+<div class="card empty"><span class="ic neutral" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span><h2>حللت {{resolvedCount}} طلبات اليوم</h2><p class="muted">تُحذف تفاصيل الطلبات المحلولة تلقائياً، لذلك لا تظهر هنا.</p></div>
+</sc-if>
+
+<!-- open requests -->
+<sc-if value="{{showList}}" hint-placeholder-val="{{true}}">
+<ul class="col" style="gap: 14px">
+<sc-for list="{{items}}" as="a" hint-placeholder-count="3">
+<li class="{{a.cardCls}}">
+<div style="display: flex; gap: 14px; padding: 16px 18px; flex-wrap: wrap; align-items: flex-start">
+<span class="{{a.av}}" aria-hidden="true">{{a.initial}}</span>
+<div class="grow" style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 6px">
+<div class="row" style="flex-wrap: wrap; gap: 4px 10px">
+<h2 style="font-size: 16px">{{a.name}}</h2>
+<a class="ltr num tap" href="{{a.tel}}" style="font-size: 14px">{{a.phone}}</a>
+</div>
+<div class="reason" style="font-size: 14.5px"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4M12 16h.01M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"></path></svg>{{a.reason}}</div>
+<div class="row" style="flex-wrap: wrap; gap: 6px">
+<span class="bdg outline"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2"></path></svg>ينتظر منذ {{a.wait}}</span>
+<sc-if value="{{a.hasRef}}" hint-placeholder-val="{{false}}"><a class="bdg info" href="{{a.refHref}}" style="text-decoration: none">{{a.refLabel}}</a></sc-if>
+<sc-if value="{{a.paused}}" hint-placeholder-val="{{false}}"><span class="bdg info"><span class="dot"></span>هُدهُد متوقف مع هذا العميل</span></sc-if>
+</div>
+</div>
+<sc-if value="{{a.isOpen}}" hint-placeholder-val="{{true}}">
+<div class="row" style="flex-wrap: wrap; gap: 8px">
+<sc-if value="{{a.composerClosed}}" hint-placeholder-val="{{true}}"><button type="button" class="btn btn-primary btn-sm" onClick="{{a.openReply}}" aria-expanded="false">ردّ</button></sc-if>
+<a class="btn btn-secondary btn-sm" href="{{a.wa}}" target="_blank" rel="noopener" aria-label="{{a.waLabel}}"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: #25D366"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3M12 21.8a9.9 9.9 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4a9.9 9.9 0 1 1 8.4 4.6m8.4-18.3A11.8 11.8 0 0 0 12 0C5.5 0 .2 5.3.2 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.7a11.9 11.9 0 0 0 5.7 1.5c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.5-8.4z"></path></svg>افتح في واتساب</a>
+<button type="button" class="btn btn-ghost btn-sm" onClick="{{a.askResolve}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>تم الحل</button>
+</div>
+</sc-if>
+<sc-if value="{{a.isSent}}" hint-placeholder-val="{{false}}">
+<div class="row" style="flex-wrap: wrap; gap: 8px"><span class="bdg success"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>تم إرسال الرد</span><button type="button" class="btn btn-ghost btn-sm" onClick="{{a.askResolve}}">تم الحل</button></div>
+</sc-if>
+</div>
+
+<!-- reply composer -->
+<sc-if value="{{a.composerOpen}}" hint-placeholder-val="{{false}}">
+<div style="border-top: 1px solid #F3C886; background: #FFFBF3; padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; border-radius: 0 0 16px 16px">
+<div class="seg" role="group" aria-label="طريقة الرد" style="align-self: flex-start">
+<button type="button" class="{{a.modeWriteCls}}" aria-pressed="{{a.modeWriteAria}}" onClick="{{a.modeWrite}}">اكتب الرد بنفسك</button>
+<button type="button" class="{{a.modeInstrCls}}" aria-pressed="{{a.modeInstrAria}}" onClick="{{a.modeInstr}}">أعطِ هُدهُد تعليمات</button>
+</div>
+<sc-if value="{{a.isWrite}}" hint-placeholder-val="{{true}}">
+<div class="field">
+<label for="{{a.replyId}}">ردّك على {{a.first}}</label>
+<textarea id="{{a.replyId}}" class="{{a.replyCls}}" value="{{a.text}}" onChange="{{a.setText}}" placeholder="اكتب الرد كما تريد أن يصل إلى العميل"></textarea>
+<sc-if value="{{a.showErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب الرد قبل إرساله</span></sc-if>
+</div>
+<div class="row" style="flex-wrap: wrap; gap: 6px">
+<span class="subtle">اقتراح هُدهُد:</span>
+<button type="button" class="chip sm" onClick="{{a.useSuggestion}}">{{a.suggestShort}}</button>
+</div>
+</sc-if>
+<sc-if value="{{a.isInstr}}" hint-placeholder-val="{{false}}">
+<div class="field">
+<label for="{{a.instrId}}">ماذا تريد أن يقول هُدهُد؟</label>
+<input id="{{a.instrId}}" class="{{a.replyCls}}" value="{{a.instr}}" onChange="{{a.setInstr}}" placeholder="{{a.instrPh}}">
+<span class="hint">يكتب هُدهُد الرد بأسلوبك ويرسله، ثم يتابع المحادثة.</span>
+<sc-if value="{{a.showErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب التعليمات أولاً</span></sc-if>
+</div>
+</sc-if>
+<label class="row" style="gap: 10px; font-size: 14px; cursor: pointer; min-height: 40px">
+<input type="checkbox" checked="{{a.resume}}" onChange="{{a.toggleResume}}" style="width: 18px; height: 18px; accent-color: #0B7F58">
+<span>دع هُدهُد يتابع مع العميل بعد ردّي</span>
+</label>
+<div class="row" style="flex-wrap: wrap; gap: 8px">
+<button type="button" class="btn btn-primary" onClick="{{a.send}}" disabled="{{a.sending}}"><sc-if value="{{a.sending}}" hint-placeholder-val="{{false}}"><span class="spin"></span></sc-if>{{a.sendLabel}}</button>
+<button type="button" class="btn btn-ghost" onClick="{{a.closeReply}}">إلغاء</button>
+<span class="subtle grow" style="text-align: left">يُرسَل من رقم واتساب نشاطك</span>
+</div>
+</div>
+</sc-if>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+</main>
+</div>
+
+<sc-if value="{{confirmOpen}}" hint-placeholder-val="{{false}}">
+<div class="backdrop" onClick="{{cancelResolve}}">
+<div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="rs-h" aria-describedby="rs-d" onClick="{{stop}}">
+<div class="dialog-body">
+<h2 id="rs-h">هل تريد اعتبار طلب {{confirmName}} محلولاً؟</h2>
+<p id="rs-d" class="muted">سيُزال من القائمة وتُحذف تفاصيله، وسيعود هُدهُد للرد على هذا العميل تلقائياً.</p>
+</div>
+<div class="dialog-foot">
+<button type="button" class="btn btn-secondary" onClick="{{cancelResolve}}">ليس بعد</button>
+<button type="button" class="btn btn-primary" onClick="{{doResolve}}">نعم، تم الحل</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+<div class="{{toastCls}}" role="status" aria-live="polite"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{toastIcon}}"></path></svg>{{toast}}</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startView":{"editor":"enum","options":["normal","empty","loading","error"],"default":"normal"},"$preview":{"width":1440,"height":1000}}'>
+const SEED = [
+  { id: 'a1', name: 'محمد أبو شمسية', phone: '+970 56 901 4477', av: 2, wait: '25 دقيقة', reason: 'شكوى على تأخر الطلب #1038. تُحوَّل الشكاوى إليك حسب إعداداتك.', ref: { label: 'الطلب #1038 · خرج للتوصيل', href: 'Orders.dc.html' },
+    suggestion: 'معك حق ونعتذر منك. سيصلك الطلب اليوم قبل الساعة 4:00، والتوصيل على حسابنا.', instrPh: 'مثلاً: اعتذر له وأخبره أن التوصيل مجاني' },
+  { id: 'a2', name: 'ميس خليل', phone: '+970 59 734 2211', av: 4, wait: '12 دقيقة', reason: 'طلبت خصماً بنسبة 20% على باقة العروس، والخصومات ليست من صلاحيات هُدهُد.', ref: { label: 'حجز B-208 · باقة العروس', href: 'Bookings.dc.html' },
+    suggestion: 'يمكننا منحك خصماً بنسبة 10% إذا أكّدتِ الحجز اليوم، ليصبح سعر الباقة 810 ₪.', instrPh: 'مثلاً: امنحها 15% بشرط دفع عربون 100 ₪' },
+  { id: 'a3', name: 'حلا جرار', phone: '+970 59 220 8813', av: 5, wait: '4 دقائق', reason: 'سألت عن منتج غير موجود في قائمة منتجاتك (كريم كيراتين للأطفال).',
+    suggestion: 'لا يتوفر لدينا كريم كيراتين للأطفال حالياً، لكن لدينا شامبو أرغان لطيف يناسب الأطفال بسعر 45 ₪.', instrPh: 'مثلاً: أخبرها أنه سيصل الأسبوع القادم' }
+];
+
+class Component extends DCLogic {
+  state = { view: undefined, tab: 'open', items: SEED.map((x) => Object.assign({ st: 'open', composer: false, mode: 'write', text: '', instr: '', resume: true, sending: false, err: false }, x)), resolved: 5, confirmId: null, toast: '', toastBad: false };
+  flash(t, bad) { clearTimeout(this._t); this.setState({ toast: t, toastBad: !!bad }); this._t = setTimeout(() => this.setState({ toast: '' }), 3400); }
+  upd(id, patch) { this.setState({ items: this.state.items.map((x) => (x.id === id ? Object.assign({}, x, patch) : x)) }); }
+  renderVals() {
+    const s = this.state;
+    const set = (p) => this.setState(p);
+    const view = s.view !== undefined ? s.view : (this.props.startView || 'normal');
+    const items = view === 'empty' ? [] : s.items;
+    const ok = view === 'normal' || view === 'empty';
+    const confirmItem = s.items.find((x) => x.id === s.confirmId);
+    return {
+      views: [['normal', 'عادي'], ['empty', 'لا شيء'], ['loading', 'تحميل'], ['error', 'خطأ']].map((v) => ({ label: v[1], cls: view === v[0] ? 'on' : '', aria: view === v[0] ? 'true' : 'false', pick: () => set({ view: v[0] }) })),
+      tabs: [['open', 'مفتوحة', items.length, 'count hot'], ['done', 'تم حلها اليوم', s.resolved, 'count']].map((t) => ({ label: t[1], count: t[2], countCls: t[3], cls: 'chip' + (s.tab === t[0] ? ' on' : ''), aria: s.tab === t[0] ? 'true' : 'false', pick: () => set({ tab: t[0] }) })),
+      three: [1, 2, 3],
+      isLoading: view === 'loading', isError: view === 'error',
+      retry: () => { set({ view: 'loading' }); setTimeout(() => this.setState({ view: 'normal' }), 900); },
+      allClear: ok && s.tab === 'open' && items.length === 0,
+      showResolved: ok && s.tab === 'done', resolvedCount: s.resolved,
+      showList: ok && s.tab === 'open' && items.length > 0,
+      items: items.map((a) => {
+        const write = a.mode === 'write';
+        const body = write ? a.text : a.instr;
+        return {
+          name: a.name, first: a.name.split(' ')[0], phone: a.phone, tel: 'tel:' + a.phone.replace(/\s/g, ''),
+          wa: 'https://wa.me/' + a.phone.replace(/[^\d]/g, ''), waLabel: 'افتح محادثة ' + a.name + ' في واتساب',
+          initial: a.name.charAt(0), av: 'av lg c' + a.av, wait: a.wait, reason: a.reason,
+          hasRef: !!a.ref, refLabel: a.ref ? a.ref.label : '', refHref: a.ref ? a.ref.href : '#',
+          paused: a.st === 'sent' && !a.resume,
+          cardCls: 'card' + (a.composer ? ' attn' : ''),
+          isOpen: a.st === 'open', isSent: a.st === 'sent',
+          composerOpen: a.composer && a.st === 'open', composerClosed: !a.composer,
+          openReply: () => this.upd(a.id, { composer: true }),
+          closeReply: () => this.upd(a.id, { composer: false, err: false }),
+          isWrite: write, isInstr: !write,
+          modeWriteCls: write ? 'on' : '', modeInstrCls: write ? '' : 'on', modeWriteAria: write ? 'true' : 'false', modeInstrAria: write ? 'false' : 'true',
+          modeWrite: () => this.upd(a.id, { mode: 'write', err: false }), modeInstr: () => this.upd(a.id, { mode: 'instr', err: false }),
+          replyId: 'reply-' + a.id, instrId: 'instr-' + a.id,
+          text: a.text, setText: (e) => this.upd(a.id, { text: e.target.value, err: false }),
+          instr: a.instr, setInstr: (e) => this.upd(a.id, { instr: e.target.value, err: false }), instrPh: a.instrPh,
+          replyCls: a.err ? 'input bad' : 'input', showErr: a.err,
+          suggestShort: a.suggestion, useSuggestion: () => this.upd(a.id, { text: a.suggestion, err: false }),
+          resume: a.resume, toggleResume: () => this.upd(a.id, { resume: !a.resume }),
+          sending: a.sending, sendLabel: a.sending ? 'جارٍ الإرسال…' : (write ? 'أرسل الرد' : 'دع هُدهُد يرد'),
+          send: () => {
+            if (!body.trim()) { this.upd(a.id, { err: true }); return; }
+            this.upd(a.id, { sending: true });
+            setTimeout(() => {
+              this.upd(a.id, { sending: false, st: 'sent', composer: false });
+              this.flash(a.resume ? 'تم إرسال الرد إلى ' + a.name.split(' ')[0] + '، وسيتابع هُدهُد معه' : 'تم إرسال الرد. هُدهُد متوقف مع هذا العميل لحد ما تحل الطلب');
+            }, 900);
+          },
+          askResolve: () => set({ confirmId: a.id })
+        };
+      }),
+      confirmOpen: !!confirmItem, confirmName: confirmItem ? confirmItem.name : '',
+      cancelResolve: () => set({ confirmId: null }),
+      doResolve: () => { const id = s.confirmId; set({ confirmId: null, items: s.items.filter((x) => x.id !== id), resolved: s.resolved + 1 }); this.flash('تم الحل وحُذفت التفاصيل'); },
+      stop: (e) => { if (e && e.stopPropagation) e.stopPropagation(); },
+      hasToast: !!s.toast, toast: s.toast, toastCls: s.toastBad ? 'toast bad' : 'toast ok', toastIcon: s.toastBad ? 'M12 8v4M12 16h.01' : 'M5 12.5l4.5 4.5L19 7'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-14T09:30:00Z"
+  },
+  "title": "Hodhod Business Dashboard",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "title": "الرئيسية",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Attention.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "title": "تحتاج تدخلك",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Orders.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "title": "الطلبات",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Bookings.dc.html": {
+      "x": 4560,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "title": "الحجوزات",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Catalog.dc.html": {
+      "x": 6080,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "title": "المنتجات والخدمات",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Sidebar.dc.html": {
+      "x": 0,
+      "y": 1320,
+      "w": 268,
+      "h": 900,
+      "title": "مكوّن: القائمة الجانبية",
+      "is_interactive": true
+    },
+    "Business.dc.html": {
+      "x": 7600,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "title": "معلومات نشاطك",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "FAQ.dc.html": {
+      "x": 9120,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "title": "الأسئلة الشائعة",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "AISettings.dc.html": {
+      "x": 10640,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "title": "إعدادات هُدهُد",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Account.dc.html": {
+      "x": 12160,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "title": "إعدادات الحساب",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Onboarding.dc.html": {
+      "x": 13680,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "title": "إعداد الحساب (8 خطوات)",
+      "expand": "fill",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Attention.dc.html",
+    "Orders.dc.html",
+    "Bookings.dc.html",
+    "Catalog.dc.html",
+    "Business.dc.html",
+    "FAQ.dc.html",
+    "AISettings.dc.html",
+    "Account.dc.html",
+    "Onboarding.dc.html",
+    "Sidebar.dc.html"
+  ],
+  "notes": {
+    "desktop": {
+      "x": 0,
+      "y": -320,
+      "text": "هُدهُد: لوحة تحكم النشاط (سطح المكتب)",
+      "kind": "title1",
+      "maxW": 15120
+    },
+    "parts": {
+      "x": 0,
+      "y": 1020,
+      "text": "المكوّنات",
+      "kind": "title1",
+      "maxW": 1800
+    }
+  },
+  "designSystems": []
+}

@@ -1,0 +1,32 @@
+// Make Clerk's sign-in / sign-up / profile components look like the rest of the dashboard.
+export const clerkAppearance = {
+  layout: { socialButtonsPlacement: 'top' as const, socialButtonsVariant: 'blockButton' as const, logoPlacement: 'none' as const },
+  variables: {
+    colorPrimary: '#0B7F58',
+    colorText: '#121A2E',
+    colorTextSecondary: '#4A5468',
+    colorBackground: '#FFFFFF',
+    colorInputBackground: '#FFFFFF',
+    colorInputText: '#121A2E',
+    colorDanger: '#B42318',
+    colorSuccess: '#0B7F58',
+    fontFamily: 'var(--font-plex), var(--font-tajawal), sans-serif',
+    fontSize: '15px',
+    borderRadius: '12px',
+  },
+  elements: {
+    rootBox: { width: '100%' },
+    cardBox: { width: '100%', boxShadow: 'none', border: '0' },
+    card: { boxShadow: 'none', border: '0', padding: '0', background: 'transparent' },
+    header: { display: 'none' },
+    footer: { background: 'transparent' },
+    socialButtonsBlockButton: { minHeight: '48px', border: '1.5px solid #D3D8E2', borderRadius: '12px', fontWeight: 700, fontSize: '16px' },
+    dividerText: { color: '#4A5468', fontSize: '14px' },
+    formFieldLabel: { fontWeight: 700, fontSize: '15px', color: '#121A2E' },
+    formFieldInput: { minHeight: '48px', borderRadius: '12px', border: '1.5px solid #D3D8E2', fontSize: '16px', direction: 'ltr', textAlign: 'right' },
+    formButtonPrimary: { minHeight: '50px', borderRadius: '12px', fontWeight: 700, fontSize: '16px', color: '#fff', textTransform: 'none', boxShadow: 'none' },
+    footerActionLink: { color: '#0A6A4A', fontWeight: 700 },
+    formFieldAction: { color: '#0A6A4A', fontWeight: 700 },
+    identityPreviewEditButton: { color: '#0A6A4A' },
+  },
+};

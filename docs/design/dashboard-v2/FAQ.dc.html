@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هُدهُد: الأسئلة الشائعة</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="hodhod.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Tajawal:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="hd" style="font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif; color: #121A2E; background: #F7F8F4">
+<dc-import name="Sidebar" active="faq" hint-size="0px,0px"></dc-import>
+
+<div class="content">
+<div class="rv" role="region" aria-label="أدوات المعاينة (ليست جزءاً من المنتج)">
+<b>معاينة</b><span>حالة الصفحة:</span>
+<div class="seg" role="group" aria-label="حالة الصفحة">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="4"><button type="button" class="{{v.cls}}" aria-pressed="{{v.aria}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for>
+</div>
+</div>
+
+<main class="page" id="main" style="max-width: 1100px">
+<div class="page-head">
+<div class="t"><h1>الأسئلة الشائعة</h1><p>أجوبة جاهزة يستخدمها هُدهُد كما كتبتها. أضف الأسئلة التي يكرّرها عملاؤك.</p></div>
+<button type="button" class="btn btn-primary" onClick="{{addNew}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>إضافة سؤال</button>
+</div>
+
+<sc-if value="{{isLoading}}" hint-placeholder-val="{{false}}">
+<div class="col" style="gap: 16px" aria-busy="true" aria-label="جارٍ التحميل"><div class="sk" style="height: 120px; border-radius: 16px"></div><div class="sk" style="height: 44px; border-radius: 12px"></div><div class="sk" style="height: 380px; border-radius: 16px"></div></div>
+</sc-if>
+<sc-if value="{{isError}}" hint-placeholder-val="{{false}}">
+<div class="card empty" role="alert"><span class="ic danger" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg></span><h2>تعذّر تحميل الأسئلة</h2><p class="muted">لا يزال هُدهُد يستخدم آخر نسخة محفوظة من أجوبتك.</p><button type="button" class="btn btn-primary" onClick="{{retry}}">أعد المحاولة</button></div>
+</sc-if>
+
+<sc-if value="{{showBody}}" hint-placeholder-val="{{true}}">
+<div class="col" style="gap: 20px">
+
+<!-- suggestions -->
+<sc-if value="{{hasSugg}}" hint-placeholder-val="{{true}}">
+<section class="card" aria-labelledby="sg-h">
+<div class="card-head"><div class="row grow" style="gap: 12px"><span class="ic indigo" style="display: grid; place-items: center; flex: none"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"></path></svg></span><div><h2 id="sg-h">أسئلة يطرحها عادةً عملاء {{bizType}}</h2><span class="subtle">اقتراحات حسب نوع نشاطك، لم تُضف بعد</span></div></div></div>
+<ul style="padding: 4px 0">
+<sc-for list="{{sugg}}" as="g" hint-placeholder-count="3">
+<li class="sugg"><span class="grow" style="font-weight: 600; font-size: 14.5px">{{g.q}}</span><div class="row" style="gap: 4px"><button type="button" class="btn btn-soft btn-sm" onClick="{{g.add}}" aria-label="{{g.addLabel}}">أضف جواباً</button><button type="button" class="btn btn-ghost btn-sm" onClick="{{g.dismiss}}" aria-label="{{g.dismissLabel}}">تجاهل</button></div></li>
+</sc-for>
+</ul>
+</section>
+</sc-if>
+
+<!-- empty -->
+<sc-if value="{{isEmpty}}" hint-placeholder-val="{{false}}">
+<div class="card empty">
+<span class="ic brand" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"></path></svg></span>
+<h2>لا توجد أسئلة بعد</h2>
+<p class="muted">ابدأ بالأسئلة المقترحة أعلاه أو أضف سؤالاً يتكرّر كثيراً. يجيب هُدهُد من معلومات نشاطك حتى تضيف أجوبتك.</p>
+<button type="button" class="btn btn-primary btn-sm" onClick="{{addNew}}">أضف أول سؤال</button>
+</div>
+</sc-if>
+
+<sc-if value="{{hasItems}}" hint-placeholder-val="{{true}}">
+<div class="toolbar" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+<div class="search" style="flex: 1 1 240px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"></path></svg><label for="f-q" class="sr-only">ابحث في الأسئلة</label><input id="f-q" class="input" type="search" placeholder="ابحث في الأسئلة والأجوبة" value="{{q}}" onChange="{{setQ}}"></div>
+<div class="row" style="gap: 6px; flex-wrap: wrap" role="group" aria-label="التصنيف"><sc-for list="{{cats}}" as="c" hint-placeholder-count="6"><button type="button" class="{{c.cls}}" aria-pressed="{{c.aria}}" onClick="{{c.pick}}">{{c.label}}<span class="ct num">{{c.count}}</span></button></sc-for></div>
+</div>
+
+<section class="card" aria-label="قائمة الأسئلة">
+<div class="card-head"><span class="subtle">{{summary}}</span></div>
+<sc-if value="{{noMatch}}" hint-placeholder-val="{{false}}"><div class="empty" style="padding: 32px 20px"><b>لا توجد نتائج</b><p class="muted" style="font-size: 14px">جرّب كلمة أخرى أو اختر «الكل».</p><button type="button" class="btn btn-secondary btn-sm" onClick="{{clear}}">مسح البحث</button></div></sc-if>
+<ul>
+<sc-for list="{{items}}" as="f" hint-placeholder-count="6">
+<li class="{{f.cls}}">
+<div class="col grow" style="gap: 6px; min-width: 0">
+<h3 style="font-size: 15.5px; line-height: 1.5">{{f.q}}</h3>
+<p class="ans">{{f.a}}</p>
+<div class="row" style="gap: 8px; flex-wrap: wrap; font-size: 12.5px"><span class="bdg outline">{{f.cat}}</span><span class="subtle" style="font-size: 12.5px">{{f.meta}}</span><sc-if value="{{f.off}}" hint-placeholder-val="{{false}}"><span class="bdg neutral">متوقف: لا يستخدمه هُدهُد</span></sc-if></div>
+</div>
+<div class="faq-acts">
+<label class="row" style="gap: 8px; font-size: 13px; color: #4A5468; min-height: 40px; padding-inline-end: 8px"><button type="button" class="{{f.swCls}}" role="switch" aria-checked="{{f.aria}}" aria-label="{{f.swLabel}}" onClick="{{f.toggle}}"></button><span>{{f.swText}}</span></label>
+<div class="row" style="gap: 2px">
+<button type="button" class="btn btn-ghost btn-sm" onClick="{{f.edit}}" aria-label="{{f.editLabel}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"></path></svg>تعديل</button>
+<button type="button" class="ib sm danger" onClick="{{f.del}}" aria-label="{{f.delLabel}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg></button>
+</div>
+</div>
+</li>
+</sc-for>
+</ul>
+</section>
+</sc-if>
+
+<p class="subtle row" style="gap: 8px; align-items: flex-start"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; margin-top: 3px"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"></path></svg><span>لا يحفظ هُدهُد نصوص المحادثات. تظهر هنا أعداد الاستخدام فقط، دون أي معلومة عن العملاء أو رسائلهم.</span></p>
+</div>
+</sc-if>
+</main>
+</div>
+
+<!-- editor drawer -->
+<sc-if value="{{drawerOpen}}" hint-placeholder-val="{{false}}">
+<div class="scrim" onClick="{{close}}"></div>
+<aside class="drawer-r" role="dialog" aria-modal="true" aria-labelledby="ed-h">
+<div class="drawer-head"><h2 id="ed-h" class="grow" style="font-size: 19px">{{fTitle}}</h2><button type="button" class="ib" onClick="{{close}}" aria-label="إغلاق"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div class="drawer-body">
+<div class="field"><label for="e-q">السؤال <span class="req" aria-hidden="true">*</span></label><input id="e-q" class="{{qCls}}" value="{{form.q}}" onChange="{{setQf}}" placeholder="مثلاً: هل تستقبلون حجوزات بدون موعد؟" aria-required="true"><sc-if value="{{qErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب السؤال</span></sc-if></div>
+<div class="field"><label for="e-a">الجواب <span class="req" aria-hidden="true">*</span></label><textarea id="e-a" class="{{aCls}}" value="{{form.a}}" onChange="{{setAf}}" placeholder="اكتب الجواب كما تريد أن يصل إلى العميل" aria-required="true" style="min-height: 120px"></textarea>
+<div class="row" style="justify-content: space-between"><sc-if value="{{aErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب الجواب</span></sc-if><sc-if value="{{aOk}}" hint-placeholder-val="{{true}}"><span class="hint">الأجوبة القصيرة والواضحة أفضل في واتساب.</span></sc-if><span class="{{lenCls}}">{{len}}/500</span></div></div>
+<div class="field"><label for="e-c">التصنيف</label><select id="e-c" class="input" value="{{form.cat}}" onChange="{{setCf}}"><sc-for list="{{catOpts}}" as="o" hint-placeholder-count="5"><option>{{o}}</option></sc-for></select></div>
+<div class="field"><span class="lbl">صيغ أخرى للسؤال <span class="opt">(اختياري، تساعد هُدهُد على التعرّف على السؤال)</span></span>
+<div class="alts"><sc-for list="{{alts}}" as="al" hint-placeholder-count="2"><span class="alt">{{al.text}}<button type="button" class="ib sm" onClick="{{al.remove}}" aria-label="{{al.removeLabel}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></span></sc-for></div>
+<div class="row" style="gap: 8px"><label for="e-alt" class="sr-only">صيغة جديدة</label><input id="e-alt" class="input" value="{{newAlt}}" onChange="{{setAlt}}" placeholder="مثلاً: متى تفتحون؟" style="flex: 1 1 auto"><button type="button" class="btn btn-secondary btn-sm" onClick="{{addAlt}}">إضافة</button></div>
+</div>
+<div class="row" style="justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid #E6E9F0; border-radius: 12px"><span><b style="display: block">مفعّل</b><span class="subtle">عند إيقافه، لا يستخدم هُدهُد هذا الجواب</span></span><button type="button" class="{{fSwCls}}" role="switch" aria-checked="{{fSwAria}}" aria-label="مفعّل" onClick="{{toggleF}}"></button></div>
+
+<div class="field"><span class="lbl">معاينة <span class="opt">(للتجربة فقط، لا تُحفظ)</span></span>
+<div class="chat" style="background: #EFEAE2; border-radius: 12px; padding: 14px">
+<div class="msg in">{{prevQ}}</div>
+<div class="msg ai"><div class="who">هُدهُد</div>{{prevA}}</div>
+</div>
+</div>
+</div>
+<div class="drawer-foot">
+<button type="button" class="btn btn-primary" onClick="{{save}}" style="flex: 1 1 auto">{{saveLabel}}</button>
+<button type="button" class="btn btn-secondary" onClick="{{close}}">إلغاء</button>
+</div>
+</aside>
+</sc-if>
+
+<sc-if value="{{delOpen}}" hint-placeholder-val="{{false}}">
+<div class="backdrop" onClick="{{closeDel}}">
+<div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dl-h" onClick="{{stop}}">
+<div class="dialog-body"><h2 id="dl-h">هل تريد حذف هذا السؤال؟</h2><p class="muted">«{{delQ}}». لن يستخدم هُدهُد هذا الجواب بعد الآن. لإيقافه مؤقتاً، استخدم مفتاح «مفعّل» بدلاً من الحذف.</p></div>
+<div class="dialog-foot"><button type="button" class="btn btn-secondary" onClick="{{closeDel}}">لا، تراجع</button><button type="button" class="btn btn-danger" onClick="{{doDelete}}">احذف</button></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+<div class="toast ok" role="status" aria-live="polite"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>{{toast}}</span><sc-if value="{{toastUndo}}" hint-placeholder-val="{{false}}"><button type="button" onClick="{{undo}}">تراجع</button></sc-if></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+const CATS = ['عام', 'الحجوزات', 'الأسعار', 'التوصيل', 'المنتجات'];
+const FAQS = [
+  { id: 1, q: 'ما هي ساعات العمل؟', a: 'نستقبلكم من السبت إلى الخميس، من التاسعة صباحاً حتى السابعة مساءً. يوم الجمعة عطلة.', cat: 'عام', on: true, used: 31, upd: 'قبل 3 أيام', alts: ['متى تفتحون؟', 'هل أنتم مفتوحون اليوم؟'] },
+  { id: 2, q: 'كيف أحجز موعداً؟', a: 'يمكنك الحجز هنا مباشرة: أخبرنا بالخدمة واليوم المناسب لك، وسنقترح عليك الأوقات المتاحة ونؤكد الموعد.', cat: 'الحجوزات', on: true, used: 24, upd: 'قبل أسبوع', alts: [] },
+  { id: 3, q: 'هل يمكنني إلغاء الموعد أو تأجيله؟', a: 'نعم، يمكنك الإلغاء أو التأجيل قبل الموعد بثلاث ساعات على الأقل. لباقة العروس عربون قدره 100 ₪ غير مسترد.', cat: 'الحجوزات', on: true, used: 9, upd: 'قبل شهر', alts: ['بدي أأجل موعدي'] },
+  { id: 4, q: 'كم سعر صبغة الشعر؟', a: 'تبدأ أسعار الصبغة من 150 ₪ للشعر القصير، ويختلف السعر حسب الطول واللون. نقدّم استشارة مجانية قبل الصبغة.', cat: 'الأسعار', on: true, used: 17, upd: 'قبل يومين', alts: [] },
+  { id: 5, q: 'هل توصلون المنتجات خارج رام الله؟', a: 'نعم، نوصل إلى نابلس وبيت لحم والخليل خلال يوم إلى ثلاثة أيام عمل. رسوم التوصيل من 15 إلى 30 ₪، والتوصيل مجاني للطلبات التي تزيد على 200 ₪.', cat: 'التوصيل', on: true, used: 12, upd: 'قبل أسبوع', alts: [] },
+  { id: 6, q: 'هل المركز مخصّص للنساء فقط؟', a: 'نعم، المركز نسائي بالكامل، وجميع العاملات فيه من السيدات.', cat: 'عام', on: true, used: 8, upd: 'قبل شهرين', alts: [] },
+  { id: 7, q: 'هل منتجات العناية بالشعر أصلية؟', a: 'نعم، جميع منتجاتنا أصلية ومستوردة من موزعين معتمدين، وتحمل تاريخ الإنتاج والانتهاء.', cat: 'المنتجات', on: true, used: 5, upd: 'قبل 3 أسابيع', alts: [] },
+  { id: 8, q: 'هل لديكم عروض في شهر رمضان؟', a: 'نعم، خصم 20% على جلسات العناية بالبشرة طوال شهر رمضان.', cat: 'الأسعار', on: false, used: 0, upd: 'قبل 6 أشهر', alts: [] }
+];
+const SUGG = ['هل تستقبلون زبونات بدون موعد مسبق؟', 'هل منتجاتكم مناسبة للبشرة الحساسة؟', 'كم تستغرق جلسة الكيراتين؟', 'هل يوجد موقف للسيارات قريب منكم؟'];
+const clone = (x) => JSON.parse(JSON.stringify(x));
+
+class Component extends DCLogic {
+  state = { view: 'normal', items: clone(FAQS), sugg: SUGG.slice(), q: '', cat: 'all', editId: null, form: null, touched: false, newAlt: '', delId: null, lastDel: null, toast: '', toastUndo: false };
+  flash(t, undo) { clearTimeout(this._t); this.setState({ toast: t, toastUndo: !!undo }); this._t = setTimeout(() => this.setState({ toast: '' }), 4000); }
+  openForm(item, q) {
+    this.setState({ editId: item ? item.id : 'new', form: item ? clone(item) : { q: q || '', a: '', cat: 'عام', on: true, alts: [] }, touched: false, newAlt: '' });
+  }
+  renderVals() {
+    const s = this.state; const set = (p) => this.setState(p);
+    const qn = s.q.trim();
+    const inCat = (x) => s.cat === 'all' || x.cat === s.cat;
+    const list = s.items.filter((x) => inCat(x) && (!qn || x.q.indexOf(qn) >= 0 || x.a.indexOf(qn) >= 0));
+    const f = s.form || {};
+    const qErr = s.touched && !String(f.q || '').trim();
+    const aErr = s.touched && !String(f.a || '').trim();
+    const len = String(f.a || '').length;
+    const del = s.items.find((x) => x.id === s.delId);
+    const active = s.items.filter((x) => x.on).length;
+    return {
+      views: [['normal', 'عادي'], ['empty', 'حساب جديد'], ['loading', 'تحميل'], ['error', 'خطأ']].map((v) => ({ label: v[1], cls: s.view === v[0] ? 'on' : '', aria: s.view === v[0] ? 'true' : 'false', pick: () => {
+        if (v[0] === 'empty') set({ view: 'normal', items: [], sugg: SUGG.slice(), q: '', cat: 'all' });
+        else if (v[0] === 'normal') set({ view: 'normal', items: clone(FAQS), sugg: SUGG.slice(), q: '', cat: 'all' });
+        else set({ view: v[0] });
+      } })),
+      isLoading: s.view === 'loading', isError: s.view === 'error', showBody: s.view === 'normal',
+      retry: () => { set({ view: 'loading' }); setTimeout(() => this.setState({ view: 'normal' }), 900); },
+      bizType: 'صالونات التجميل',
+      hasSugg: s.sugg.length > 0,
+      sugg: s.sugg.map((g) => ({ q: g, addLabel: 'أضف جواباً لسؤال: ' + g, dismissLabel: 'تجاهل سؤال: ' + g,
+        add: () => this.openForm(null, g),
+        dismiss: () => set({ sugg: s.sugg.filter((x) => x !== g) }) })),
+      isEmpty: s.items.length === 0, hasItems: s.items.length > 0,
+      q: s.q, setQ: (e) => set({ q: e.target.value }), clear: () => set({ q: '', cat: 'all' }),
+      cats: [['all', 'الكل']].concat(CATS.map((c) => [c, c])).map((c) => ({ label: c[1], count: c[0] === 'all' ? s.items.length : s.items.filter((x) => x.cat === c[0]).length, cls: 'chip' + (s.cat === c[0] ? ' on' : ''), aria: s.cat === c[0] ? 'true' : 'false', pick: () => set({ cat: c[0] }) })),
+      summary: s.items.length + ' أسئلة · ' + active + ' مفعّلة · استخدمها هُدهُد ' + s.items.reduce((n, x) => n + x.used, 0) + ' مرة هذا الشهر',
+      noMatch: list.length === 0,
+      items: list.map((x) => ({
+        cls: 'faq' + (x.on ? '' : ' off'), q: x.q, a: x.a, cat: x.cat, off: !x.on,
+        meta: (x.used ? 'استُخدم ' + x.used + ' مرة هذا الشهر · ' : 'لم يُستخدم هذا الشهر · ') + 'آخر تحديث: ' + x.upd,
+        swCls: 'sw' + (x.on ? ' on' : ''), aria: x.on ? 'true' : 'false', swText: x.on ? 'مفعّل' : 'متوقف', swLabel: 'تفعيل سؤال: ' + x.q,
+        toggle: () => { set({ items: s.items.map((y) => (y.id === x.id ? Object.assign({}, y, { on: !y.on }) : y)) }); this.flash(x.on ? 'أُوقف السؤال، ولن يستخدمه هُدهُد' : 'فُعّل السؤال'); },
+        edit: () => this.openForm(x), editLabel: 'تعديل سؤال: ' + x.q,
+        del: () => set({ delId: x.id }), delLabel: 'حذف سؤال: ' + x.q
+      })),
+      addNew: () => this.openForm(null),
+      drawerOpen: !!s.form, fTitle: s.editId === 'new' ? 'سؤال جديد' : 'تعديل السؤال', form: f,
+      qCls: 'input' + (qErr ? ' bad' : ''), aCls: 'input' + (aErr ? ' bad' : ''), qErr: qErr, aErr: aErr, aOk: !aErr,
+      len: len, lenCls: len > 500 ? 'err' : 'hint',
+      setQf: (e) => set({ form: Object.assign({}, this.state.form, { q: e.target.value }) }),
+      setAf: (e) => set({ form: Object.assign({}, this.state.form, { a: e.target.value }) }),
+      setCf: (e) => set({ form: Object.assign({}, this.state.form, { cat: e.target.value }) }),
+      catOpts: CATS,
+      alts: (f.alts || []).map((t, i) => ({ text: t, removeLabel: 'حذف الصيغة: ' + t, remove: () => set({ form: Object.assign({}, f, { alts: f.alts.filter((x, k) => k !== i) }) }) })),
+      newAlt: s.newAlt, setAlt: (e) => set({ newAlt: e.target.value }),
+      addAlt: () => { const t = s.newAlt.trim(); if (!t) return; set({ form: Object.assign({}, f, { alts: (f.alts || []).concat([t]) }), newAlt: '' }); },
+      fSwCls: 'sw' + (f.on ? ' on' : ''), fSwAria: f.on ? 'true' : 'false', toggleF: () => set({ form: Object.assign({}, f, { on: !f.on }) }),
+      prevQ: String(f.q || '').trim() || 'اكتب السؤال لترى المعاينة',
+      prevA: String(f.a || '').trim() || 'سيظهر جوابك هنا كما سيرسله هُدهُد.',
+      saveLabel: s.editId === 'new' ? 'أضف السؤال' : 'احفظ التعديلات',
+      close: () => set({ form: null, editId: null }),
+      save: () => {
+        if (!String(f.q || '').trim() || !String(f.a || '').trim() || len > 500) { set({ touched: true }); return; }
+        const isNew = s.editId === 'new';
+        const item = Object.assign({}, f, { q: f.q.trim(), a: f.a.trim(), upd: 'الآن' });
+        if (isNew) { item.id = Date.now(); item.used = 0; }
+        set({ items: isNew ? [item].concat(s.items) : s.items.map((x) => (x.id === s.editId ? item : x)), sugg: s.sugg.filter((x) => x !== item.q), form: null, editId: null });
+        this.flash(isNew ? 'تمت إضافة السؤال' : 'تم حفظ التعديلات');
+      },
+      delOpen: !!del, delQ: del ? del.q : '', closeDel: () => set({ delId: null }), stop: (e) => e.stopPropagation(),
+      doDelete: () => { const idx = s.items.findIndex((x) => x.id === s.delId); const it = s.items[idx]; set({ items: s.items.filter((x) => x.id !== s.delId), delId: null, lastDel: { it: it, idx: idx } }); this.flash('تم حذف السؤال', true); },
+      undo: () => { if (!s.lastDel) return; const arr = s.items.slice(); arr.splice(s.lastDel.idx, 0, s.lastDel.it); set({ items: arr, lastDel: null, toast: '' }); },
+      hasToast: !!s.toast, toast: s.toast, toastUndo: s.toastUndo
+    };
+  }
+}
+</script>
+</body>
+</html>

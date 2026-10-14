@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هُدهُد: المنتجات والخدمات</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="hodhod.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Tajawal:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="hd" style="font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif; color: #121A2E; background: #F7F8F4">
+<dc-import name="Sidebar" active="catalog" hint-size="0px,0px"></dc-import>
+
+<div class="content">
+<div class="rv" role="region" aria-label="أدوات المعاينة (ليست جزءاً من المنتج)">
+<b>معاينة</b><span>حالة الصفحة:</span>
+<div class="seg" role="group" aria-label="حالة الصفحة">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="4"><button type="button" class="{{v.cls}}" aria-pressed="{{v.aria}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for>
+</div>
+</div>
+
+<main class="page" id="main">
+<div class="page-head">
+<div class="t"><h1>المنتجات والخدمات</h1><p>يجيب هُدهُد العملاء عن الأسعار والتوفّر من هذه القائمة، ويسجّل منها الطلبات والحجوزات.</p></div>
+<button type="button" class="btn btn-primary" onClick="{{addNew}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>{{addLabel}}</button>
+</div>
+
+<div class="tabs" role="tablist" aria-label="النوع">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="2"><button type="button" role="tab" class="{{t.cls}}" aria-selected="{{t.aria}}" onClick="{{t.pick}}">{{t.label}}<span class="count" style="height: 20px; min-width: 20px; font-size: 11.5px">{{t.count}}</span></button></sc-for>
+</div>
+
+<div class="toolbar">
+<div class="search" style="flex: 1 1 240px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"></path></svg><label for="c-q" class="sr-only">ابحث</label><input id="c-q" class="input" type="search" placeholder="{{searchPh}}" value="{{q}}" onChange="{{setQ}}"></div>
+<div class="row" style="gap: 6px; flex-wrap: wrap" role="group" aria-label="فلترة"><sc-for list="{{filters}}" as="f" hint-placeholder-count="4"><button type="button" class="{{f.cls}}" aria-pressed="{{f.aria}}" onClick="{{f.pick}}">{{f.label}}</button></sc-for></div>
+</div>
+
+<sc-if value="{{isLoading}}" hint-placeholder-val="{{false}}">
+<div class="pgrid" aria-busy="true" aria-label="جاري التحميل"><sc-for list="{{six}}" as="x" hint-placeholder-count="6"><div class="card pcard"><div class="sk" style="aspect-ratio: 4 / 3"></div><div class="sk" style="height: 16px; width: 70%"></div><div class="sk" style="height: 14px; width: 40%"></div></div></sc-for></div>
+</sc-if>
+<sc-if value="{{isError}}" hint-placeholder-val="{{false}}">
+<div class="card empty" role="alert"><span class="ic danger" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg></span><h2>تعذّر تحميل القائمة</h2><p class="muted">لا يزال هُدهُد يستخدم آخر نسخة محفوظة من منتجاتك.</p><button type="button" class="btn btn-primary" onClick="{{retry}}">أعد المحاولة</button></div>
+</sc-if>
+<sc-if value="{{isEmpty}}" hint-placeholder-val="{{false}}">
+<div class="card empty">
+<span class="ic brand" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="{{emptyIcon}}"></path></svg></span>
+<h2>{{emptyTitle}}</h2>
+<p class="muted">{{emptyText}}</p>
+<div class="row" style="flex-wrap: wrap; justify-content: center"><button type="button" class="btn btn-primary btn-sm" onClick="{{addNew}}">{{emptyCta}}</button><a class="btn btn-ghost btn-sm" href="Account.dc.html">{{hideText}}</a></div>
+</div>
+</sc-if>
+<sc-if value="{{noMatch}}" hint-placeholder-val="{{false}}"><div class="card empty"><b>لا توجد نتائج</b><p class="muted" style="font-size: 14px">جرّب كلمة أخرى أو امسح عامل التصفية.</p><button type="button" class="btn btn-secondary btn-sm" onClick="{{clear}}">مسح البحث</button></div></sc-if>
+
+<!-- products grid -->
+<sc-if value="{{showProducts}}" hint-placeholder-val="{{true}}">
+<ul class="pgrid">
+<sc-for list="{{products}}" as="p" hint-placeholder-count="6">
+<li class="{{p.cls}}">
+<div class="{{p.thumb}}" role="img" aria-label="{{p.imgLabel}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{p.icon}}"></path></svg><sc-if value="{{p.off}}" hint-placeholder-val="{{false}}"><span class="bdg neutral" style="position: absolute; top: 8px; right: 8px">مخفي عن العملاء</span></sc-if></div>
+<div class="col" style="gap: 4px">
+<div class="row" style="justify-content: space-between; align-items: flex-start; gap: 8px"><h3 style="font-size: 15.5px; line-height: 1.4">{{p.name}}</h3><b class="num" style="white-space: nowrap; color: #0A6A4A">{{p.price}}</b></div>
+<sc-if value="{{p.hasVariants}}" hint-placeholder-val="{{false}}"><div class="row" style="gap: 4px; flex-wrap: wrap"><sc-for list="{{p.variants}}" as="vr" hint-placeholder-count="2"><span class="bdg outline" style="font-size: 11.5px">{{vr}}</span></sc-for></div></sc-if>
+<span class="{{p.stockCls}}" style="align-self: flex-start">{{p.stock}}</span>
+</div>
+<div class="row" style="justify-content: space-between; margin-top: auto; padding-top: 4px; border-top: 1px solid #E6E9F0">
+<label class="row" style="gap: 8px; font-size: 13px; color: #4A5468; min-height: 40px"><button type="button" class="{{p.swCls}}" role="switch" aria-checked="{{p.aria}}" aria-label="{{p.swLabel}}" onClick="{{p.toggle}}"></button><span class="hide-m">{{p.swText}}</span></label>
+<button type="button" class="btn btn-ghost btn-sm" onClick="{{p.edit}}" aria-label="{{p.editLabel}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"></path></svg>تعديل</button>
+</div>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+
+<!-- services list -->
+<sc-if value="{{showServices}}" hint-placeholder-val="{{false}}">
+<ul class="card">
+<sc-for list="{{services}}" as="v" hint-placeholder-count="6">
+<li style="display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 14px 20px; border-top: 1px solid #E6E9F0">
+<div class="grow" style="flex: 1 1 240px"><div class="row" style="gap: 8px; flex-wrap: wrap"><h3>{{v.name}}</h3><sc-if value="{{v.off}}" hint-placeholder-val="{{false}}"><span class="bdg neutral">مخفية</span></sc-if></div><p class="subtle" style="font-size: 13.5px">{{v.desc}}</p></div>
+<div class="row" style="gap: 18px; flex-wrap: wrap">
+<span class="col" style="gap: 0"><span class="subtle">المدة</span><b>{{v.dur}}</b></span>
+<span class="col" style="gap: 0"><span class="subtle">السعر</span><b class="num">{{v.price}}</b></span>
+<span class="col" style="gap: 0"><span class="subtle">من</span><span class="row" style="gap: 4px"><sc-for list="{{v.staff}}" as="sf" hint-placeholder-count="1"><span class="{{sf.av}}" title="{{sf.name}}">{{sf.initial}}</span></sc-for></span></span>
+<span class="col" style="gap: 0"><span class="subtle">متاحة</span><b style="font-weight: 600">{{v.days}}</b></span>
+</div>
+<div class="row" style="gap: 6px">
+<button type="button" class="{{v.swCls}}" role="switch" aria-checked="{{v.aria}}" aria-label="{{v.swLabel}}" onClick="{{v.toggle}}"></button>
+<button type="button" class="btn btn-ghost btn-sm" onClick="{{v.edit}}" aria-label="{{v.editLabel}}">تعديل</button>
+</div>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+</main>
+</div>
+
+<!-- ================= EDIT DRAWER ================= -->
+<sc-if value="{{drawerOpen}}" hint-placeholder-val="{{false}}">
+<div class="scrim" onClick="{{close}}"></div>
+<aside class="drawer-r" role="dialog" aria-modal="true" aria-labelledby="ed-h">
+<div class="drawer-head"><h2 id="ed-h" class="grow" style="font-size: 19px">{{fTitle}}</h2><button type="button" class="ib" onClick="{{close}}" aria-label="إغلاق"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div class="drawer-body">
+<sc-if value="{{fIsProduct}}" hint-placeholder-val="{{true}}">
+<div class="field"><span class="lbl">صورة المنتج <span class="opt">(تساعد العميل على معرفة ما يطلبه)</span></span>
+<sc-if value="{{imgNone}}" hint-placeholder-val="{{true}}"><div class="drop"><svg class="i i-lg" viewBox="0 0 24 24" aria-hidden="true" style="color: #5F687B"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"></path></svg><b style="font-size: 14px">اسحب الصورة إلى هنا</b><div class="row" style="gap: 8px; flex-wrap: wrap; justify-content: center"><button type="button" class="btn btn-secondary btn-sm" onClick="{{pickImg}}">اختر صورة</button><button type="button" class="btn btn-secondary btn-sm" onClick="{{pickImg}}">صوّر بالكاميرا</button></div><span class="hint">JPG أو PNG أو WebP، حتى 10 ميغابايت. نصغّرها تلقائياً.</span></div></sc-if>
+<sc-if value="{{imgBusy}}" hint-placeholder-val="{{false}}"><div class="drop" aria-live="polite"><span class="spin dk"></span><b style="font-size: 14px">جارٍ تجهيز الصورة…</b><div class="bar" style="width: 180px"><span style="width: 60%"></span></div></div></sc-if>
+<sc-if value="{{imgDone}}" hint-placeholder-val="{{false}}"><div class="row" style="gap: 12px"><div class="{{fThumb}}" style="width: 120px" role="img" aria-label="معاينة الصورة"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{fIcon}}"></path></svg></div><div class="col" style="gap: 4px"><span class="bdg success" style="align-self: flex-start">جاهزة · 184 KB</span><div class="row" style="gap: 4px"><button type="button" class="btn-link" onClick="{{pickImg}}">تغيير</button><button type="button" class="btn-link" style="color: #B42318" onClick="{{removeImg}}">إزالة</button></div></div></div></sc-if>
+</div>
+</sc-if>
+
+<div class="field"><label for="f-name">الاسم <span class="req" aria-hidden="true">*</span></label><input id="f-name" class="{{nameCls}}" value="{{f.name}}" onChange="{{setF.name}}" placeholder="{{namePh}}" aria-required="true"><sc-if value="{{nameErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب الاسم</span></sc-if></div>
+<div class="field"><label for="f-desc">الوصف <span class="opt">(اختياري)</span></label><textarea id="f-desc" class="input" value="{{f.desc}}" onChange="{{setF.desc}}" placeholder="الحجم، المكونات، لمن يناسب… أي معلومة قد يسأل عنها العميل"></textarea></div>
+<div class="grid-2" style="gap: 12px">
+<div class="field"><label for="f-price">السعر (₪) <span class="req" aria-hidden="true">*</span></label><input id="f-price" class="{{priceCls}}" inputmode="decimal" dir="ltr" value="{{f.price}}" onChange="{{setF.price}}" placeholder="0" aria-required="true"><sc-if value="{{priceErr}}" hint-placeholder-val="{{false}}"><span class="err">يجب أن يكون السعر رقماً أكبر من صفر</span></sc-if></div>
+<sc-if value="{{fIsService}}" hint-placeholder-val="{{false}}"><div class="field"><label for="f-dur">المدة</label><select id="f-dur" class="input" value="{{f.dur}}" onChange="{{setF.dur}}"><option value="30">30 د</option><option value="45">45 د</option><option value="60">ساعة</option><option value="90">ساعة ونصف</option><option value="120">ساعتان</option><option value="150">ساعتان ونصف</option><option value="240">4 ساعات</option></select></div></sc-if>
+</div>
+
+<sc-if value="{{fIsProduct}}" hint-placeholder-val="{{true}}">
+<fieldset class="field" style="border: 0; padding: 0; margin: 0"><legend class="lbl" style="margin-bottom: 6px">الأحجام أو الأنواع <span class="opt">(اختياري)</span></legend>
+<ul class="col" style="gap: 8px">
+<sc-for list="{{variants}}" as="vr" hint-placeholder-count="2"><li class="row" style="gap: 8px"><label class="sr-only" for="{{vr.nid}}">اسم النوع</label><input id="{{vr.nid}}" class="input" value="{{vr.name}}" onChange="{{vr.setName}}" placeholder="مثلاً: 500 مل"><label class="sr-only" for="{{vr.pid}}">سعره</label><input id="{{vr.pid}}" class="input" inputmode="decimal" dir="ltr" value="{{vr.price}}" onChange="{{vr.setPrice}}" placeholder="₪" style="max-width: 100px"><button type="button" class="ib sm danger" onClick="{{vr.remove}}" aria-label="إزالة النوع"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></li></sc-for>
+</ul>
+<button type="button" class="btn-link" onClick="{{addVariant}}" style="align-self: flex-start">+ أضف حجم أو نوع</button>
+</fieldset>
+<fieldset class="field" style="border: 0; padding: 0; margin: 0"><legend class="lbl" style="margin-bottom: 6px">التوفّر</legend>
+<div class="col" style="gap: 8px">
+<label class="{{stAlwaysCls}}"><input type="radio" name="stk" checked="{{stAlways}}" onChange="{{setStAlways}}"><span><b>متوفر دائماً</b><span class="subtle">دون تتبّع الكمية</span></span></label>
+<label class="{{stQtyCls}}"><input type="radio" name="stk" checked="{{stQty}}" onChange="{{setStQty}}"><span class="grow"><b>بكمية محددة</b><span class="subtle">يخبر هُدهُد العملاء بنفاد الكمية عند انتهائها</span></span></label>
+<sc-if value="{{stQty}}" hint-placeholder-val="{{false}}"><div class="field" style="padding-inline-start: 30px"><label for="f-qty">الكمية الموجودة</label><input id="f-qty" class="input" inputmode="numeric" dir="ltr" value="{{f.qty}}" onChange="{{setF.qty}}" style="max-width: 140px"></div></sc-if>
+<label class="{{stOutCls}}"><input type="radio" name="stk" checked="{{stOut}}" onChange="{{setStOut}}"><span><b>نفد حالياً</b><span class="subtle">يعتذر هُدهُد ويعرض بدائل</span></span></label>
+</div>
+</fieldset>
+</sc-if>
+
+<sc-if value="{{fIsService}}" hint-placeholder-val="{{false}}">
+<fieldset class="field" style="border: 0; padding: 0; margin: 0"><legend class="lbl" style="margin-bottom: 6px">من يقدّم الخدمة</legend>
+<div class="row" style="gap: 8px; flex-wrap: wrap"><sc-for list="{{staffOpts}}" as="o" hint-placeholder-count="2"><label class="{{o.cls}}"><input type="checkbox" checked="{{o.on}}" onChange="{{o.toggle}}">{{o.name}}</label></sc-for></div>
+<sc-if value="{{staffErr}}" hint-placeholder-val="{{false}}"><span class="err">اختر موظفة واحدة على الأقل</span></sc-if>
+</fieldset>
+<fieldset class="field" style="border: 0; padding: 0; margin: 0"><legend class="lbl" style="margin-bottom: 6px">الأيام المتاحة</legend>
+<div class="row" style="gap: 6px; flex-wrap: wrap"><sc-for list="{{dayOpts}}" as="o" hint-placeholder-count="7"><button type="button" class="{{o.cls}}" aria-pressed="{{o.aria}}" onClick="{{o.toggle}}">{{o.name}}</button></sc-for></div>
+</fieldset>
+</sc-if>
+
+<div class="row" style="justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid #E6E9F0; border-radius: 12px"><span><b style="display: block">ظاهر للعملاء</b><span class="subtle">عند إيقافه، لن يعرضه هُدهُد ولن يقبل طلبات عليه</span></span><button type="button" class="{{fSwCls}}" role="switch" aria-checked="{{fSwAria}}" aria-label="ظاهر للعملاء" onClick="{{toggleF}}"></button></div>
+</div>
+<div class="drawer-foot">
+<button type="button" class="btn btn-primary" onClick="{{save}}" style="flex: 1 1 auto">{{saveLabel}}</button>
+<button type="button" class="btn btn-secondary" onClick="{{close}}">إلغاء</button>
+<sc-if value="{{canDelete}}" hint-placeholder-val="{{false}}"><button type="button" class="btn btn-danger-soft" onClick="{{askDelete}}">احذف</button></sc-if>
+</div>
+</aside>
+</sc-if>
+
+<sc-if value="{{delOpen}}" hint-placeholder-val="{{false}}">
+<div class="backdrop" onClick="{{closeDel}}">
+<div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dl-h" onClick="{{stop}}">
+<div class="dialog-body"><h2 id="dl-h">هل تريد حذف «{{f.name}}»؟</h2><p class="muted">لن يعرضه هُدهُد بعد الآن، ولن تتأثر الطلبات السابقة. لإخفائه مؤقتاً، أوقف خيار «ظاهر للعملاء» بدلاً من الحذف.</p></div>
+<div class="dialog-foot"><button type="button" class="btn btn-secondary" onClick="{{closeDel}}">لا، تراجع</button><button type="button" class="btn btn-danger" onClick="{{doDelete}}">احذف</button></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+<div class="toast ok" role="status" aria-live="polite"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>{{toast}}</span><sc-if value="{{toastUndo}}" hint-placeholder-val="{{false}}"><button type="button" onClick="{{undo}}">تراجع</button></sc-if></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startTab":{"editor":"enum","options":["products","services"],"default":"products"},"$preview":{"width":1440,"height":1000}}'>
+const IC = { bottle: 'M10 3h4v3l2 2v12a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V8l2-2zM8 12h8', drop: 'M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z', jar: 'M6 8h12v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2zM7 4h10v4H7z', spray: 'M9 8h6v13H9zM10 4h4v4h-4zM17 5h2M17 8h3M17 2h2', perfume: 'M8 9h8v11a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1zM10 5h4v4h-4zM9 3h6', gift: 'M4 9h16v4H4zM6 13h12v8H6zM12 9v12M12 9s-4-1-4-4a2 2 0 0 1 4 0zM12 9s4-1 4-4a2 2 0 0 0-4 0z', comb: 'M4 10h16v4H4zM6 14v5M9 14v5M12 14v5M15 14v5M18 14v5' };
+const STAFF = { sara: { name: 'سارة', av: 1 }, lian: { name: 'ليان', av: 4 } };
+const DAYS = ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+const P = (id, name, price, desc, stock, icon, t, variants, active) => ({ id, kind: 'product', name, price: String(price), desc, stock, icon, t, variants: variants || [], active: active !== false, img: true });
+const S = (id, name, price, desc, dur, staff, days, active) => ({ id, kind: 'service', name, price: String(price), desc, dur: String(dur), staff, days, active: active !== false });
+const ALLD = [0, 1, 2, 3, 4, 5];
+const SEED = [
+  P('p1', 'شامبو أرغان', 45, 'للشعر الجاف والمصبوغ، خالي من السلفات.', 24, 'bottle', 0, [['250 مل', '45'], ['500 مل', '80']]),
+  P('p2', 'زيت شعر طبيعي', 60, 'زيت أرغان وجوز الهند، 100 مل.', 12, 'drop', 2),
+  P('p3', 'ماسك كيراتين', 85, 'علاج مكثّف بعد الصبغة، 200 مل.', 3, 'jar', 3),
+  P('p4', 'بخاخ حماية من الحرارة', 55, 'قبل السشوار والمكواة.', 18, 'spray', 1),
+  P('p5', 'عطر الياسمين', 120, 'عطر شعر وجسم.', 0, 'perfume', 4, [['50 مل', '120'], ['100 مل', '190']]),
+  P('p6', 'مجموعة العناية بالشعر', 210, 'شامبو + ماسك + زيت، في علبة هدية.', 6, 'gift', 5),
+  P('p7', 'مشط خشب', 20, '', 40, 'comb', 6, [], false),
+  S('s1', 'قص وسشوار', 70, 'قص حسب الطلب مع سشوار.', 45, ['sara'], ALLD),
+  S('s2', 'صبغة شعر', 180, 'لون واحد، شامل غسيل وسشوار.', 120, ['sara'], ALLD),
+  S('s3', 'كيراتين', 350, 'حسب طول الشعر، يبدأ من 350 ₪.', 150, ['sara'], [0, 1, 2, 3, 5]),
+  S('s4', 'مناكير', 60, 'تنظيف وطلاء عادي. الجل +20 ₪.', 45, ['lian'], ALLD),
+  S('s5', 'باديكير', 80, '', 60, ['lian'], ALLD),
+  S('s6', 'تنظيف بشرة', 150, 'جلسة كاملة مع ماسك.', 60, ['lian'], [0, 2, 4]),
+  S('s7', 'باقة العروس', 900, 'تسريحة ومكياج ومناكير وباديكير وتنظيف بشرة قبل العرس بأسبوع.', 240, ['sara', 'lian'], [0, 1, 2, 3, 4, 5])
+];
+const durText = (d) => ({ 30: '30 د', 45: '45 د', 60: 'ساعة', 90: 'ساعة ونصف', 120: 'ساعتان', 150: 'ساعتان ونصف', 240: '4 ساعات' })[+d] || d + ' د';
+
+class Component extends DCLogic {
+  state = { view: 'normal', tab: undefined, items: SEED.map((x) => Object.assign({}, x)), q: '', filter: 'all', editId: null, f: null, touched: false, img: 'done', delOpen: false, toast: '', lastDel: null };
+  flash(t, undo) { clearTimeout(this._t); this.setState({ toast: t, toastUndo: !!undo }); this._t = setTimeout(() => this.setState({ toast: '' }), 4000); }
+  open(it) { this.setState({ editId: it ? it.id : 'new', f: it ? JSON.parse(JSON.stringify(it)) : null, touched: false, img: it && it.img ? 'done' : 'none' }); }
+  renderVals() {
+    const s = this.state; const set = (p) => this.setState(p);
+    const tab = s.tab !== undefined ? s.tab : (this.props.startTab || 'products');
+    const kind = tab === 'products' ? 'product' : 'service';
+    const empty = s.view === 'empty';
+    const all = empty ? [] : s.items;
+    const mine = all.filter((x) => x.kind === kind);
+    const q = s.q.trim();
+    const stockOf = (x) => (x.stock === 'always' ? 99 : +x.stock);
+    const fdefs = kind === 'product' ? [['all', 'الكل'], ['in', 'متوفر'], ['low', 'كمية قليلة'], ['out', 'نفد'], ['off', 'مخفي']] : [['all', 'الكل'], ['on', 'ظاهرة'], ['off', 'مخفية']];
+    const filt = (x) => {
+      if (s.filter === 'off') return !x.active;
+      if (s.filter === 'on') return x.active;
+      if (s.filter === 'in') return x.active && stockOf(x) > 5;
+      if (s.filter === 'low') return stockOf(x) > 0 && stockOf(x) <= 5;
+      if (s.filter === 'out') return stockOf(x) === 0;
+      return true;
+    };
+    const list = mine.filter((x) => filt(x) && (!q || x.name.indexOf(q) >= 0 || (x.desc || '').indexOf(q) >= 0));
+    const toggle = (x) => () => { set({ items: s.items.map((y) => (y.id === x.id ? Object.assign({}, y, { active: !y.active }) : y)) }); this.flash(x.active ? 'أُخفي «' + x.name + '» عن العملاء' : 'أصبح «' + x.name + '» ظاهراً للعملاء'); };
+
+    // form
+    const f = s.f || { kind: kind, name: '', desc: '', price: '', dur: '45', staff: ['sara'], days: ALLD.slice(), variants: [], stock: 'always', qty: '10', active: true, icon: kind === 'product' ? 'bottle' : '', t: s.items.length % 7 };
+    if (s.f && s.f.kind === 'product' && s.f.qty === undefined) f.qty = String(s.f.stock === 'always' ? 10 : s.f.stock);
+    const fk = f.stockMode || (f.stock === 'always' ? 'always' : (+f.stock === 0 ? 'out' : 'qty'));
+    const isNew = s.editId === 'new';
+    const nameErr = s.touched && !String(f.name).trim();
+    const priceN = Number(String(f.price).replace(',', '.'));
+    const priceErr = s.touched && !(priceN > 0);
+    const staffErr = s.touched && f.kind === 'service' && (!f.staff || !f.staff.length);
+    const setForm = (p) => this.setState({ f: Object.assign({}, f, p) });
+    const setF = {}; ['name', 'desc', 'price', 'dur', 'qty'].forEach((k) => { setF[k] = (e) => setForm({ [k]: e.target.value }); });
+
+    return {
+      views: [['normal', 'عادي'], ['empty', 'فارغ'], ['loading', 'تحميل'], ['error', 'خطأ']].map((v) => ({ label: v[1], cls: s.view === v[0] ? 'on' : '', aria: s.view === v[0] ? 'true' : 'false', pick: () => set({ view: v[0] }) })),
+      tabs: [['products', 'المنتجات', all.filter((x) => x.kind === 'product').length], ['services', 'الخدمات', all.filter((x) => x.kind === 'service').length]].map((t) => ({ label: t[1], count: t[2], cls: 'tab' + (tab === t[0] ? ' on' : ''), aria: tab === t[0] ? 'true' : 'false', pick: () => set({ tab: t[0], filter: 'all', q: '' }) })),
+      addLabel: kind === 'product' ? 'أضف منتج' : 'أضف خدمة', addNew: () => this.open(null),
+      searchPh: kind === 'product' ? 'ابحث في المنتجات' : 'ابحث في الخدمات', q: s.q, setQ: (e) => set({ q: e.target.value }), clear: () => set({ q: '', filter: 'all' }),
+      filters: fdefs.map((d) => ({ label: d[1], cls: 'chip' + (s.filter === d[0] ? ' on' : ''), aria: s.filter === d[0] ? 'true' : 'false', pick: () => set({ filter: d[0] }) })),
+      six: [1, 2, 3, 4, 5, 6],
+      isLoading: s.view === 'loading', isError: s.view === 'error', retry: () => { set({ view: 'loading' }); setTimeout(() => this.setState({ view: 'normal' }), 900); },
+      isEmpty: s.view !== 'loading' && s.view !== 'error' && mine.length === 0,
+      emptyIcon: kind === 'product' ? 'M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0' : 'M4 5h16v15H4zM4 10h16M9 3v4M15 3v4',
+      emptyTitle: kind === 'product' ? 'لم تُضف منتجات بعد' : 'لم تُضف خدمات بعد',
+      emptyText: kind === 'product' ? 'أضف منتجاتك مع أسعارها ليجيب هُدهُد العملاء ويسجّل طلباتهم.' : 'أضف خدماتك ومدتها ليحجز هُدهُد المواعيد المتاحة للعملاء.',
+      emptyCta: kind === 'product' ? 'أضف أول منتج' : 'أضف أول خدمة', hideText: kind === 'product' ? 'لا تبيع منتجات؟ أخفِ هذا القسم' : 'لا تقدّم خدمات؟ أخفِ هذا القسم',
+      noMatch: s.view === 'normal' && mine.length > 0 && list.length === 0,
+      showProducts: s.view === 'normal' && kind === 'product' && list.length > 0,
+      showServices: s.view === 'normal' && kind === 'service' && list.length > 0,
+      products: list.filter((x) => x.kind === 'product').map((x) => {
+        const n = stockOf(x);
+        return {
+          name: x.name, price: x.price + ' ₪', icon: IC[x.icon] || IC.bottle, thumb: 'thumb t' + x.t, imgLabel: 'صورة ' + x.name, off: !x.active, cls: 'card pcard' + (x.active ? '' : ' off'),
+          variants: x.variants.map((v) => v[0] + ' · ' + v[1] + ' ₪'), hasVariants: x.variants.length > 0,
+          stock: x.stock === 'always' ? 'متوفر' : (n === 0 ? 'نفد' : (n <= 5 ? 'كمية قليلة · ' + n : 'متوفر · ' + n)), stockCls: x.stock === 'always' ? 'bdg success' : (n === 0 ? 'bdg danger' : (n <= 5 ? 'bdg warning' : 'bdg success')),
+          swCls: x.active ? 'sw on' : 'sw', aria: x.active ? 'true' : 'false', swLabel: 'ظهور ' + x.name + ' للعملاء', swText: x.active ? 'ظاهر' : 'مخفي', toggle: toggle(x),
+          edit: () => this.open(x), editLabel: 'تعديل ' + x.name
+        };
+      }),
+      services: list.filter((x) => x.kind === 'service').map((x) => ({
+        name: x.name, desc: x.desc || 'بدون وصف', dur: durText(x.dur), price: x.price + ' ₪', off: !x.active,
+        staff: x.staff.map((k) => ({ name: STAFF[k].name, initial: STAFF[k].name.charAt(0), av: 'av sm c' + STAFF[k].av })),
+        days: x.days.length >= 6 ? 'كل أيام الدوام' : x.days.map((d) => DAYS[d]).join('، '),
+        swCls: x.active ? 'sw on' : 'sw', aria: x.active ? 'true' : 'false', swLabel: 'ظهور ' + x.name + ' للعملاء', toggle: toggle(x),
+        edit: () => this.open(x), editLabel: 'تعديل ' + x.name
+      })),
+
+      drawerOpen: !!s.editId, close: () => set({ editId: null, f: null }),
+      fTitle: isNew ? (kind === 'product' ? 'منتج جديد' : 'خدمة جديدة') : 'تعديل ' + f.name,
+      fIsProduct: f.kind === 'product', fIsService: f.kind === 'service',
+      f: f, setF: setF,
+      namePh: f.kind === 'product' ? 'مثلاً: شامبو أرغان' : 'مثلاً: قص وسشوار',
+      nameErr: nameErr, nameCls: nameErr ? 'input bad' : 'input', priceErr: priceErr, priceCls: priceErr ? 'input ltr bad' : 'input ltr', staffErr: staffErr,
+      imgNone: s.img === 'none', imgBusy: s.img === 'busy', imgDone: s.img === 'done',
+      pickImg: () => { set({ img: 'busy' }); setTimeout(() => this.setState({ img: 'done' }), 1100); }, removeImg: () => set({ img: 'none' }),
+      fThumb: 'thumb t' + (f.t || 0), fIcon: IC[f.icon] || IC.bottle,
+      variants: (f.variants || []).map((v, i) => ({
+        name: v[0], price: v[1], nid: 'vn' + i, pid: 'vp' + i,
+        setName: (e) => setForm({ variants: f.variants.map((x, j) => (j === i ? [e.target.value, x[1]] : x)) }),
+        setPrice: (e) => setForm({ variants: f.variants.map((x, j) => (j === i ? [x[0], e.target.value] : x)) }),
+        remove: () => setForm({ variants: f.variants.filter((x, j) => j !== i) })
+      })),
+      addVariant: () => setForm({ variants: (f.variants || []).concat([['', '']]) }),
+      stAlways: fk === 'always', stQty: fk === 'qty', stOut: fk === 'out',
+      stAlwaysCls: 'radio-card' + (fk === 'always' ? ' on' : ''), stQtyCls: 'radio-card' + (fk === 'qty' ? ' on' : ''), stOutCls: 'radio-card' + (fk === 'out' ? ' on' : ''),
+      setStAlways: () => setForm({ stockMode: 'always' }), setStQty: () => setForm({ stockMode: 'qty' }), setStOut: () => setForm({ stockMode: 'out' }),
+      staffOpts: Object.keys(STAFF).map((k) => { const on = (f.staff || []).indexOf(k) >= 0; return { name: STAFF[k].name, on: on, cls: 'check' + (on ? ' on' : ''), toggle: () => setForm({ staff: on ? f.staff.filter((x) => x !== k) : (f.staff || []).concat([k]) }) }; }),
+      dayOpts: DAYS.map((d, i) => { const on = (f.days || []).indexOf(i) >= 0; return { name: d, cls: 'chip' + (on ? ' on' : ''), aria: on ? 'true' : 'false', toggle: () => setForm({ days: on ? f.days.filter((x) => x !== i) : (f.days || []).concat([i]) }) }; }),
+      fSwCls: f.active ? 'sw on' : 'sw', fSwAria: f.active ? 'true' : 'false', toggleF: () => setForm({ active: !f.active }),
+      saveLabel: isNew ? 'أضف' : 'احفظ التعديلات', canDelete: !isNew,
+      save: () => {
+        if (!String(f.name).trim() || !(priceN > 0) || (f.kind === 'service' && (!f.staff || !f.staff.length))) { set({ touched: true }); return; }
+        const item = Object.assign({}, f, { name: String(f.name).trim(), price: String(priceN), img: s.img === 'done' });
+        if (f.kind === 'product') { item.stock = fk === 'always' ? 'always' : (fk === 'out' ? 0 : Math.max(0, parseInt(f.qty, 10) || 0)); item.variants = (f.variants || []).filter((v) => String(v[0]).trim()); delete item.stockMode; }
+        if (isNew) item.id = (f.kind === 'product' ? 'p' : 's') + Date.now();
+        set({ items: isNew ? [item].concat(s.items) : s.items.map((x) => (x.id === item.id ? item : x)), editId: null, f: null, view: 'normal' });
+        this.flash(isNew ? 'تمت إضافة «' + item.name + '»' : 'تم حفظ التعديلات');
+      },
+      askDelete: () => set({ delOpen: true }), closeDel: () => set({ delOpen: false }), delOpen: s.delOpen,
+      doDelete: () => { const idx = s.items.findIndex((x) => x.id === s.editId); const it = s.items[idx]; set({ items: s.items.filter((x) => x.id !== s.editId), delOpen: false, editId: null, f: null, lastDel: { it: it, idx: idx } }); this.flash('تم حذف «' + it.name + '»', true); },
+      undo: () => { if (!s.lastDel) return; const arr = s.items.slice(); arr.splice(s.lastDel.idx, 0, s.lastDel.it); set({ items: arr, lastDel: null, toast: '' }); },
+      stop: (e) => { if (e && e.stopPropagation) e.stopPropagation(); },
+      hasToast: !!s.toast, toast: s.toast, toastUndo: !!s.toastUndo
+    };
+  }
+}
+</script>
+</body>
+</html>

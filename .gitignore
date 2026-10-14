@@ -1,3 +1,11 @@
 node_modules
 .vercel
 .env*
+!.env.example
+.next
+next-env.d.ts
+*.tsbuildinfo
+/test-results
+/screenshots
+AGENTS.md
+.next-build
