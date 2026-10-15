@@ -522,20 +522,14 @@ try {
     await page.getByText('واتساب متصل').first().waitFor();
     await shoot(page, '100-account-wa');
   });
-  await step('account: team invite', async () => {
-    await click(page.getByRole('tab', { name: 'فريق العمل' }));
-    await click(page.getByRole('button', { name: 'أرسل الدعوة' }));
-    await page.getByText('اكتب الاسم').first().waitFor();
-    await page.fill('#iv-n', 'نور حمدان');
-    await page.fill('#iv-p', '+970 59 300 7712');
-    await click(page.getByRole('button', { name: 'أرسل الدعوة' }));
-    await toast('أُرسلت الدعوة عبر واتساب');
-    await shoot(page, '101-account-team');
-  });
-  await step('account: plan', async () => {
-    await click(page.getByRole('tab', { name: 'الاشتراك' }));
-    await page.getByText('الباقة الأساسية').first().waitFor();
-    await shoot(page, '102-account-plan');
+  // فريق العمل and الاشتراك are hidden for now (HIDDEN_ACCOUNT_TABS in app/dashboard/account/tabs.ts).
+  await step('account: team and plan tabs are hidden', async () => {
+    same(await page.getByRole('tab', { name: 'فريق العمل' }).count(), 0);
+    same(await page.getByRole('tab', { name: 'الاشتراك' }).count(), 0);
+    await go(page, '/dashboard/account?tab=team');
+    await page.getByText('واتساب متصل').first().waitFor();
+    await go(page, '/dashboard/account?tab=plan');
+    await page.getByText('واتساب متصل').first().waitFor();
   });
   await step('account: sections hide/show orders', async () => {
     await click(page.getByRole('tab', { name: 'أقسام اللوحة' }));
@@ -577,7 +571,6 @@ try {
     same((await sql(`select config->>'tone' tone from ai_settings where business_id=$1`, [id]))[0].tone, 'formal');
     same((await sql(`select count(*)::int n from products where business_id=$1 and name='كريم يدين' and deleted_at is null`, [id]))[0].n, 1);
     same((await sql(`select count(*)::int n from delivery_areas where business_id=$1 and name='طولكرم'`, [id]))[0].n, 1);
-    same((await sql(`select count(*)::int n from team_members where business_id=$1 and name='نور حمدان'`, [id]))[0].n, 1);
     await go(page, '/dashboard/business');
     ok(await has('https://maps.google.com/x'), 'business page does not show the saved map link');
     await go(page, '/dashboard/catalog');

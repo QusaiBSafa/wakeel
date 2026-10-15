@@ -8,8 +8,9 @@ import AccountTeam from '@/components/account/AccountTeam';
 import AccountWhatsApp from '@/components/account/AccountWhatsApp';
 import Tabs from '@/components/ui/Tabs';
 import type { AccountData } from '@/lib/server/loaders/account';
+import { type AccountTab, VISIBLE_ACCOUNT_TABS } from './tabs';
 
-export type AccountTab = 'wa' | 'team' | 'plan' | 'sections';
+export type { AccountTab };
 
 export default function AccountClient({ data, initialTab }: { data: AccountData; initialTab: AccountTab }) {
   const router = useRouter();
@@ -25,7 +26,7 @@ export default function AccountClient({ data, initialTab }: { data: AccountData;
       <div className="page-head">
         <div className="t">
           <h1>إعدادات الحساب</h1>
-          <p>ربط واتساب، وفريق العمل، والاشتراك، والأقسام الظاهرة في لوحة التحكم.</p>
+          <p>ربط واتساب، والأقسام الظاهرة في لوحة التحكم.</p>
         </div>
       </div>
       <Tabs
@@ -33,11 +34,11 @@ export default function AccountClient({ data, initialTab }: { data: AccountData;
         value={tab}
         onChange={go}
         tabs={[
-          { value: 'wa', label: 'واتساب', dot: waState !== 'on' },
-          { value: 'team', label: 'فريق العمل' },
-          { value: 'plan', label: 'الاشتراك' },
-          { value: 'sections', label: 'أقسام اللوحة' },
-        ]}
+          { value: 'wa' as const, label: 'واتساب', dot: waState !== 'on' },
+          { value: 'team' as const, label: 'فريق العمل' },
+          { value: 'plan' as const, label: 'الاشتراك' },
+          { value: 'sections' as const, label: 'أقسام اللوحة' },
+        ].filter((t) => VISIBLE_ACCOUNT_TABS.includes(t.value))}
       />
       <div style={{ marginTop: 20 }}>
         {tab === 'wa' && <AccountWhatsApp data={data} state={waState} onChanged={refresh} />}
