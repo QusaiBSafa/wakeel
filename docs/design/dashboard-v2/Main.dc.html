@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هُدهُد: الرئيسية</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="hodhod.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Tajawal:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="hd" style="font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif; color: #121A2E; background: #F7F8F4">
+<dc-import name="Sidebar" active="home" wa="{{waProp}}" hint-size="0px,0px"></dc-import>
+
+<div class="content">
+<div class="rv" role="region" aria-label="أدوات المعاينة (ليست جزءاً من المنتج)">
+<b>معاينة</b><span>حالة الصفحة:</span>
+<div class="seg" role="group" aria-label="حالة الصفحة">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="5"><button type="button" class="{{v.cls}}" aria-pressed="{{v.aria}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for>
+</div>
+</div>
+
+<main class="page" id="main">
+<div class="page-head">
+<div class="t">
+<h1>صباح الخير، رنا</h1>
+<p>الأربعاء 14 تشرين الأول · إليك ملخص عملك اليوم.</p>
+</div>
+<a class="btn btn-secondary" href="Attention.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>تحتاج تدخلك</a>
+</div>
+
+<!-- ===== loading ===== -->
+<sc-if value="{{isLoading}}" hint-placeholder-val="{{false}}">
+<div aria-busy="true" aria-label="جاري التحميل" class="col" style="gap: 16px">
+<div class="sk" style="height: 84px; border-radius: 16px"></div>
+<div class="grid-4"><div class="sk" style="height: 118px; border-radius: 16px"></div><div class="sk" style="height: 118px; border-radius: 16px"></div><div class="sk" style="height: 118px; border-radius: 16px"></div><div class="sk" style="height: 118px; border-radius: 16px"></div></div>
+<div class="split"><div class="sk" style="height: 340px; border-radius: 16px"></div><div class="sk" style="height: 340px; border-radius: 16px"></div></div>
+</div>
+</sc-if>
+
+<!-- ===== error ===== -->
+<sc-if value="{{isError}}" hint-placeholder-val="{{false}}">
+<div class="card empty" role="alert">
+<span class="ic danger" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg></span>
+<h2>تعذّر تحميل الصفحة</h2>
+<p class="muted">حدثت مشكلة في الاتصال. لا يزال هُدهُد يعمل ويرد على عملائك، لكن الأرقام غير متاحة حالياً.</p>
+<button type="button" class="btn btn-primary" onClick="{{retry}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"></path></svg>أعد المحاولة</button>
+</div>
+</sc-if>
+
+<sc-if value="{{showBody}}" hint-placeholder-val="{{true}}">
+
+<!-- ===== status banner ===== -->
+<sc-if value="{{stOn}}" hint-placeholder-val="{{true}}">
+<section class="card card-pad" aria-label="حالة هُدهُد" style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px">
+<span class="ic brand" style="width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center"><img src="/_blob/42cc7e2cd03a6fde924c98a24846265f" alt="" width="26" height="34"></span>
+<div class="grow" style="flex: 1 1 260px">
+<div class="row" style="flex-wrap: wrap; gap: 8px"><h2 style="font-size: 18px">هُدهُد يعمل ويرد على عملائك</h2><span class="bdg success"><span class="pulse"></span>يعمل تلقائياً</span></div>
+<p class="muted" style="font-size: 14px">واتساب متصل على <span class="ltr num">+970 59 812 3344</span> · آخر رد قبل دقيقتين</p>
+</div>
+<div class="row" style="flex-wrap: wrap">
+<a class="btn btn-secondary btn-sm" href="AISettings.dc.html">إعدادات هُدهُد</a>
+<button type="button" class="btn btn-ghost btn-sm" onClick="{{askPause}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"></path></svg>إيقاف مؤقت</button>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{stPaused}}" hint-placeholder-val="{{false}}">
+<section class="alert warning" role="status" style="align-items: center; flex-wrap: wrap">
+<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"></path></svg>
+<div class="grow" style="flex: 1 1 240px"><b>هُدهُد متوقف مؤقتاً.</b> ستنتظر الرسائل الجديدة ردّك أنت.</div>
+<button type="button" class="btn btn-primary btn-sm" onClick="{{resume}}">أعد تشغيله</button>
+</section>
+</sc-if>
+
+<sc-if value="{{stWaOff}}" hint-placeholder-val="{{false}}">
+<section class="alert danger" role="alert" style="align-items: center; flex-wrap: wrap">
+<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>
+<div class="grow" style="flex: 1 1 240px"><b>انقطع اتصال واتساب منذ الساعة 9:42.</b> لا يستقبل هُدهُد الرسائل حالياً، ولن يصل أي رد إلى العملاء.</div>
+<a class="btn btn-danger btn-sm" href="Account.dc.html">أعد ربط واتساب</a>
+</section>
+</sc-if>
+
+<sc-if value="{{stNew}}" hint-placeholder-val="{{false}}">
+<section class="card card-pad" style="display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: center">
+<span class="ic brand" style="width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center"><img src="/_blob/42cc7e2cd03a6fde924c98a24846265f" alt="" width="30" height="39"></span>
+<div class="grow" style="flex: 1 1 300px">
+<h2>لنبدأ تشغيل هُدهُد</h2>
+<p class="muted">بقيت 6 خطوات قصيرة: اربط واتساب، وأضف منتجاتك، وجرّب محادثة. يمكنك التوقف والعودة في أي وقت.</p>
+<div class="row" style="margin-top: 10px"><div class="bar grow" style="max-width: 320px"><span style="width: 25%"></span></div><span class="subtle">2 من 8</span></div>
+</div>
+<a class="btn btn-primary" href="Onboarding.dc.html">أكمل الإعداد</a>
+</section>
+</sc-if>
+
+<!-- ===== stats ===== -->
+<section class="grid-4 keep2" aria-label="ملخص اليوم">
+<sc-for list="{{stats}}" as="s" hint-placeholder-count="4">
+<a class="card stat" href="{{s.href}}" style="text-decoration: none; color: inherit">
+<span class="lab"><span class="{{s.ic}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{s.icon}}"></path></svg></span>{{s.label}}</span>
+<span class="val num">{{s.value}}</span>
+<span class="subtle">{{s.note}}</span>
+</a>
+</sc-for>
+</section>
+
+<div class="split">
+<div class="col" style="gap: 20px">
+
+<!-- needs you -->
+<section class="attn" aria-labelledby="attn-h">
+<div class="card-head" style="border-bottom-color: #F3C886; background: #FFF9EF; border-radius: 16px 16px 0 0">
+<div class="row"><span class="ic warn" style="width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg></span><h2 id="attn-h">تحتاج تدخلك</h2><span class="count hot">{{attnCount}}</span></div>
+<a href="Attention.dc.html" style="font-size: 14px">عرض الكل</a>
+</div>
+<sc-if value="{{hasAttn}}" hint-placeholder-val="{{true}}">
+<ul>
+<sc-for list="{{attn}}" as="a" hint-placeholder-count="3">
+<li class="attn-row">
+<span class="{{a.av}}" aria-hidden="true">{{a.initial}}</span>
+<div class="grow">
+<div class="row" style="flex-wrap: wrap; gap: 4px 10px"><b>{{a.name}}</b><span class="subtle ltr num">{{a.phone}}</span></div>
+<div class="reason"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4M12 16h.01M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"></path></svg>{{a.reason}}</div>
+</div>
+<div class="col" style="align-items: flex-end; gap: 6px; flex: none">
+<span class="subtle">ينتظر منذ {{a.wait}}</span>
+<a class="btn btn-primary btn-sm" href="Attention.dc.html">ردّ</a>
+</div>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+<sc-if value="{{noAttn}}" hint-placeholder-val="{{false}}">
+<div class="empty" style="padding: 28px 20px">
+<span class="ic brand" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>
+<b>لا يوجد ما ينتظرك</b>
+<p class="muted" style="font-size: 14px">عندما يحتاج هُدهُد إلى رأيك، ستظهر الطلبات هنا فوراً.</p>
+</div>
+</sc-if>
+</section>
+
+<!-- recent orders -->
+<section class="card" aria-labelledby="ord-h">
+<div class="card-head"><h2 id="ord-h">آخر الطلبات</h2><a href="Orders.dc.html" style="font-size: 14px">كل الطلبات</a></div>
+<sc-if value="{{hasOrders}}" hint-placeholder-val="{{true}}">
+<div class="tbl-wrap hide-m">
+<table class="tbl">
+<thead><tr><th scope="col">الطلب</th><th scope="col">العميل</th><th scope="col">المنتجات</th><th scope="col">الإجمالي</th><th scope="col">الحالة</th></tr></thead>
+<tbody>
+<sc-for list="{{orders}}" as="o" hint-placeholder-count="5">
+<tr>
+<td class="ltr num" style="text-align: right; font-weight: 600"><a href="Orders.dc.html">{{o.id}}</a></td>
+<td><div style="font-weight: 600">{{o.customer}}</div><div class="subtle">{{o.time}}</div></td>
+<td class="muted" style="max-width: 240px">{{o.items}}</td>
+<td class="num" style="font-weight: 700; white-space: nowrap">{{o.total}}</td>
+<td><div class="col" style="gap: 4px; align-items: flex-start"><span class="{{o.stCls}}">{{o.st}}</span><sc-if value="{{o.draft}}" hint-placeholder-val="{{false}}"><span class="bdg warning" style="font-size: 11.5px">مسودة · بانتظار تأكيد العميل</span></sc-if></div></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<ul class="only-m">
+<sc-for list="{{orders}}" as="o" hint-placeholder-count="5">
+<li style="border-top: 1px solid #E6E9F0">
+<a href="Orders.dc.html" style="display: flex; gap: 10px; align-items: center; padding: 12px 16px; color: inherit; text-decoration: none">
+<div class="grow"><div class="row" style="gap: 8px"><b class="ltr num">{{o.id}}</b><span class="{{o.stCls}}">{{o.st}}</span></div><div class="subtle trunc">{{o.customer}} · {{o.items}}</div></div>
+<b class="num" style="white-space: nowrap">{{o.total}}</b>
+</a>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+<sc-if value="{{noOrders}}" hint-placeholder-val="{{false}}">
+<div class="empty"><span class="ic neutral" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0"></path></svg></span><b>لا توجد طلبات بعد</b><p class="muted" style="font-size: 14px">عندما يطلب عميل عبر واتساب، يسجّل هُدهُد الطلب هنا.</p><a class="btn btn-soft btn-sm" href="Catalog.dc.html">أضف منتجاتك</a></div>
+</sc-if>
+</section>
+</div>
+
+<div class="col" style="gap: 20px">
+<!-- upcoming bookings -->
+<section class="card" aria-labelledby="bk-h">
+<div class="card-head"><h2 id="bk-h">الحجوزات القادمة</h2><a href="Bookings.dc.html" style="font-size: 14px">التقويم</a></div>
+<sc-if value="{{hasBookings}}" hint-placeholder-val="{{true}}">
+<ul>
+<sc-for list="{{bookings}}" as="b" hint-placeholder-count="4">
+<li style="display: flex; gap: 12px; align-items: center; padding: 12px 20px; border-top: 1px solid #E6E9F0">
+<div style="width: 56px; flex: none; text-align: center"><b class="num" style="display: block; font-size: 16px">{{b.time}}</b><span class="subtle">{{b.ampm}}</span></div>
+<div class="grow"><b style="display: block">{{b.name}}</b><span class="subtle">{{b.service}} · {{b.staff}}</span></div>
+<span class="{{b.stCls}}">{{b.st}}</span>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+<sc-if value="{{noBookings}}" hint-placeholder-val="{{false}}">
+<div class="empty" style="padding: 28px 20px"><b>لا توجد حجوزات قادمة</b><p class="muted" style="font-size: 14px">حدّد أوقات عملك ليبدأ هُدهُد باستقبال الحجوزات.</p><a class="btn btn-soft btn-sm" href="Bookings.dc.html">إعداد المواعيد</a></div>
+</sc-if>
+</section>
+
+<!-- today's activity: numbers only, no message content -->
+<section class="card" aria-labelledby="act-h">
+<div class="card-head"><h2 id="act-h">نشاط هُدهُد اليوم</h2></div>
+<sc-if value="{{hasConvs}}" hint-placeholder-val="{{true}}">
+<ul>
+<sc-for list="{{activity}}" as="c" hint-placeholder-count="5">
+<li style="display: flex; gap: 12px; align-items: center; padding: 11px 20px; border-top: 1px solid #E6E9F0">
+<span class="{{c.ic}}" style="width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="{{c.icon}}"></path></svg></span>
+<span class="grow">{{c.label}}</span>
+<b class="num" style="font-size: 17px">{{c.value}}</b>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+<sc-if value="{{noConvs}}" hint-placeholder-val="{{false}}">
+<div class="empty" style="padding: 28px 20px"><b>لا يوجد نشاط بعد</b><p class="muted" style="font-size: 14px">بعد ربط واتساب، ستظهر هنا أرقام نشاط هُدهُد اليومي.</p></div>
+</sc-if>
+<div class="row" style="gap: 8px; padding: 12px 20px; border-top: 1px solid #E6E9F0; color: #4A5468; font-size: 13px">
+<svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+<span>حمايةً لخصوصية عملائك، لا يحفظ هُدهُد محتوى المحادثات، وتظهر هنا الأرقام فقط.</span>
+</div>
+</section>
+</div>
+</div>
+
+</sc-if>
+</main>
+</div>
+
+<sc-if value="{{confirmPause}}" hint-placeholder-val="{{false}}">
+<div class="backdrop" onClick="{{cancelPause}}">
+<div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="pz-h" aria-describedby="pz-d" onClick="{{stop}}">
+<div class="dialog-body">
+<span class="ic warn" style="width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center"><svg class="i i-lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"></path></svg></span>
+<h2 id="pz-h">إيقاف هُدهُد مؤقتاً؟</h2>
+<p id="pz-d" class="muted">لن يرد هُدهُد على أي رسالة جديدة حتى تعيد تشغيله، وسينتظر العملاء ردّك أنت.</p>
+</div>
+<div class="dialog-foot">
+<button type="button" class="btn btn-secondary" onClick="{{cancelPause}}">إلغاء</button>
+<button type="button" class="btn btn-danger" onClick="{{doPause}}">إيقاف مؤقت</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+<div class="toast ok" role="status" aria-live="polite"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>{{toast}}</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startView":{"editor":"enum","options":["normal","new","loading","error","waoff"],"default":"normal"},"$preview":{"width":1440,"height":1000}}'>
+const ATTN = [
+  { name: 'محمد أبو شمسية', phone: '+970 56 901 4477', reason: 'شكوى: تأخّر الطلب #1038', summary: 'لم يصل طلبه إلى نابلس منذ أمس.', wait: '25 دقيقة', av: 'av c2' },
+  { name: 'ميس خليل', phone: '+970 59 734 2211', reason: 'طلبت خصماً بنسبة 20% على باقة العروس', summary: 'ستؤكد حجز 15 تشرين الثاني اليوم إذا حصلت على خصم.', wait: '12 دقيقة', av: 'av c4' },
+  { name: 'حلا جرار', phone: '+970 59 220 8813', reason: 'سؤال عن منتج غير موجود في القائمة', summary: 'تريد كريم كيراتين لابنتها (8 سنوات).', wait: '4 دقائق', av: 'av c5' }
+];
+const ACTIVITY = [
+  { label: 'محادثات ردّ عليها هُدهُد تلقائياً', value: '44', icon: 'M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z', ic: 'ic brand' },
+  { label: 'طلبات سجّلها', value: '4', icon: 'M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0', ic: 'ic indigo' },
+  { label: 'حجوزات أكّدها', value: '5', icon: 'M4 5h16v15H4zM4 10h16M9 3v4M15 3v4', ic: 'ic accent' },
+  { label: 'حُوّلت إليك', value: '3', icon: 'M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z', ic: 'ic warn' },
+  { label: 'متوسط وقت الرد', value: '6 ثوانٍ', icon: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2', ic: 'ic neutral' }
+];
+const ORDERS = [
+  { id: '#1043', customer: 'أحمد عودة', time: 'اليوم 10:12 ص', items: 'شامبو أرغان ×2، زيت شعر طبيعي ×1', total: '165 ₪', s: 'new', draft: true },
+  { id: '#1042', customer: 'ليان سعادة', time: 'اليوم 9:40 ص', items: 'ماسك كيراتين ×1، بخاخ حماية ×1', total: '155 ₪', s: 'new' },
+  { id: '#1041', customer: 'سامر حداد', time: 'اليوم 8:55 ص', items: 'عطر الياسمين 50 مل ×1', total: '145 ₪', s: 'confirmed' },
+  { id: '#1040', customer: 'رنين عابد', time: 'أمس 6:20 م', items: 'مجموعة العناية بالشعر ×1', total: '210 ₪', s: 'preparing' },
+  { id: '#1038', customer: 'محمد أبو شمسية', time: 'أمس 2:05 م', items: 'شامبو أرغان ×3', total: '160 ₪', s: 'out' }
+];
+const OST = { new: ['جديد', 'bdg info'], confirmed: ['تم التأكيد', 'bdg brand'], preparing: ['قيد التجهيز', 'bdg accent'], out: ['خرج للتوصيل', 'bdg outline'], delivered: ['تم التسليم', 'bdg success'], cancelled: ['ملغي', 'bdg neutral'] };
+const BOOKINGS = [
+  { time: '11:30', ampm: 'ص', name: 'لينا سمارة', service: 'مناكير', staff: 'ليان', st: 'مؤكد', stCls: 'bdg success' },
+  { time: '12:00', ampm: 'م', name: 'جنى خليفة', service: 'قص وسشوار', staff: 'سارة', st: 'مؤكد', stCls: 'bdg success' },
+  { time: '2:00', ampm: 'م', name: 'ميرا داود', service: 'كيراتين', staff: 'سارة', st: 'بانتظار التأكيد', stCls: 'bdg warning' },
+  { time: '3:00', ampm: 'م', name: 'سلمى حجازي', service: 'باديكير', staff: 'ليان', st: 'مؤكد', stCls: 'bdg success' }
+];
+
+class Component extends DCLogic {
+  state = { view: undefined, paused: false, confirmPause: false, toast: '' };
+  flash(t) { clearTimeout(this._t); this.setState({ toast: t }); this._t = setTimeout(() => this.setState({ toast: '' }), 3200); }
+  renderVals() {
+    const s = this.state;
+    const view = s.view !== undefined ? s.view : (this.props.startView || 'normal');
+    const isNew = view === 'new';
+    const set = (p) => this.setState(p);
+    const views = [['normal', 'عادي'], ['new', 'حساب جديد'], ['loading', 'تحميل'], ['error', 'خطأ'], ['waoff', 'واتساب مفصول']];
+    const stats = isNew ? [
+      { label: 'محادثات اليوم', value: '0', note: 'بعد ربط واتساب', icon: 'M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z', ic: 'ic brand', href: 'Attention.dc.html' },
+      { label: 'تحتاج تدخلك', value: '0', note: 'لا شيء', icon: 'M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z', ic: 'ic neutral', href: 'Attention.dc.html' },
+      { label: 'طلبات جديدة', value: '0', note: '—', icon: 'M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0', ic: 'ic indigo', href: 'Orders.dc.html' },
+      { label: 'حجوزات اليوم', value: '0', note: '—', icon: 'M4 5h16v15H4zM4 10h16M9 3v4M15 3v4', ic: 'ic accent', href: 'Bookings.dc.html' }
+    ] : [
+      { label: 'محادثات اليوم', value: '47', note: 'ردّ هُدهُد على 44 منها تلقائياً', icon: 'M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z', ic: 'ic brand', href: 'AISettings.dc.html' },
+      { label: 'تحتاج تدخلك', value: '3', note: 'أقدمها منذ 25 دقيقة', icon: 'M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z', ic: 'ic danger', href: 'Attention.dc.html' },
+      { label: 'طلبات جديدة', value: '6', note: 'قيمتها 1,240 ₪', icon: 'M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0', ic: 'ic indigo', href: 'Orders.dc.html' },
+      { label: 'حجوزات اليوم', value: '9', note: 'التالي 11:30 · لينا سمارة', icon: 'M4 5h16v15H4zM4 10h16M9 3v4M15 3v4', ic: 'ic accent', href: 'Bookings.dc.html' }
+    ];
+    const attn = isNew ? [] : ATTN.map((a) => Object.assign({ initial: a.name.charAt(0) }, a));
+    const orders = isNew ? [] : ORDERS.map((o) => Object.assign({ st: OST[o.s][0], stCls: OST[o.s][1], draft: !!o.draft }, o));
+    const bookings = isNew ? [] : BOOKINGS;
+    const activity = isNew ? [] : ACTIVITY;
+    const ok = view === 'normal' || view === 'waoff' || view === 'new';
+    return {
+      views: views.map((v) => ({ label: v[1], cls: view === v[0] ? 'on' : '', aria: view === v[0] ? 'true' : 'false', pick: () => set({ view: v[0] }) })),
+      waProp: view === 'waoff' ? 'off' : (isNew ? 'off' : 'on'),
+      isLoading: view === 'loading', isError: view === 'error', showBody: ok,
+      retry: () => { set({ view: 'loading' }); setTimeout(() => this.setState({ view: 'normal' }), 900); },
+      stOn: view === 'normal' && !s.paused, stPaused: view === 'normal' && s.paused, stWaOff: view === 'waoff', stNew: isNew,
+      askPause: () => set({ confirmPause: true }), cancelPause: () => set({ confirmPause: false }),
+      doPause: () => { set({ confirmPause: false, paused: true }); this.flash('تم إيقاف هُدهُد مؤقتاً'); },
+      resume: () => { set({ paused: false }); this.flash('عاد هُدهُد إلى العمل'); },
+      confirmPause: s.confirmPause,
+      stop: (e) => { if (e && e.stopPropagation) e.stopPropagation(); },
+      stats: stats,
+      attn: attn, attnCount: attn.length, hasAttn: attn.length > 0, noAttn: attn.length === 0,
+      orders: orders, hasOrders: orders.length > 0, noOrders: orders.length === 0,
+      bookings: bookings, hasBookings: bookings.length > 0, noBookings: bookings.length === 0,
+      activity: activity, hasConvs: activity.length > 0, noConvs: activity.length === 0,
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هُدهُد: معلومات نشاطك</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="hodhod.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Tajawal:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="hd" style="font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif; color: #121A2E; background: #F7F8F4">
+<dc-import name="Sidebar" active="business" hint-size="0px,0px"></dc-import>
+
+<div class="content">
+<div class="rv" role="region" aria-label="أدوات المعاينة (ليست جزءاً من المنتج)">
+<b>معاينة</b><span>حالة الصفحة:</span>
+<div class="seg" role="group" aria-label="حالة الصفحة">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="4"><button type="button" class="{{v.cls}}" aria-pressed="{{v.aria}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for>
+</div>
+</div>
+
+<main class="page" id="main" style="max-width: 1100px">
+<div class="page-head">
+<div class="t"><h1>معلومات نشاطك</h1><p>يستخدم هُدهُد هذه المعلومات للإجابة عن أسئلة العملاء. كلما كانت أدق، كانت ردوده أفضل.</p></div>
+</div>
+
+<sc-if value="{{isLoading}}" hint-placeholder-val="{{false}}">
+<div class="col" style="gap: 16px" aria-busy="true" aria-label="جارٍ التحميل"><div class="sk" style="height: 90px; border-radius: 16px"></div><div class="sk" style="height: 200px; border-radius: 16px"></div><div class="sk" style="height: 200px; border-radius: 16px"></div></div>
+</sc-if>
+<sc-if value="{{isError}}" hint-placeholder-val="{{false}}">
+<div class="card empty" role="alert"><span class="ic danger" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg></span><h2>تعذّر تحميل معلومات نشاطك</h2><p class="muted">لا يزال هُدهُد يستخدم آخر نسخة محفوظة من المعلومات.</p><button type="button" class="btn btn-primary" onClick="{{retry}}">أعد المحاولة</button></div>
+</sc-if>
+
+<sc-if value="{{showBody}}" hint-placeholder-val="{{true}}">
+<!-- completeness -->
+<section class="card card-pad" aria-labelledby="cm-h" style="display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center">
+<div class="grow" style="flex: 1 1 280px">
+<div class="row" style="justify-content: space-between"><h2 id="cm-h" style="font-size: 17px">اكتمال المعلومات</h2><b class="num">{{doneCount}} من {{totalCount}}</b></div>
+<div class="bar" style="margin-top: 8px" role="progressbar" aria-label="اكتمال المعلومات" aria-valuemin="0" aria-valuemax="{{totalCount}}" aria-valuenow="{{doneCount}}"><span style="width: {{donePct}}"></span></div>
+</div>
+<sc-if value="{{hasMissing}}" hint-placeholder-val="{{true}}"><p class="muted" style="flex: 1 1 280px; font-size: 14px">ينقص: {{missing}}</p></sc-if>
+<sc-if value="{{allDone}}" hint-placeholder-val="{{false}}"><p style="flex: 1 1 280px; font-size: 14px; color: #0E7A4C; font-weight: 600">المعلومات مكتملة، ويستطيع هُدهُد الإجابة عن معظم الأسئلة.</p></sc-if>
+</section>
+
+<!-- generic sections -->
+<sc-for list="{{sections}}" as="sec" hint-placeholder-count="4">
+<section class="card" aria-labelledby="{{sec.hid}}">
+<div class="card-head">
+<div class="grow"><h2 id="{{sec.hid}}">{{sec.title}}</h2><span class="subtle">{{sec.updated}}</span></div>
+<sc-if value="{{sec.notEditing}}" hint-placeholder-val="{{true}}"><button type="button" class="btn btn-secondary btn-sm" onClick="{{sec.edit}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"></path></svg>{{sec.editLabel}}</button></sc-if>
+</div>
+<sc-if value="{{sec.notEditing}}" hint-placeholder-val="{{true}}">
+<div class="card-body">
+<sc-if value="{{sec.isEmpty}}" hint-placeholder-val="{{false}}"><p class="muted" style="font-size: 14px">{{sec.emptyText}}</p></sc-if>
+<sc-if value="{{sec.hasData}}" hint-placeholder-val="{{true}}"><dl class="kv"><sc-for list="{{sec.view}}" as="vw" hint-placeholder-count="3"><dt>{{vw.label}}</dt><dd class="{{vw.cls}}" style="white-space: pre-line">{{vw.value}}</dd></sc-for></dl></sc-if>
+</div>
+</sc-if>
+<sc-if value="{{sec.editing}}" hint-placeholder-val="{{false}}">
+<div class="card-body col" style="gap: 14px">
+<sc-for list="{{sec.fields}}" as="fd" hint-placeholder-count="3">
+<div class="field">
+<label for="{{fd.id}}">{{fd.label}}<sc-if value="{{fd.req}}" hint-placeholder-val="{{false}}"> <span class="req" aria-hidden="true">*</span></sc-if><sc-if value="{{fd.optional}}" hint-placeholder-val="{{false}}"> <span class="opt">(اختياري)</span></sc-if></label>
+<sc-if value="{{fd.isText}}" hint-placeholder-val="{{true}}"><input id="{{fd.id}}" class="{{fd.cls}}" type="{{fd.type}}" inputmode="{{fd.mode}}" value="{{fd.value}}" onChange="{{fd.set}}" placeholder="{{fd.ph}}"></sc-if>
+<sc-if value="{{fd.isArea}}" hint-placeholder-val="{{false}}"><textarea id="{{fd.id}}" class="{{fd.cls}}" value="{{fd.value}}" onChange="{{fd.set}}" placeholder="{{fd.ph}}"></textarea></sc-if>
+<sc-if value="{{fd.isSelect}}" hint-placeholder-val="{{false}}"><select id="{{fd.id}}" class="input" value="{{fd.value}}" onChange="{{fd.set}}"><sc-for list="{{fd.options}}" as="op" hint-placeholder-count="4"><option value="{{op}}">{{op}}</option></sc-for></select></sc-if>
+<sc-if value="{{fd.hasHint}}" hint-placeholder-val="{{false}}"><span class="hint">{{fd.hint}}</span></sc-if>
+<sc-if value="{{fd.err}}" hint-placeholder-val="{{false}}"><span class="err">{{fd.err}}</span></sc-if>
+</div>
+</sc-for>
+</div>
+<div class="card-foot"><button type="button" class="btn btn-secondary btn-sm" onClick="{{sec.cancel}}">إلغاء</button><button type="button" class="btn btn-primary btn-sm" onClick="{{sec.save}}">حفظ</button></div>
+</sc-if>
+</section>
+</sc-for>
+
+<!-- opening hours (linked to bookings) -->
+<section class="card" aria-labelledby="hr-h">
+<div class="card-head"><div class="grow"><h2 id="hr-h">ساعات العمل</h2><span class="subtle">مرتبطة بأوقات الحجز · آخر تحديث: {{hoursUpdated}}</span></div><a class="btn btn-secondary btn-sm" href="Bookings.dc.html">تعديل من الحجوزات</a></div>
+<div class="card-body">
+<ul style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px 24px">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="7"><li class="row" style="justify-content: space-between; border-bottom: 1px dashed #E6E9F0; padding: 6px 0"><b style="font-weight: 600">{{h.day}}</b><span class="{{h.cls}}">{{h.time}}</span></li></sc-for>
+</ul>
+</div>
+</section>
+
+<!-- delivery -->
+<section class="card" aria-labelledby="dv-h">
+<div class="card-head"><div class="grow"><h2 id="dv-h">مناطق التوصيل ورسومه</h2><span class="subtle">آخر تحديث: {{delivUpdated}}</span></div><button type="button" class="{{delivSw}}" role="switch" aria-checked="{{delivAria}}" aria-label="تفعيل التوصيل" onClick="{{toggleDeliv}}"></button></div>
+<sc-if value="{{delivOff}}" hint-placeholder-val="{{false}}"><div class="card-body"><p class="muted" style="font-size: 14px">التوصيل غير مفعّل. سيخبر هُدهُد العملاء بأن الاستلام من المحل فقط.</p></div></sc-if>
+<sc-if value="{{delivOn}}" hint-placeholder-val="{{true}}">
+<div class="tbl-wrap">
+<table class="tbl stack">
+<thead><tr><th scope="col">المنطقة</th><th scope="col">الرسوم</th><th scope="col">مدة التوصيل</th><th scope="col"><span class="sr-only">إجراءات</span></th></tr></thead>
+<tbody>
+<sc-for list="{{areas}}" as="a" hint-placeholder-count="5">
+<tr style="cursor: default">
+<td><label class="sr-only" for="{{a.nid}}">المنطقة</label><input id="{{a.nid}}" class="{{a.nameCls}}" value="{{a.name}}" onChange="{{a.setName}}" style="min-width: 140px"></td>
+<td><label class="sr-only" for="{{a.fid}}">الرسوم بالشيكل</label><div class="row" style="gap: 6px"><input id="{{a.fid}}" class="input ltr" inputmode="decimal" value="{{a.fee}}" onChange="{{a.setFee}}" style="width: 80px"><span class="muted">₪</span></div></td>
+<td><label class="sr-only" for="{{a.tid}}">مدة التوصيل</label><select id="{{a.tid}}" class="input" value="{{a.time}}" onChange="{{a.setTime}}" style="min-width: 150px"><option>في اليوم نفسه</option><option>يوم عمل واحد</option><option>يوم إلى يومي عمل</option><option>2 إلى 3 أيام عمل</option></select></td>
+<td style="text-align: left"><button type="button" class="ib sm danger" onClick="{{a.remove}}" aria-label="{{a.removeLabel}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg></button></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div class="card-body row" style="flex-wrap: wrap; gap: 12px; border-top: 1px solid #E6E9F0">
+<button type="button" class="btn btn-soft btn-sm" onClick="{{addArea}}">+ إضافة منطقة</button>
+<span class="grow"></span>
+<label class="row" style="gap: 8px; font-size: 14px" for="free-over">توصيل مجاني للطلبات فوق<input id="free-over" class="input ltr" inputmode="decimal" value="{{freeOver}}" onChange="{{setFreeOver}}" style="width: 90px">₪</label>
+</div>
+<sc-if value="{{areasDirty}}" hint-placeholder-val="{{false}}"><div class="card-foot"><button type="button" class="btn btn-secondary btn-sm" onClick="{{resetAreas}}">إلغاء</button><button type="button" class="btn btn-primary btn-sm" onClick="{{saveAreas}}">حفظ مناطق التوصيل</button></div></sc-if>
+</sc-if>
+</section>
+
+<!-- other rules -->
+<section class="card" aria-labelledby="ru-h">
+<div class="card-head"><div class="grow"><h2 id="ru-h">قواعد أخرى</h2><span class="subtle">معلومات خاصة بنشاطك يجب أن يعرفها هُدهُد</span></div></div>
+<ul>
+<sc-for list="{{rules}}" as="r" hint-placeholder-count="3"><li class="row" style="gap: 10px; padding: 10px 20px; border-top: 1px solid #E6E9F0"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true" style="color: #0B7F58"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span class="grow">{{r.text}}</span><button type="button" class="ib sm danger" onClick="{{r.remove}}" aria-label="{{r.removeLabel}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></li></sc-for>
+<sc-if value="{{noRules}}" hint-placeholder-val="{{false}}"><li class="muted" style="padding: 12px 20px; border-top: 1px solid #E6E9F0; font-size: 14px">لا توجد قواعد بعد.</li></sc-if>
+</ul>
+<div class="card-foot" style="justify-content: stretch">
+<label for="new-rule" class="sr-only">قاعدة جديدة</label>
+<input id="new-rule" class="{{ruleCls}}" value="{{newRule}}" onChange="{{setNewRule}}" placeholder="مثلاً: لا نستقبل حجوزات لنفس اليوم بعد الساعة 6 مساءً" style="flex: 1 1 260px">
+<button type="button" class="btn btn-soft btn-sm" onClick="{{addRule}}">إضافة</button>
+</div>
+</section>
+</sc-if>
+</main>
+</div>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+<div class="toast ok" role="status" aria-live="polite"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>{{toast}}</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+const CATS = ['صالون ومركز تجميل', 'عيادة', 'مطعم أو مخبز', 'متجر ملابس', 'متجر إلكترونيات', 'خدمات أخرى'];
+const DEFS = [
+  { key: 'basic', title: 'المعلومات الأساسية', empty: 'أضف اسم نشاطك ونوعه ووصفاً قصيراً.', fields: [
+    { k: 'name', label: 'اسم النشاط', req: true, ph: 'مثلاً: مركز لمسة للتجميل' },
+    { k: 'cat', label: 'نوع النشاط', select: CATS },
+    { k: 'desc', label: 'وصف قصير', area: true, optional: true, ph: 'ماذا تقدّم؟ وما الذي يميّزك؟', hint: 'جملتان تكفيان. يستخدمه هُدهُد عند التعريف بنشاطك.' }
+  ] },
+  { key: 'location', title: 'العنوان والموقع', empty: 'أضف عنوانك ليرشد هُدهُد العملاء إليك.', fields: [
+    { k: 'address', label: 'العنوان', req: true, ph: 'المدينة، الشارع، المبنى' },
+    { k: 'landmark', label: 'أقرب معلم', optional: true, ph: 'مثلاً: فوق صيدلية الشفاء' },
+    { k: 'map', label: 'رابط الخريطة', optional: true, type: 'url', mode: 'url', ph: 'https://maps.google.com/…', url: true },
+    { k: 'parking', label: 'المواقف', optional: true, ph: 'مثلاً: موقف عام مجاني خلف المبنى' }
+  ] },
+  { key: 'contact', title: 'التواصل', empty: 'أضف رقم الهاتف وحسابات التواصل.', fields: [
+    { k: 'phone', label: 'رقم الهاتف', req: true, type: 'tel', mode: 'tel', ph: '+970 59 123 4567', phone: true },
+    { k: 'insta', label: 'إنستغرام', optional: true, ph: '@username', ltr: true },
+    { k: 'fb', label: 'فيسبوك', optional: true, ph: 'facebook.com/…', ltr: true },
+    { k: 'web', label: 'الموقع الإلكتروني', optional: true, type: 'url', mode: 'url', ph: 'https://', url: true }
+  ] },
+  { key: 'policy', title: 'سياسة الإرجاع والإلغاء', empty: 'وضّح متى يمكن للعميل إرجاع منتج أو إلغاء موعد.', fields: [
+    { k: 'returns', label: 'إرجاع المنتجات واستبدالها', area: true, optional: true, ph: 'مثلاً: يمكن استبدال المنتج خلال 7 أيام إذا كان مغلقاً' },
+    { k: 'cancel', label: 'إلغاء المواعيد', area: true, optional: true, ph: 'مثلاً: يمكن الإلغاء قبل الموعد بثلاث ساعات على الأقل' }
+  ] }
+];
+const FULL = {
+  basic: { name: 'مركز لمسة للتجميل', cat: 'صالون ومركز تجميل', desc: 'مركز نسائي للشعر والأظافر والعناية بالبشرة في رام الله، نستخدم منتجات طبيعية.' },
+  location: { address: 'رام الله، شارع الإرسال، عمارة الريان، الطابق الثاني', landmark: 'فوق صيدلية الشفاء', map: 'https://maps.google.com/?q=31.9073,35.2042', parking: 'موقف عام مجاني خلف المبنى' },
+  contact: { phone: '+970 59 812 3344', insta: '@lamsa.ps', fb: 'facebook.com/lamsa.ps', web: '' },
+  policy: { returns: 'يمكن استبدال المنتجات خلال 7 أيام إذا كانت مغلقة. لا تُسترد المبالغ نقداً.', cancel: 'يمكن الإلغاء أو التأجيل قبل الموعد بثلاث ساعات على الأقل. لباقة العروس عربون 100 ₪ غير مسترد.' }
+};
+const UPDATED = { basic: 'قبل 3 أيام', location: 'قبل أسبوعين', contact: 'قبل 3 أيام', policy: 'قبل شهر' };
+const HOURS = [['السبت', '9:00 ص – 7:00 م'], ['الأحد', '9:00 ص – 7:00 م'], ['الاثنين', '9:00 ص – 7:00 م'], ['الثلاثاء', '9:00 ص – 7:00 م'], ['الأربعاء', '9:00 ص – 7:00 م'], ['الخميس', '9:00 ص – 7:00 م'], ['الجمعة', 'مغلق']];
+const AREAS = [['رام الله والبيرة', '15', 'في اليوم نفسه'], ['بيتونيا', '15', 'في اليوم نفسه'], ['نابلس', '25', 'يوم إلى يومي عمل'], ['بيت لحم', '25', 'يوم إلى يومي عمل'], ['الخليل', '30', '2 إلى 3 أيام عمل']];
+const RULES = ['لا نستقبل حجوزات لنفس اليوم بعد الساعة 6 مساءً.', 'الأطفال دون 12 سنة يحتاجون إلى مرافق.', 'نقدّم استشارة مجانية قبل الكيراتين والصبغة.'];
+const PHONE = /^\+?[\d][\d\s\-()]{7,18}$/;
+const URL = /^https?:\/\/\S+$/i;
+
+class Component extends DCLogic {
+  state = { view: 'normal', data: JSON.parse(JSON.stringify(FULL)), updated: Object.assign({}, UPDATED), editing: null, draft: null, touched: false, areas: AREAS.map((a) => a.slice()), savedAreas: AREAS.map((a) => a.slice()), freeOver: '200', deliv: true, delivUpdated: 'قبل أسبوع', rules: RULES.slice(), newRule: '', ruleErr: false, toast: '' };
+  flash(t) { clearTimeout(this._t); this.setState({ toast: t }); this._t = setTimeout(() => this.setState({ toast: '' }), 3200); }
+  errOf(fd, v) {
+    const val = String(v || '').trim();
+    if (fd.req && !val) return 'هذا الحقل مطلوب';
+    if (val && fd.phone && !PHONE.test(val)) return 'الرقم غير صحيح، اكتبه مع رمز الدولة';
+    if (val && fd.url && !URL.test(val)) return 'يجب أن يبدأ الرابط بـ https://';
+    return '';
+  }
+  renderVals() {
+    const s = this.state; const set = (p) => this.setState(p);
+    const sections = DEFS.map((d) => {
+      const data = s.data[d.key] || {};
+      const editing = s.editing === d.key;
+      const src = editing ? s.draft : data;
+      const filled = d.fields.filter((fd) => String(data[fd.k] || '').trim());
+      return {
+        hid: 'sec-' + d.key, title: d.title, updated: filled.length ? 'آخر تحديث: ' + s.updated[d.key] : 'لم تُضف بعد',
+        editing: editing, notEditing: !editing, editLabel: filled.length ? 'تعديل' : 'إضافة',
+        isEmpty: filled.length === 0, hasData: filled.length > 0, emptyText: d.empty,
+        view: filled.map((fd) => ({ label: fd.label, value: data[fd.k], cls: (fd.phone || fd.url || fd.ltr) ? 'ltr' : '' })),
+        edit: () => set({ editing: d.key, draft: Object.assign({}, data), touched: false }),
+        cancel: () => set({ editing: null, draft: null, touched: false }),
+        save: () => {
+          const bad = d.fields.some((fd) => this.errOf(fd, s.draft[fd.k]));
+          if (bad) { set({ touched: true }); return; }
+          const clean = {}; d.fields.forEach((fd) => { clean[fd.k] = String(s.draft[fd.k] || '').trim(); });
+          set({ data: Object.assign({}, s.data, { [d.key]: clean }), updated: Object.assign({}, s.updated, { [d.key]: 'الآن' }), editing: null, draft: null, touched: false });
+          this.flash('تم حفظ «' + d.title + '»، ويستخدمها هُدهُد الآن');
+        },
+        fields: d.fields.map((fd) => {
+          const err = s.touched && editing ? this.errOf(fd, src ? src[fd.k] : '') : '';
+          return {
+            id: 'f-' + fd.k, label: fd.label, req: !!fd.req, optional: !!fd.optional, ph: fd.ph || '',
+            isText: !fd.area && !fd.select, isArea: !!fd.area, isSelect: !!fd.select, options: fd.select || [],
+            type: fd.type || 'text', mode: fd.mode || 'text', hasHint: !!fd.hint, hint: fd.hint || '',
+            value: src ? (src[fd.k] || '') : '', err: err,
+            cls: 'input' + ((fd.phone || fd.url || fd.ltr) ? ' ltr' : '') + (err ? ' bad' : ''),
+            set: (e) => this.setState({ draft: Object.assign({}, this.state.draft, { [fd.k]: e.target.value }) })
+          };
+        })
+      };
+    });
+    const checks = [['الاسم', s.data.basic.name], ['الوصف', s.data.basic.desc], ['العنوان', s.data.location.address], ['رابط الخريطة', s.data.location.map], ['رقم الهاتف', s.data.contact.phone], ['سياسة الإرجاع أو الإلغاء', s.data.policy.returns || s.data.policy.cancel], ['مناطق التوصيل', !s.deliv || s.areas.length]];
+    const done = checks.filter((c) => c[1] && String(c[1]).trim() !== '').length;
+    const areasDirty = JSON.stringify(s.areas) !== JSON.stringify(s.savedAreas);
+    return {
+      views: [['normal', 'عادي'], ['empty', 'حساب جديد'], ['loading', 'تحميل'], ['error', 'خطأ']].map((v) => ({ label: v[1], cls: s.view === v[0] ? 'on' : '', aria: s.view === v[0] ? 'true' : 'false', pick: () => {
+        if (v[0] === 'empty') set({ view: 'normal', data: { basic: { name: 'مركز لمسة للتجميل', cat: CATS[0], desc: '' }, location: {}, contact: {}, policy: {} }, areas: [], savedAreas: [], rules: [], editing: null });
+        else if (v[0] === 'normal') set({ view: 'normal', data: JSON.parse(JSON.stringify(FULL)), areas: AREAS.map((a) => a.slice()), savedAreas: AREAS.map((a) => a.slice()), rules: RULES.slice(), editing: null });
+        else set({ view: v[0] });
+      } })),
+      isLoading: s.view === 'loading', isError: s.view === 'error', showBody: s.view === 'normal',
+      retry: () => { set({ view: 'loading' }); setTimeout(() => this.setState({ view: 'normal' }), 900); },
+      doneCount: done, totalCount: checks.length, donePct: Math.round(done / checks.length * 100) + '%',
+      hasMissing: done < checks.length, allDone: done === checks.length,
+      missing: checks.filter((c) => !(c[1] && String(c[1]).trim() !== '')).map((c) => c[0]).join('، '),
+      sections: sections,
+      hours: HOURS.map((h) => ({ day: h[0], time: h[1], cls: h[1] === 'مغلق' ? 'muted' : 'num' })), hoursUpdated: 'قبل يومين',
+      delivOn: s.deliv, delivOff: !s.deliv, delivSw: s.deliv ? 'sw on' : 'sw', delivAria: s.deliv ? 'true' : 'false', delivUpdated: s.delivUpdated,
+      toggleDeliv: () => { set({ deliv: !s.deliv, delivUpdated: 'الآن' }); this.flash(s.deliv ? 'تم إيقاف التوصيل' : 'تم تفعيل التوصيل'); },
+      areas: s.areas.map((a, i) => {
+        const upd = (j, v) => set({ areas: s.areas.map((x, k) => (k === i ? x.map((y, m) => (m === j ? v : y)) : x)) });
+        return {
+          name: a[0], fee: a[1], time: a[2], nid: 'an' + i, fid: 'af' + i, tid: 'at' + i, nameCls: String(a[0]).trim() ? 'input' : 'input bad',
+          setName: (e) => upd(0, e.target.value), setFee: (e) => upd(1, e.target.value.replace(/[^\d.]/g, '')), setTime: (e) => upd(2, e.target.value),
+          remove: () => set({ areas: s.areas.filter((x, k) => k !== i) }), removeLabel: 'حذف منطقة ' + (a[0] || 'جديدة')
+        };
+      }),
+      addArea: () => set({ areas: s.areas.concat([['', '20', 'يوم عمل واحد']]) }),
+      areasDirty: areasDirty, resetAreas: () => set({ areas: s.savedAreas.map((a) => a.slice()) }),
+      saveAreas: () => { if (s.areas.some((a) => !String(a[0]).trim())) { this.flash('اكتب اسم كل منطقة قبل الحفظ'); return; } set({ savedAreas: s.areas.map((a) => a.slice()), delivUpdated: 'الآن' }); this.flash('تم حفظ مناطق التوصيل'); },
+      freeOver: s.freeOver, setFreeOver: (e) => set({ freeOver: e.target.value.replace(/[^\d]/g, '') }),
+      rules: s.rules.map((r, i) => ({ text: r, removeLabel: 'حذف القاعدة: ' + r, remove: () => set({ rules: s.rules.filter((x, k) => k !== i) }) })),
+      noRules: s.rules.length === 0,
+      newRule: s.newRule, setNewRule: (e) => set({ newRule: e.target.value, ruleErr: false }), ruleCls: s.ruleErr ? 'input bad' : 'input',
+      addRule: () => { if (!s.newRule.trim()) { set({ ruleErr: true }); return; } set({ rules: s.rules.concat([s.newRule.trim()]), newRule: '' }); this.flash('تمت إضافة القاعدة'); },
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

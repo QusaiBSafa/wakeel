@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هُدهُد: إعدادات الحساب</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="hodhod.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Tajawal:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="hd" style="font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif; color: #121A2E; background: #F7F8F4">
+<dc-import name="Sidebar" active="account" wa="{{waProp}}" hint-size="0px,0px"></dc-import>
+
+<div class="content">
+<div class="rv" role="region" aria-label="أدوات المعاينة (ليست جزءاً من المنتج)">
+<b>معاينة</b><span>حالة واتساب:</span>
+<div class="seg" role="group" aria-label="حالة واتساب">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="5"><button type="button" class="{{v.cls}}" aria-pressed="{{v.aria}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for>
+</div>
+</div>
+
+<main class="page" id="main" style="max-width: 1000px">
+<div class="page-head">
+<div class="t"><h1>إعدادات الحساب</h1><p>ربط واتساب، وفريق العمل، والاشتراك، والأقسام الظاهرة في لوحة التحكم.</p></div>
+</div>
+
+<div class="tabs" role="tablist" aria-label="أقسام الإعدادات" style="margin-bottom: 20px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="4"><button type="button" role="tab" class="{{t.cls}}" aria-selected="{{t.aria}}" onClick="{{t.pick}}">{{t.label}}<sc-if value="{{t.dot}}" hint-placeholder-val="{{false}}"><span class="count hot" style="height: 18px; min-width: 18px; font-size: 11px">!</span></sc-if></button></sc-for>
+</div>
+
+<sc-if value="{{isLoading}}" hint-placeholder-val="{{false}}">
+<div class="col" style="gap: 16px" aria-busy="true" aria-label="جارٍ التحميل"><div class="sk" style="height: 220px; border-radius: 16px"></div><div class="sk" style="height: 160px; border-radius: 16px"></div></div>
+</sc-if>
+
+<!-- ============ WHATSAPP ============ -->
+<sc-if value="{{tabWa}}" hint-placeholder-val="{{true}}">
+<div class="col" style="gap: 20px">
+
+<sc-if value="{{waOn}}" hint-placeholder-val="{{true}}">
+<section class="card" aria-labelledby="wa-h">
+<div class="card-head"><div class="row" style="gap: 12px"><span class="ic brand" style="display: grid; place-items: center"><svg class="i i-lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"></path></svg></span><div><h2 id="wa-h">واتساب متصل</h2><span class="subtle">يستقبل هُدهُد رسائل عملائك ويرد عليها من هذا الرقم</span></div></div><span class="bdg success">متصل</span></div>
+<div class="card-body">
+<dl class="kv">
+<dt>الرقم</dt><dd class="ltr num" style="text-align: right">+970 59 812 3344</dd>
+<dt>الاسم الظاهر للعملاء</dt><dd>مركز لمسة للتجميل</dd>
+<dt>نوع الحساب</dt><dd>واتساب للأعمال · عبر Meta</dd>
+<dt>متصل منذ</dt><dd>3 آب 2026</dd>
+<dt>جودة الرقم</dt><dd><span class="bdg success">جيدة</span> <span class="subtle">لا توجد بلاغات أو حظر من العملاء</span></dd>
+<dt>رسائل هذا الشهر</dt><dd class="num">1,284 رسالة <span class="subtle">(أعداد فقط، لا تُحفظ النصوص)</span></dd>
+</dl>
+</div>
+<div class="card-foot"><a class="btn btn-secondary btn-sm" href="Onboarding.dc.html">اختبر الاتصال</a><button type="button" class="btn btn-danger-soft btn-sm" onClick="{{askDisconnect}}">افصل الرقم</button></div>
+</section>
+</sc-if>
+
+<sc-if value="{{waWarn}}" hint-placeholder-val="{{false}}">
+<section class="card" aria-labelledby="ww-h" style="border-color: #F5C98B">
+<div class="card-head"><div class="row" style="gap: 12px"><span class="ic warn" style="display: grid; place-items: center"><svg class="i i-lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg></span><div><h2 id="ww-h">الاتصال يحتاج إلى انتباه</h2><span class="subtle">+970 59 812 3344</span></div></div><span class="bdg warning">يحتاج إلى انتباه</span></div>
+<div class="card-body col" style="gap: 12px">
+<div class="alert warning"><span><b>تنتهي صلاحية الربط مع Meta خلال 3 أيام.</b> أعد تسجيل الدخول إلى حسابك في Meta لتجديده. حتى ذلك الحين يعمل هُدهُد كالمعتاد.</span></div>
+<p class="muted" style="font-size: 14px">إذا انتهت الصلاحية، يتوقف هُدهُد عن الرد إلى أن تجدّد الربط. لن تُفقد أي طلبات أو حجوزات.</p>
+</div>
+<div class="card-foot"><button type="button" class="btn btn-primary btn-sm" onClick="{{renew}}">جدّد الربط الآن</button><a class="btn-link" href="FAQ.dc.html">لماذا يحدث هذا؟</a></div>
+</section>
+</sc-if>
+
+<sc-if value="{{waOff}}" hint-placeholder-val="{{false}}">
+<section class="card empty" aria-labelledby="wo-h">
+<span class="ic neutral" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19zM4 4l16 16"></path></svg></span>
+<h2 id="wo-h">واتساب غير متصل</h2>
+<p class="muted">لا يستطيع هُدهُد الرد على عملائك حتى تربط رقم واتساب للأعمال. يستغرق الربط نحو 5 دقائق.</p>
+<a class="btn btn-primary" href="Onboarding.dc.html">اربط رقم واتساب</a>
+<span class="subtle">ستحتاج إلى حسابك في فيسبوك، ورقم يمكنه استقبال رمز تحقق.</span>
+</section>
+</sc-if>
+
+<section class="card" aria-labelledby="bh-h">
+<div class="card-head"><div><h2 id="bh-h">الرد خارج أوقات العمل</h2><span class="subtle">أوقات العمل من صفحة الحجوزات</span></div></div>
+<div class="card-body col" style="gap: 8px" role="radiogroup" aria-labelledby="bh-h">
+<sc-for list="{{afterOpts}}" as="o" hint-placeholder-count="2"><label class="{{o.cls}}"><input type="radio" name="after" checked="{{o.on}}" onChange="{{o.pick}}"><span><b>{{o.title}}</b><span class="subtle">{{o.desc}}</span></span></label></sc-for>
+</div>
+</section>
+</div>
+</sc-if>
+
+<!-- ============ TEAM ============ -->
+<sc-if value="{{tabTeam}}" hint-placeholder-val="{{false}}">
+<div class="col" style="gap: 20px">
+<section class="card" aria-labelledby="tm-h">
+<div class="card-head"><div><h2 id="tm-h">فريق العمل</h2><span class="subtle">{{teamCount}}</span></div></div>
+<ul>
+<sc-for list="{{members}}" as="m" hint-placeholder-count="3">
+<li class="row" style="gap: 12px; padding: 14px 20px; border-top: 1px solid #E6E9F0; flex-wrap: wrap">
+<span class="{{m.av}}" aria-hidden="true">{{m.initial}}</span>
+<div class="col grow" style="gap: 2px; min-width: 160px"><b>{{m.name}}<sc-if value="{{m.pending}}" hint-placeholder-val="{{false}}"> <span class="bdg warning">دعوة معلّقة</span></sc-if></b><span class="subtle ltr" style="text-align: right">{{m.contact}}</span></div>
+<sc-if value="{{m.owner}}" hint-placeholder-val="{{false}}"><span class="bdg brand">المالكة</span></sc-if>
+<sc-if value="{{m.editable}}" hint-placeholder-val="{{true}}">
+<label class="sr-only" for="{{m.rid}}">صلاحية {{m.name}}</label>
+<select id="{{m.rid}}" class="input" value="{{m.role}}" onChange="{{m.setRole}}" style="width: auto; min-width: 150px"><option value="admin">مدير: كل الصلاحيات</option><option value="staff">موظف: الطلبات والحجوزات</option><option value="book">الحجوزات فقط</option></select>
+<button type="button" class="ib sm danger" onClick="{{m.remove}}" aria-label="{{m.removeLabel}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg></button>
+</sc-if>
+</li>
+</sc-for>
+</ul>
+</section>
+
+<section class="card" aria-labelledby="iv-h">
+<div class="card-head"><div><h2 id="iv-h">دعوة عضو جديد</h2><span class="subtle">تصله رسالة واتساب برابط الدخول</span></div></div>
+<div class="card-body">
+<div class="grid-3" style="gap: 12px; align-items: start">
+<div class="field"><label for="iv-n">الاسم <span class="req" aria-hidden="true">*</span></label><input id="iv-n" class="{{ivNameCls}}" value="{{ivName}}" onChange="{{setIvName}}" placeholder="مثلاً: نور حمدان"><sc-if value="{{ivNameErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب الاسم</span></sc-if></div>
+<div class="field"><label for="iv-p">رقم واتساب <span class="req" aria-hidden="true">*</span></label><input id="iv-p" class="{{ivPhoneCls}}" type="tel" inputmode="tel" dir="ltr" value="{{ivPhone}}" onChange="{{setIvPhone}}" placeholder="+970 59 123 4567"><sc-if value="{{ivPhoneErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب رقماً صحيحاً، مثل ‎+970 59 123 4567</span></sc-if></div>
+<div class="field"><label for="iv-r">الصلاحية</label><select id="iv-r" class="input" value="{{ivRole}}" onChange="{{setIvRole}}"><option value="admin">مدير: كل الصلاحيات</option><option value="staff">موظف: الطلبات والحجوزات</option><option value="book">الحجوزات فقط</option></select></div>
+</div>
+</div>
+<div class="card-foot"><button type="button" class="btn btn-primary btn-sm" onClick="{{invite}}">أرسل الدعوة</button></div>
+</section>
+</div>
+</sc-if>
+
+<!-- ============ PLAN ============ -->
+<sc-if value="{{tabPlan}}" hint-placeholder-val="{{false}}">
+<div class="col" style="gap: 20px">
+<section class="card" aria-labelledby="pl-h">
+<div class="card-head"><div><h2 id="pl-h">الباقة الأساسية</h2><span class="subtle">تتجدد في 3 تشرين الثاني 2026</span></div><b class="num" style="font-size: 20px; color: #0A6A4A">149 ₪ <span class="subtle" style="font-weight: 500">شهرياً</span></b></div>
+<div class="card-body col" style="gap: 18px">
+<sc-for list="{{usage}}" as="u" hint-placeholder-count="3">
+<div class="col" style="gap: 6px"><div class="row" style="justify-content: space-between"><span style="font-weight: 600; font-size: 14px">{{u.label}}</span><span class="num subtle">{{u.text}}</span></div><div class="bar" role="progressbar" aria-label="{{u.label}}" aria-valuenow="{{u.pct}}" aria-valuemin="0" aria-valuemax="100"><span style="{{u.style}}"></span></div></div>
+</sc-for>
+<div class="alert info"><span>يحتسب «محادثة» كل عميل تواصل معك خلال 24 ساعة، مهما كان عدد رسائله.</span></div>
+</div>
+<div class="card-foot"><button type="button" class="btn btn-indigo btn-sm" onClick="{{upgrade}}">اطّلع على الباقات</button></div>
+</section>
+</div>
+</sc-if>
+
+<!-- ============ SECTIONS ============ -->
+<sc-if value="{{tabSec}}" hint-placeholder-val="{{false}}">
+<section class="card" aria-labelledby="sc-h">
+<div class="card-head"><div><h2 id="sc-h">الأقسام الظاهرة</h2><span class="subtle">أخفِ ما لا يناسب نشاطك. لن يتحدث هُدهُد عن قسم مخفي.</span></div></div>
+<ul>
+<sc-for list="{{sections}}" as="x" hint-placeholder-count="5">
+<li style="padding: 14px 20px; border-top: 1px solid #E6E9F0">
+<div class="row" style="justify-content: space-between; gap: 14px; align-items: flex-start"><span class="row" style="gap: 12px; align-items: flex-start; min-width: 0"><span class="ic neutral" style="display: grid; place-items: center; width: 36px; height: 36px; flex: none"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{x.icon}}"></path></svg></span><span class="col" style="gap: 2px"><b>{{x.title}}</b><span class="subtle">{{x.desc}}</span></span></span><button type="button" class="{{x.swCls}}" role="switch" aria-checked="{{x.aria}}" aria-label="{{x.swLabel}}" onClick="{{x.toggle}}" style="margin-top: 6px"></button></div>
+<sc-if value="{{x.off}}" hint-placeholder-val="{{false}}"><div class="alert info" style="margin-top: 10px; font-size: 13px; padding: 8px 12px">{{x.offText}}</div></sc-if>
+</li>
+</sc-for>
+</ul>
+</section>
+</sc-if>
+</main>
+</div>
+
+<sc-if value="{{discOpen}}" hint-placeholder-val="{{false}}">
+<div class="backdrop" onClick="{{closeDisc}}">
+<div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dc-h" onClick="{{stop}}">
+<div class="dialog-body"><h2 id="dc-h">فصل رقم واتساب؟</h2><p class="muted">سيتوقف هُدهُد فوراً عن الرد على عملائك من الرقم ‎+970 59 812 3344. تبقى الطلبات والحجوزات ومعلومات نشاطك محفوظة، ويمكنك إعادة الربط لاحقاً.</p></div>
+<div class="dialog-foot"><button type="button" class="btn btn-secondary" onClick="{{closeDisc}}">لا، أبقِه متصلاً</button><button type="button" class="btn btn-danger" onClick="{{doDisconnect}}">افصل الرقم</button></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{rmOpen}}" hint-placeholder-val="{{false}}">
+<div class="backdrop" onClick="{{closeRm}}">
+<div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="rm-h" onClick="{{stop}}">
+<div class="dialog-body"><h2 id="rm-h">إزالة {{rmName}} من الفريق؟</h2><p class="muted">لن يتمكن من الدخول إلى لوحة التحكم بعد الآن. تبقى الحجوزات المسندة إليه كما هي.</p></div>
+<div class="dialog-foot"><button type="button" class="btn btn-secondary" onClick="{{closeRm}}">إلغاء</button><button type="button" class="btn btn-danger" onClick="{{doRemove}}">أزِل</button></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+<div class="toast ok" role="status" aria-live="polite"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>{{toast}}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startTab":{"editor":"enum","options":["wa","team","plan","sections"],"default":"wa"},"startWa":{"editor":"enum","options":["on","warn","off"],"default":"on"},"$preview":{"width":1440,"height":1000}}'>
+const MEMBERS = [
+  { id: 1, name: 'رنا خوري', contact: '+970 59 812 3344 · rana@lamsa.ps', owner: true, c: 1 },
+  { id: 2, name: 'سارة عودة', contact: '+970 56 230 1187', role: 'staff', c: 0 },
+  { id: 3, name: 'ليان حداد', contact: '+970 59 455 9021', role: 'book', c: 4 },
+  { id: 4, name: 'نور حمدان', contact: '+970 59 300 7712', role: 'book', c: 2, pending: true }
+];
+const SECTIONS = [
+  ['orders', 'الطلبات', 'استقبال طلبات شراء المنتجات وتوصيلها', 'M6 7h12l-1 13H7zM9 7a3 3 0 0 1 6 0', 'أُخفيت صفحة الطلبات. إذا طلب عميل شراء منتج، يخبره هُدهُد بأن الشراء يتم في المحل.'],
+  ['bookings', 'الحجوزات', 'حجز المواعيد حسب أوقات العمل وفريق العمل', 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4', 'أُخفيت صفحة الحجوزات. لن يحجز هُدهُد مواعيد، وسيحوّل طلبات الحجز إليك.'],
+  ['products', 'المنتجات', 'عرض المنتجات وأسعارها وتوفّرها', 'M20 12l-8 8-8-8V4h8z', 'لن يتحدث هُدهُد عن المنتجات أو أسعارها.'],
+  ['services', 'الخدمات', 'عرض الخدمات ومددها وأسعارها', 'M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z', 'لن يتحدث هُدهُد عن الخدمات أو أسعارها.'],
+  ['delivery', 'التوصيل', 'مناطق التوصيل ورسومه', 'M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4z', 'سيخبر هُدهُد العملاء بأن الاستلام من المحل فقط.']
+];
+const PHONE = /^\+?[\d][\d\s\-()]{7,18}$/;
+
+class Component extends DCLogic {
+  state = { tab: this.props.startTab || 'wa', wa: this.props.startWa || 'on', loading: false, after: 'reply', members: MEMBERS.slice(), sec: { orders: true, bookings: true, products: true, services: true, delivery: true }, discOpen: false, rmId: null, ivName: '', ivPhone: '', ivRole: 'staff', ivTouched: false, toast: '' };
+  flash(t) { clearTimeout(this._t); this.setState({ toast: t }); this._t = setTimeout(() => this.setState({ toast: '' }), 3200); }
+  renderVals() {
+    const s = this.state; const set = (p) => this.setState(p);
+    const ivNameErr = s.ivTouched && !s.ivName.trim();
+    const ivPhoneErr = s.ivTouched && !PHONE.test(s.ivPhone.trim());
+    const rm = s.members.find((m) => m.id === s.rmId);
+    const usage = [['المحادثات هذا الشهر', 412, 1000], ['أعضاء الفريق', s.members.length, 5], ['المنتجات والخدمات', 14, 100]];
+    return {
+      views: [['on', 'متصل'], ['warn', 'يحتاج إلى انتباه'], ['off', 'غير متصل'], ['loading', 'تحميل']].map((v) => ({ label: v[1], cls: (v[0] === 'loading' ? s.loading : (!s.loading && s.wa === v[0])) ? 'on' : '', aria: 'false', pick: () => {
+        if (v[0] === 'loading') { set({ loading: true }); setTimeout(() => this.setState({ loading: false }), 1200); } else set({ wa: v[0], loading: false, tab: 'wa' });
+      } })),
+      waProp: s.wa,
+      tabs: [['wa', 'واتساب'], ['team', 'فريق العمل'], ['plan', 'الاشتراك'], ['sections', 'أقسام اللوحة']].map((t) => ({ label: t[1], dot: t[0] === 'wa' && s.wa !== 'on', cls: 'tab' + (s.tab === t[0] ? ' on' : ''), aria: s.tab === t[0] ? 'true' : 'false', pick: () => set({ tab: t[0] }) })),
+      isLoading: s.loading,
+      tabWa: !s.loading && s.tab === 'wa', tabTeam: !s.loading && s.tab === 'team', tabPlan: !s.loading && s.tab === 'plan', tabSec: !s.loading && s.tab === 'sections',
+      waOn: s.wa === 'on', waWarn: s.wa === 'warn', waOff: s.wa === 'off',
+      askDisconnect: () => set({ discOpen: true }), discOpen: s.discOpen, closeDisc: () => set({ discOpen: false }), stop: (e) => e.stopPropagation(),
+      doDisconnect: () => { set({ wa: 'off', discOpen: false }); this.flash('فُصل رقم واتساب، وتوقف هُدهُد عن الرد'); },
+      renew: () => { set({ wa: 'on' }); this.flash('جُدّد الربط مع Meta لمدة 60 يوماً'); },
+      afterOpts: [['reply', 'يرد هُدهُد كالمعتاد', 'يجيب عن الأسئلة ويسجّل الطلبات، ويخبر العميل بأن الفريق سيتابع في أوقات العمل.'], ['away', 'يرسل رسالة غياب فقط', '«شكراً لتواصلك! نحن خارج أوقات العمل، وسنرد عليك صباح الغد.»']].map((o) => ({ title: o[1], desc: o[2], on: s.after === o[0], cls: 'radio-card' + (s.after === o[0] ? ' on' : ''), pick: () => { set({ after: o[0] }); this.flash('حُفظ الإعداد'); } })),
+      teamCount: s.members.length + ' أعضاء من أصل 5 في باقتك',
+      members: s.members.map((m) => ({ name: m.name, contact: m.contact, initial: m.name.charAt(0), av: 'av c' + m.c, owner: !!m.owner, editable: !m.owner, pending: !!m.pending, role: m.role, rid: 'role-' + m.id,
+        setRole: (e) => { set({ members: s.members.map((x) => (x.id === m.id ? Object.assign({}, x, { role: e.target.value }) : x)) }); this.flash('تم تغيير صلاحية ' + m.name); },
+        remove: () => set({ rmId: m.id }), removeLabel: 'إزالة ' + m.name })),
+      rmOpen: !!rm, rmName: rm ? rm.name : '', closeRm: () => set({ rmId: null }),
+      doRemove: () => { set({ members: s.members.filter((x) => x.id !== s.rmId), rmId: null }); this.flash('أُزيل ' + rm.name + ' من الفريق'); },
+      ivName: s.ivName, ivPhone: s.ivPhone, ivRole: s.ivRole,
+      setIvName: (e) => set({ ivName: e.target.value }), setIvPhone: (e) => set({ ivPhone: e.target.value }), setIvRole: (e) => set({ ivRole: e.target.value }),
+      ivNameErr: ivNameErr, ivPhoneErr: ivPhoneErr, ivNameCls: 'input' + (ivNameErr ? ' bad' : ''), ivPhoneCls: 'input' + (ivPhoneErr ? ' bad' : ''),
+      invite: () => {
+        if (!s.ivName.trim() || !PHONE.test(s.ivPhone.trim())) { set({ ivTouched: true }); return; }
+        if (s.members.length >= 5) { this.flash('وصلت إلى الحد الأقصى لأعضاء الفريق في باقتك'); return; }
+        set({ members: s.members.concat([{ id: Date.now(), name: s.ivName.trim(), contact: s.ivPhone.trim(), role: s.ivRole, c: 5, pending: true }]), ivName: '', ivPhone: '', ivTouched: false });
+        this.flash('أُرسلت الدعوة عبر واتساب');
+      },
+      usage: usage.map((u) => { const pct = Math.round(u[1] / u[2] * 100); return { label: u[0], text: u[1].toLocaleString('en-US') + ' / ' + u[2].toLocaleString('en-US'), pct: pct, style: 'width: ' + pct + '%' + (pct >= 80 ? '; background: #B54708' : '') }; }),
+      upgrade: () => this.flash('تفاصيل الباقات قريباً'),
+      sections: SECTIONS.map((x) => { const on = s.sec[x[0]]; return { title: x[1], desc: x[2], icon: x[3], offText: x[4], off: !on, swCls: 'sw' + (on ? ' on' : ''), aria: on ? 'true' : 'false', swLabel: 'إظهار قسم ' + x[1],
+        toggle: () => { set({ sec: Object.assign({}, s.sec, { [x[0]]: !on }) }); this.flash(on ? 'أُخفي قسم ' + x[1] : 'ظهر قسم ' + x[1]); } }; }),
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

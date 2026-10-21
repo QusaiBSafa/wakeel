@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هُدهُد: الطلبات</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="hodhod.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Tajawal:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="hd" style="font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif; color: #121A2E; background: #F7F8F4">
+<dc-import name="Sidebar" active="orders" hint-size="0px,0px"></dc-import>
+
+<div class="content">
+<div class="rv" role="region" aria-label="أدوات المعاينة (ليست جزءاً من المنتج)">
+<b>معاينة</b><span>حالة الصفحة:</span>
+<div class="seg" role="group" aria-label="حالة الصفحة">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="4"><button type="button" class="{{v.cls}}" aria-pressed="{{v.aria}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for>
+</div>
+</div>
+
+<main class="page" id="main">
+<div class="page-head">
+<div class="t"><h1>الطلبات</h1><p>الطلبات التي سجّلها هُدهُد من واتساب، والطلبات التي أضفتها بنفسك.</p></div>
+<button type="button" class="btn btn-primary" onClick="{{newOrder}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>طلب جديد</button>
+</div>
+
+<div class="tabs" role="tablist" aria-label="حالة الطلب">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="7"><button type="button" role="tab" class="{{t.cls}}" aria-selected="{{t.aria}}" onClick="{{t.pick}}">{{t.label}}<span class="{{t.countCls}}" style="height: 20px; min-width: 20px; font-size: 11.5px">{{t.count}}</span></button></sc-for>
+</div>
+
+<div class="toolbar">
+<div class="search" style="flex: 1 1 260px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"></path></svg><label for="o-q" class="sr-only">ابحث في الطلبات</label><input id="o-q" class="input" type="search" placeholder="ابحث برقم الطلب أو الاسم أو رقم الهاتف" value="{{q}}" onChange="{{setQ}}"></div>
+<label class="sr-only" for="o-date">الفترة</label>
+<select id="o-date" class="input" style="width: auto; min-width: 150px" value="{{range}}" onChange="{{setRange}}"><option value="all">كل الفترات</option><option value="today">اليوم</option><option value="week">آخر 7 أيام</option></select>
+</div>
+
+<sc-if value="{{isLoading}}" hint-placeholder-val="{{false}}">
+<div class="card" aria-busy="true" aria-label="جاري التحميل"><sc-for list="{{six}}" as="x" hint-placeholder-count="6"><div style="display: flex; gap: 16px; padding: 16px 20px; border-bottom: 1px solid #E6E9F0"><div class="sk" style="height: 16px; width: 60px"></div><div class="sk" style="height: 16px; flex: 1"></div><div class="sk" style="height: 16px; width: 90px"></div></div></sc-for></div>
+</sc-if>
+<sc-if value="{{isError}}" hint-placeholder-val="{{false}}">
+<div class="card empty" role="alert"><span class="ic danger" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg></span><h2>تعذّر تحميل الطلبات</h2><p class="muted">لا يزال هُدهُد يسجّل الطلبات الجديدة، لكن تعذّر عرض القائمة الآن.</p><button type="button" class="btn btn-primary" onClick="{{retry}}">أعد المحاولة</button></div>
+</sc-if>
+<sc-if value="{{isEmpty}}" hint-placeholder-val="{{false}}">
+<div class="card empty"><span class="ic indigo" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0"></path></svg></span><h2>لا توجد طلبات بعد</h2><p class="muted">عندما يطلب عميل عبر واتساب، يسجّل هُدهُد الطلب هنا وينتظر تأكيدك. يمكنك أيضاً إضافة طلب بنفسك.</p><div class="row" style="flex-wrap: wrap; justify-content: center"><button type="button" class="btn btn-primary btn-sm" onClick="{{newOrder}}">أضف طلب</button><a class="btn btn-secondary btn-sm" href="Catalog.dc.html">راجع المنتجات</a></div></div>
+</sc-if>
+<sc-if value="{{noMatch}}" hint-placeholder-val="{{false}}">
+<div class="card empty"><b>لا توجد طلبات مطابقة للبحث</b><p class="muted" style="font-size: 14px">جرّب كلمة أخرى أو امسح عوامل التصفية.</p><button type="button" class="btn btn-secondary btn-sm" onClick="{{clear}}">مسح عوامل التصفية</button></div>
+</sc-if>
+
+<sc-if value="{{showList}}" hint-placeholder-val="{{true}}">
+<div class="card hide-m">
+<div class="tbl-wrap">
+<table class="tbl">
+<thead><tr><th scope="col">الطلب</th><th scope="col">العميل</th><th scope="col">التاريخ</th><th scope="col">المنتجات</th><th scope="col">الإجمالي</th><th scope="col">الحالة</th></tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="o" hint-placeholder-count="8">
+<tr class="{{o.rowCls}}" onClick="{{o.open}}">
+<td><button type="button" class="btn-link ltr num" onClick="{{o.open}}" aria-label="{{o.openLabel}}">{{o.id}}</button><div class="subtle" style="display: flex; gap: 4px; align-items: center"><sc-if value="{{o.byAi}}" hint-placeholder-val="{{true}}"><img src="/_blob/42cc7e2cd03a6fde924c98a24846265f" alt="" width="10" height="13"></sc-if>{{o.source}}</div></td>
+<td><div style="font-weight: 600">{{o.customer}}</div><div class="subtle ltr num" style="text-align: right">{{o.phone}}</div></td>
+<td class="muted" style="white-space: nowrap">{{o.date}}</td>
+<td class="muted" style="max-width: 260px">{{o.itemsText}}</td>
+<td style="white-space: nowrap"><b class="num">{{o.total}}</b><div class="subtle">{{o.feeText}}</div></td>
+<td><div class="col" style="gap: 4px; align-items: flex-start"><span class="{{o.stCls}}">{{o.st}}</span><sc-if value="{{o.draft}}" hint-placeholder-val="{{false}}"><span class="bdg warning" style="font-size: 11.5px">مسودة · بانتظار تأكيد العميل</span></sc-if></div></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</div>
+<ul class="only-m col" style="gap: 10px">
+<sc-for list="{{rows}}" as="o" hint-placeholder-count="6">
+<li>
+<button type="button" class="card" onClick="{{o.open}}" style="width: 100%; text-align: start; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; cursor: pointer">
+<span class="row" style="justify-content: space-between; width: 100%"><b class="ltr num">{{o.id}}</b><span class="{{o.stCls}}">{{o.st}}</span></span>
+<span class="row" style="justify-content: space-between; width: 100%; gap: 8px"><span style="font-weight: 600">{{o.customer}}</span><b class="num">{{o.total}}</b></span>
+<span class="subtle">{{o.itemsText}}</span>
+<span class="row" style="justify-content: space-between; width: 100%"><span class="subtle">{{o.date}}</span><sc-if value="{{o.draft}}" hint-placeholder-val="{{false}}"><span class="bdg warning" style="font-size: 11.5px">مسودة</span></sc-if></span>
+</button>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+</main>
+</div>
+
+<!-- ================= ORDER DRAWER ================= -->
+<sc-if value="{{drawerOpen}}" hint-placeholder-val="{{false}}">
+<div class="scrim" onClick="{{close}}"></div>
+<aside class="drawer-r" role="dialog" aria-modal="true" aria-labelledby="od-h">
+<div class="drawer-head">
+<div class="grow">
+<div class="row" style="gap: 8px; flex-wrap: wrap"><h2 id="od-h" class="ltr num" style="font-size: 20px">{{d.title}}</h2><span class="{{d.stCls}}">{{d.st}}</span><sc-if value="{{d.draft}}" hint-placeholder-val="{{false}}"><span class="bdg warning">مسودة · بانتظار تأكيد العميل</span></sc-if></div>
+<span class="subtle">{{d.meta}}</span>
+</div>
+<button type="button" class="ib" onClick="{{close}}" aria-label="إغلاق"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+
+<div class="drawer-body">
+<sc-if value="{{d.isDelivered}}" hint-placeholder-val="{{false}}"><div class="alert success"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><div><b>اكتمل الطلب.</b> سُلِّم للعميل {{d.doneAt}}.</div></div></sc-if>
+<sc-if value="{{d.isCancelled}}" hint-placeholder-val="{{false}}"><div class="alert danger"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg><div><b>الطلب ملغي.</b> {{d.cancelReason}}</div></div></sc-if>
+<sc-if value="{{d.draft}}" hint-placeholder-val="{{false}}"><div class="alert warning"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4M12 16h.01M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"></path></svg><div>جهّز هُدهُد الطلب وينتظر تأكيد العميل للعنوان. إذا أكّدته بنفسك، فسنرسل له رسالة تأكيد عبر واتساب.</div></div></sc-if>
+
+<!-- customer -->
+<sc-if value="{{d.editing}}" hint-placeholder-val="{{false}}">
+<section class="card card-pad col" style="gap: 12px" aria-label="العميل">
+<div class="field"><label for="e-name">اسم العميل <span class="req" aria-hidden="true">*</span></label><input id="e-name" class="{{e.nameCls}}" value="{{e.customer}}" onChange="{{setE.customer}}" autocomplete="name"><sc-if value="{{e.nameErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب اسم العميل</span></sc-if></div>
+<div class="field"><label for="e-phone">رقم واتساب <span class="req" aria-hidden="true">*</span></label><input id="e-phone" class="{{e.phoneCls}}" type="tel" inputmode="tel" value="{{e.phone}}" onChange="{{setE.phone}}" placeholder="+970 59 123 4567"><sc-if value="{{e.phoneErr}}" hint-placeholder-val="{{false}}"><span class="err">الرقم غير صحيح، اكتبه مع رمز الدولة</span></sc-if></div>
+</section>
+</sc-if>
+<sc-if value="{{d.notEditing}}" hint-placeholder-val="{{true}}">
+<section class="card card-pad" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+<span class="{{d.av}}" aria-hidden="true">{{d.initial}}</span>
+<div class="grow"><b style="display: block">{{d.customer}}</b><a class="ltr num tap" href="{{d.tel}}" style="font-size: 14px">{{d.phone}}</a></div>
+<a class="btn btn-secondary btn-sm" href="{{d.wa}}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: #25D366"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3M12 21.8a9.9 9.9 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4a9.9 9.9 0 1 1 8.4 4.6m8.4-18.3A11.8 11.8 0 0 0 12 0C5.5 0 .2 5.3.2 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.7a11.9 11.9 0 0 0 5.7 1.5c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.5-8.4z"></path></svg>تواصل عبر واتساب</a>
+</section>
+</sc-if>
+
+<!-- items -->
+<section class="col" style="gap: 10px" aria-labelledby="it-h">
+<div class="row" style="justify-content: space-between"><h3 id="it-h">المنتجات</h3><sc-if value="{{d.canEdit}}" hint-placeholder-val="{{true}}"><sc-if value="{{d.notEditing}}" hint-placeholder-val="{{true}}"><button type="button" class="btn btn-ghost btn-sm" onClick="{{startEdit}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"></path></svg>تعديل الطلب</button></sc-if></sc-if></div>
+<ul class="card" style="padding: 4px 0">
+<sc-for list="{{d.lines}}" as="l" hint-placeholder-count="2">
+<li style="display: flex; gap: 10px; align-items: center; padding: 10px 14px; border-bottom: 1px solid #E6E9F0">
+<div class="grow"><b style="display: block; font-size: 14.5px">{{l.name}}</b><span class="subtle num">{{l.unit}} للقطعة</span></div>
+<sc-if value="{{d.editing}}" hint-placeholder-val="{{false}}">
+<div class="seg" role="group" aria-label="{{l.qtyLabel}}"><button type="button" onClick="{{l.dec}}" aria-label="إنقاص">−</button><span class="num" style="min-width: 28px; display: grid; place-items: center; font-weight: 700">{{l.qty}}</span><button type="button" onClick="{{l.inc}}" aria-label="زيادة">+</button></div>
+<button type="button" class="ib sm danger" onClick="{{l.remove}}" aria-label="{{l.removeLabel}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg></button>
+</sc-if>
+<sc-if value="{{d.notEditing}}" hint-placeholder-val="{{true}}"><span class="subtle num">×{{l.qty}}</span></sc-if>
+<b class="num" style="min-width: 64px; text-align: left">{{l.total}}</b>
+</li>
+</sc-for>
+<sc-if value="{{d.noLines}}" hint-placeholder-val="{{false}}"><li class="err" style="padding: 12px 14px">يجب أن يحتوي الطلب على منتج واحد على الأقل</li></sc-if>
+</ul>
+<sc-if value="{{d.editing}}" hint-placeholder-val="{{false}}">
+<div class="row" style="gap: 8px"><label for="add-p" class="sr-only">أضف منتج</label><select id="add-p" class="input" value="{{addSel}}" onChange="{{setAddSel}}"><sc-for list="{{products}}" as="p" hint-placeholder-count="5"><option value="{{p.id}}">{{p.label}}</option></sc-for></select><button type="button" class="btn btn-soft" onClick="{{addLine}}">أضف</button></div>
+</sc-if>
+<dl class="card card-pad" style="display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 14px">
+<dt class="muted">المجموع</dt><dd class="num">{{d.subtotal}}</dd>
+<dt class="muted">التوصيل ({{d.areaName}})</dt><dd class="num">{{d.fee}}</dd>
+<dt style="font-weight: 700; border-top: 1px solid #E6E9F0; padding-top: 8px">الإجمالي</dt><dd class="num" style="font-weight: 800; font-size: 17px; border-top: 1px solid #E6E9F0; padding-top: 8px">{{d.total}}</dd>
+</dl>
+</section>
+
+<!-- delivery & payment -->
+<section class="col" style="gap: 10px" aria-labelledby="dl-h">
+<h3 id="dl-h">التوصيل</h3>
+<sc-if value="{{d.notEditing}}" hint-placeholder-val="{{true}}">
+<dl class="card card-pad kv"><dt>المنطقة</dt><dd>{{d.areaName}}</dd><dt>العنوان</dt><dd>{{d.address}}</dd><dt>ملاحظات</dt><dd>{{d.notesText}}</dd></dl>
+</sc-if>
+<sc-if value="{{d.editing}}" hint-placeholder-val="{{false}}">
+<div class="card card-pad col" style="gap: 12px">
+<div class="field"><label for="e-area">منطقة التوصيل</label><select id="e-area" class="input" value="{{e.area}}" onChange="{{setE.area}}"><sc-for list="{{areas}}" as="a" hint-placeholder-count="5"><option value="{{a.id}}">{{a.label}}</option></sc-for></select></div>
+<div class="field"><label for="e-addr">العنوان <span class="req" aria-hidden="true">*</span></label><textarea id="e-addr" class="{{e.addrCls}}" value="{{e.address}}" onChange="{{setE.address}}" placeholder="المدينة، الحي، أقرب معلم"></textarea><sc-if value="{{e.addrErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب العنوان ليصل الطلب</span></sc-if></div>
+<div class="field"><label for="e-notes">ملاحظات <span class="opt">(اختياري)</span></label><input id="e-notes" class="input" value="{{e.notes}}" onChange="{{setE.notes}}" placeholder="مثلاً: اتصل قبل الوصول"></div>
+</div>
+</sc-if>
+</section>
+
+<!-- timeline -->
+<section class="col" style="gap: 10px" aria-labelledby="tl-h">
+<h3 id="tl-h">سجل الطلب</h3>
+<ol class="card card-pad col" style="gap: 14px">
+<sc-for list="{{d.timeline}}" as="t" hint-placeholder-count="3">
+<li style="display: flex; gap: 12px; align-items: flex-start">
+<span class="{{t.ic}}" style="width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="{{t.icon}}"></path></svg></span>
+<div class="grow"><b style="display: block; font-size: 14px">{{t.text}}</b><span class="subtle">{{t.who}} · {{t.time}}</span></div>
+</li>
+</sc-for>
+</ol>
+</section>
+</div>
+
+<div class="drawer-foot">
+<sc-if value="{{d.editing}}" hint-placeholder-val="{{false}}">
+<button type="button" class="btn btn-primary" onClick="{{saveEdit}}" style="flex: 1 1 auto">{{saveLabel}}</button>
+<button type="button" class="btn btn-secondary" onClick="{{cancelEdit}}">إلغاء</button>
+</sc-if>
+<sc-if value="{{d.showActions}}" hint-placeholder-val="{{true}}">
+<sc-if value="{{d.hasNext}}" hint-placeholder-val="{{true}}"><button type="button" class="btn btn-primary" onClick="{{advance}}" style="flex: 1 1 auto">{{d.nextLabel}}</button></sc-if>
+<sc-if value="{{d.canCancel}}" hint-placeholder-val="{{true}}"><button type="button" class="btn btn-danger-soft" onClick="{{askCancel}}">إلغاء الطلب</button></sc-if>
+<sc-if value="{{d.isFinal}}" hint-placeholder-val="{{false}}"><button type="button" class="btn btn-secondary" onClick="{{close}}" style="flex: 1 1 auto">إغلاق</button></sc-if>
+</sc-if>
+</div>
+</aside>
+</sc-if>
+
+<!-- cancel confirmation -->
+<sc-if value="{{cancelOpen}}" hint-placeholder-val="{{false}}">
+<div class="backdrop" onClick="{{closeCancel}}">
+<div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="cx-h" onClick="{{stop}}">
+<div class="dialog-body">
+<h2 id="cx-h">هل تريد إلغاء الطلب {{d.title}}؟</h2>
+<p class="muted">سنرسل إلى العميل رسالة بإلغاء الطلب، ولا يمكن التراجع عن ذلك.</p>
+<div class="field"><label for="cx-r">سبب الإلغاء</label><select id="cx-r" class="input" value="{{cancelReason}}" onChange="{{setCancelReason}}"><option value="customer">طلب العميل الإلغاء</option><option value="stock">المنتج غير متوفر</option><option value="area">لا نوصّل إلى هذه المنطقة</option><option value="other">سبب آخر</option></select></div>
+</div>
+<div class="dialog-foot"><button type="button" class="btn btn-secondary" onClick="{{closeCancel}}">لا، تراجع</button><button type="button" class="btn btn-danger" onClick="{{doCancel}}">ألغِ الطلب</button></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+<div class="toast ok" role="status" aria-live="polite"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>{{toast}}</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startOrder":{"editor":"enum","options":["","1043","1042","1040","1038","1037","1036"],"default":""},"$preview":{"width":1440,"height":1000}}'>
+const PRODUCTS = [
+  { id: 'sh', name: 'شامبو أرغان 250 مل', price: 45 }, { id: 'oil', name: 'زيت شعر طبيعي', price: 60 }, { id: 'msk', name: 'ماسك كيراتين', price: 85 },
+  { id: 'spr', name: 'بخاخ حماية من الحرارة', price: 55 }, { id: 'prf', name: 'عطر الياسمين 50 مل', price: 120 }, { id: 'set', name: 'مجموعة العناية بالشعر', price: 210 }, { id: 'cmb', name: 'مشط خشب', price: 20 }
+];
+const AREAS = [
+  { id: 'rm', name: 'رام الله والبيرة', fee: 15 }, { id: 'bt', name: 'بيتونيا', fee: 15 }, { id: 'nb', name: 'نابلس', fee: 25 },
+  { id: 'bl', name: 'بيت لحم', fee: 25 }, { id: 'hb', name: 'الخليل', fee: 30 }, { id: 'pk', name: 'استلام من المحل', fee: 0 }
+];
+const FREE_OVER = 200;
+const PHONE = /^\+?[\d][\d\s\-()]{7,18}$/;
+const PAY = { cash: 'نقداً عند الاستلام', transfer: 'تحويل بنكي', wallet: 'محفظة إلكترونية', card: 'بطاقة' };
+const FLOW = ['new', 'confirmed', 'preparing', 'out', 'delivered'];
+const ST = { new: ['جديد', 'bdg info'], confirmed: ['تم التأكيد', 'bdg brand'], preparing: ['قيد التجهيز', 'bdg accent'], out: ['خرج للتوصيل', 'bdg outline'], delivered: ['تم التسليم', 'bdg success'], cancelled: ['ملغي', 'bdg neutral'] };
+const NEXT = { new: 'أكّد الطلب', confirmed: 'ابدأ التجهيز', preparing: 'أرسله للتوصيل', out: 'تم التسليم' };
+const NEXT_TL = { confirmed: 'تم تأكيد الطلب وأُرسلت رسالة إلى العميل', preparing: 'بدأ تجهيز الطلب', out: 'خرج الطلب للتوصيل وأُرسل إشعار إلى العميل', delivered: 'تم تسليم الطلب' };
+const T = (text, who, time, k) => ({ text, who, time, k });
+const SEED = [
+  { id: '1043', customer: 'أحمد عودة', phone: '+970 56 412 9930', av: 0, date: 'اليوم 10:12 ص', day: 0, s: 'new', draft: true, ai: true, area: 'rm', address: 'البيرة، حي الجنان، قرب مسجد جمال عبد الناصر', pay: 'cash', notes: '', lines: [['sh', 2], ['oil', 1]],
+    tl: [T('سجّل هُدهُد الطلب من واتساب', 'هُدهُد', 'اليوم 10:12 ص', 'ai'), T('بانتظار تأكيد العميل للعنوان', 'هُدهُد', 'اليوم 10:12 ص', 'wait')] },
+  { id: '1042', customer: 'ليان سعادة', phone: '+970 59 402 3381', av: 1, date: 'اليوم 9:40 ص', day: 0, s: 'new', ai: true, area: 'rm', address: 'رام الله، الماصيون، عمارة النجمة ط3', pay: 'transfer', notes: 'ستحوّل المبلغ قبل التوصيل', lines: [['msk', 1], ['spr', 1]],
+    tl: [T('سجّل هُدهُد الطلب من واتساب', 'هُدهُد', 'اليوم 9:38 ص', 'ai'), T('أكّدت العميلة الطلب والعنوان', 'العميل', 'اليوم 9:40 ص', 'cust')] },
+  { id: '1041', customer: 'سامر حداد', phone: '+970 59 233 7105', av: 2, date: 'اليوم 8:55 ص', day: 0, s: 'confirmed', ai: true, area: 'bl', address: 'بيت لحم، شارع المهد، قرب البلدية', pay: 'wallet', notes: '', lines: [['prf', 1]],
+    tl: [T('سجّل هُدهُد الطلب من واتساب', 'هُدهُد', 'اليوم 8:50 ص', 'ai'), T('أكّد العميل الطلب', 'العميل', 'اليوم 8:52 ص', 'cust'), T('تم تأكيد الطلب وأُرسلت رسالة إلى العميل', 'رنا', 'اليوم 8:55 ص', 'owner')] },
+  { id: '1040', customer: 'رنين عابد', phone: '+970 56 788 2140', av: 4, date: 'أمس 6:20 م', day: 1, s: 'preparing', ai: false, area: 'rm', address: 'رام الله، الطيرة، شارع المدارس', pay: 'cash', notes: 'هدية، تحتاج إلى تغليف', lines: [['set', 1]],
+    tl: [T('رنا أضافت الطلب', 'رنا', 'أمس 6:20 م', 'owner'), T('تم تأكيد الطلب وأُرسلت رسالة إلى العميل', 'رنا', 'أمس 6:21 م', 'owner'), T('بدأ تجهيز الطلب', 'سارة', 'اليوم 9:00 ص', 'owner')] },
+  { id: '1039', customer: 'فادي نصار', phone: '+970 59 611 0932', av: 6, date: 'أمس 4:10 م', day: 1, s: 'delivered', ai: true, area: 'pk', address: 'استلام من المحل', pay: 'cash', notes: '', lines: [['sh', 1], ['cmb', 1]], doneAt: 'أمس 7:30 م',
+    tl: [T('سجّل هُدهُد الطلب من واتساب', 'هُدهُد', 'أمس 4:10 م', 'ai'), T('تم تأكيد الطلب', 'رنا', 'أمس 4:20 م', 'owner'), T('استلم العميل الطلب من المحل', 'رنا', 'أمس 7:30 م', 'done')] },
+  { id: '1038', customer: 'محمد أبو شمسية', phone: '+970 56 901 4477', av: 2, date: 'أمس 2:05 م', day: 1, s: 'out', ai: true, area: 'nb', address: 'نابلس، رفيديا، قرب جامعة النجاح', pay: 'cash', notes: '', lines: [['sh', 3]],
+    tl: [T('سجّل هُدهُد الطلب من واتساب', 'هُدهُد', 'أمس 2:04 م', 'ai'), T('تم تأكيد الطلب وأُرسلت رسالة إلى العميل', 'رنا', 'أمس 2:30 م', 'owner'), T('خرج الطلب للتوصيل وأُرسل إشعار إلى العميل', 'رنا', 'اليوم 8:15 ص', 'owner')] },
+  { id: '1037', customer: 'نور البرغوثي', phone: '+970 59 140 6612', av: 7, date: '12 تشرين الأول', day: 2, s: 'delivered', ai: true, area: 'rm', address: 'رام الله، الإرسال', pay: 'card', notes: '', lines: [['oil', 2]], doneAt: 'اليوم 9:10 ص',
+    tl: [T('سجّل هُدهُد الطلب من واتساب', 'هُدهُد', '12 تشرين الأول', 'ai'), T('خرج الطلب للتوصيل', 'رنا', 'أمس 10:00 ص', 'owner'), T('تم تسليم الطلب', 'شركة التوصيل', 'اليوم 9:10 ص', 'done')] },
+  { id: '1036', customer: 'تالا منصور', phone: '+970 59 520 4416', av: 5, date: '12 تشرين الأول', day: 2, s: 'cancelled', ai: true, area: 'rm', address: 'رام الله، عين منجد', pay: 'cash', notes: '', lines: [['cmb', 1]], cancelReason: 'طلبت العميلة الإلغاء.',
+    tl: [T('سجّل هُدهُد الطلب من واتساب', 'هُدهُد', '12 تشرين الأول', 'ai'), T('أُلغي الطلب: طلبت العميلة الإلغاء', 'رنا', '12 تشرين الأول', 'cancel')] }
+];
+const TL_IC = { ai: ['ic brand', 'M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z'], wait: ['ic warn', 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2'], cust: ['ic indigo', 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0'], owner: ['ic accent', 'M5 12.5l4.5 4.5L19 7'], done: ['ic brand', 'M5 12.5l4.5 4.5L19 7'], cancel: ['ic danger', 'M6 6l12 12M18 6L6 18'] };
+const money = (n) => n.toLocaleString('en-US') + ' ₪';
+const prod = (id) => PRODUCTS.find((p) => p.id === id);
+const area = (id) => AREAS.find((a) => a.id === id) || AREAS[0];
+function calc(o) {
+  const sub = o.lines.reduce((n, l) => n + prod(l[0]).price * l[1], 0);
+  const a = area(o.area);
+  const fee = a.fee && sub >= FREE_OVER ? 0 : a.fee;
+  return { sub, fee, total: sub + fee, free: a.fee > 0 && fee === 0 };
+}
+
+class Component extends DCLogic {
+  state = { view: 'normal', orders: SEED.map((o) => Object.assign({}, o, { lines: o.lines.map((l) => l.slice()), tl: o.tl.slice() })), tab: 'all', q: '', range: 'all', pay: 'all', openId: undefined, editing: false, edit: null, addSel: 'sh', cancelOpen: false, cancelReason: 'customer', toast: '', touched: false, nextId: 1044 };
+  flash(t) { clearTimeout(this._t); this.setState({ toast: t }); this._t = setTimeout(() => this.setState({ toast: '' }), 3200); }
+  upd(id, fn) { this.setState({ orders: this.state.orders.map((o) => (o.id === id ? fn(Object.assign({}, o, { lines: o.lines.map((l) => l.slice()), tl: o.tl.slice() })) : o)) }); }
+  renderVals() {
+    const s = this.state; const set = (p) => this.setState(p);
+    const openId = s.openId !== undefined ? s.openId : (this.props.startOrder || '');
+    const all = s.view === 'empty' ? [] : s.orders;
+    const q = s.q.trim();
+    const counts = {}; Object.keys(ST).forEach((k) => { counts[k] = all.filter((o) => o.s === k).length; });
+    const list = all.filter((o) => (s.tab === 'all' || o.s === s.tab) && (s.pay === 'all' || o.pay === s.pay) && (s.range === 'all' || (s.range === 'today' ? o.day === 0 : o.day <= 7)) &&
+      (!q || o.id.indexOf(q.replace('#', '')) >= 0 || o.customer.indexOf(q) >= 0 || o.phone.replace(/\s/g, '').indexOf(q.replace(/\s/g, '')) >= 0));
+    const rows = list.map((o) => {
+      const c = calc(o);
+      return {
+        id: '#' + o.id, customer: o.customer, phone: o.phone, date: o.date, total: money(c.total),
+        feeText: c.free ? 'توصيل مجاني' : (c.fee ? 'شامل التوصيل ' + c.fee + ' ₪' : 'استلام من المحل'),
+        itemsText: o.lines.map((l) => prod(l[0]).name + ' ×' + l[1]).join('، '),
+        payText: PAY[o.pay], st: ST[o.s][0], stCls: ST[o.s][1], draft: !!o.draft,
+        byAi: o.ai, source: o.ai ? 'من هُدهُد' : 'يدوي',
+        rowCls: o.id === openId ? 'sel' : '', openLabel: 'افتح الطلب ' + o.id,
+        open: (e) => { if (e && e.stopPropagation) e.stopPropagation(); set({ openId: o.id, editing: false }); }
+      };
+    });
+    const o = s.orders.find((x) => x.id === openId);
+    const editing = s.editing && !!s.edit;
+    const src = editing ? Object.assign({}, o, s.edit) : o;
+    let d = {};
+    if (src) {
+      const c = calc(src);
+      const fi = FLOW.indexOf(src.s);
+      const final = src.s === 'delivered' || src.s === 'cancelled';
+      d = {
+        title: src.isNew ? 'طلب جديد' : '#' + src.id, st: ST[src.s][0], stCls: ST[src.s][1], draft: !!src.draft,
+        meta: src.isNew ? 'تضيفه بنفسك' : (src.ai ? 'سجّله هُدهُد من واتساب · ' : 'أضافته رنا · ') + src.date,
+        customer: src.customer, phone: src.phone, initial: src.customer.charAt(0), av: 'av c' + src.av,
+        tel: 'tel:' + src.phone.replace(/\s/g, ''), wa: 'https://wa.me/' + src.phone.replace(/[^\d]/g, ''),
+        isDelivered: src.s === 'delivered', isCancelled: src.s === 'cancelled', doneAt: src.doneAt || 'الآن', cancelReason: src.cancelReason || '',
+        canEdit: !final, editing: editing, notEditing: !editing,
+        lines: src.lines.map((l, i) => {
+          const p = prod(l[0]);
+          return {
+            name: p.name, unit: money(p.price), qty: l[1], total: money(p.price * l[1]), qtyLabel: 'كمية ' + p.name, removeLabel: 'إزالة ' + p.name,
+            inc: () => this.setState({ edit: Object.assign({}, s.edit, { lines: s.edit.lines.map((x, j) => (j === i ? [x[0], x[1] + 1] : x)) }) }),
+            dec: () => this.setState({ edit: Object.assign({}, s.edit, { lines: s.edit.lines.map((x, j) => (j === i ? [x[0], Math.max(1, x[1] - 1)] : x)) }) }),
+            remove: () => this.setState({ edit: Object.assign({}, s.edit, { lines: s.edit.lines.filter((x, j) => j !== i) }) })
+          };
+        }),
+        noLines: src.lines.length === 0,
+        subtotal: money(c.sub), fee: c.free ? 'مجاني (للطلبات فوق ' + FREE_OVER + ' ₪)' : money(c.fee), total: money(c.total),
+        areaName: area(src.area).name, address: src.address || '—', payText: PAY[src.pay], notesText: src.notes || 'لا يوجد',
+        timeline: src.tl.map((t) => ({ text: t.text, who: t.who, time: t.time, ic: TL_IC[t.k][0], icon: TL_IC[t.k][1] })),
+        showActions: !editing, hasNext: !final && fi >= 0 && fi < 4, nextLabel: NEXT[src.s] || '', canCancel: !final, isFinal: final
+      };
+    }
+    const e = s.edit || {};
+    const addrErr = s.touched && editing && e.area !== 'pk' && !String(e.address || '').trim();
+    const nameErr = s.touched && editing && !String(e.customer || '').trim();
+    const phoneErr = s.touched && editing && !PHONE.test(String(e.phone || '').trim());
+    const setE = {}; ['customer', 'phone', 'area', 'address', 'pay', 'notes'].forEach((k) => { setE[k] = (ev) => this.setState({ edit: Object.assign({}, s.edit, { [k]: ev.target.value }) }); });
+    const close = () => set({ openId: '', editing: false, edit: null, touched: false, orders: s.orders.filter((x) => !x.isNew) });
+    return {
+      views: [['normal', 'عادي'], ['empty', 'فارغ'], ['loading', 'تحميل'], ['error', 'خطأ']].map((v) => ({ label: v[1], cls: s.view === v[0] ? 'on' : '', aria: s.view === v[0] ? 'true' : 'false', pick: () => set({ view: v[0] }) })),
+      tabs: [['all', 'الكل', all.length]].concat(Object.keys(ST).map((k) => [k, ST[k][0], counts[k]])).map((t) => ({ label: t[1], count: t[2], countCls: t[0] === 'new' && t[2] ? 'count warm' : 'count', cls: 'tab' + (s.tab === t[0] ? ' on' : ''), aria: s.tab === t[0] ? 'true' : 'false', pick: () => set({ tab: t[0] }) })),
+      q: s.q, setQ: (ev) => set({ q: ev.target.value }), range: s.range, setRange: (ev) => set({ range: ev.target.value }), pay: s.pay, setPay: (ev) => set({ pay: ev.target.value }),
+      clear: () => set({ q: '', tab: 'all', range: 'all', pay: 'all' }),
+      six: [1, 2, 3, 4, 5, 6],
+      isLoading: s.view === 'loading', isError: s.view === 'error', isEmpty: s.view === 'empty',
+      retry: () => { set({ view: 'loading' }); setTimeout(() => this.setState({ view: 'normal' }), 900); },
+      noMatch: s.view === 'normal' && list.length === 0, showList: s.view === 'normal' && list.length > 0,
+      rows: rows,
+      newOrder: () => {
+        const id = String(s.nextId);
+        const no = { id: id, isNew: true, customer: 'عميل جديد', phone: '', av: 7, date: 'اليوم', day: 0, s: 'new', ai: false, area: 'rm', address: '', pay: 'cash', notes: '', lines: [['sh', 1]], tl: [T('رنا تضيف الطلب', 'رنا', 'الآن', 'owner')] };
+        set({ orders: [no].concat(s.orders), openId: id, editing: true, edit: { customer: '', phone: '', lines: no.lines.map((l) => l.slice()), area: no.area, address: '', pay: 'cash', notes: '' }, touched: false });
+      },
+      drawerOpen: !!o, d: d, close: close,
+      startEdit: () => set({ editing: true, edit: { customer: o.customer, phone: o.phone, lines: o.lines.map((l) => l.slice()), area: o.area, address: o.address, pay: o.pay, notes: o.notes }, touched: false }),
+      cancelEdit: () => { if (o && o.isNew) close(); else set({ editing: false, edit: null, touched: false }); },
+      saveLabel: o && o.isNew ? 'احفظ الطلب' : 'احفظ التعديلات',
+      saveEdit: () => {
+        const bad = !s.edit.lines.length || (s.edit.area !== 'pk' && !String(s.edit.address || '').trim()) || !String(s.edit.customer || '').trim() || !PHONE.test(String(s.edit.phone || '').trim());
+        if (bad) { set({ touched: true }); return; }
+        const wasNew = o.isNew;
+        this.upd(o.id, (x) => { Object.assign(x, s.edit, { isNew: false }); x.lines = s.edit.lines.map((l) => l.slice()); x.tl.push(T(wasNew ? 'رنا أضافت الطلب' : 'رنا عدّلت الطلب', 'رنا', 'الآن', 'owner')); return x; });
+        set({ editing: false, edit: null, touched: false, nextId: wasNew ? s.nextId + 1 : s.nextId });
+        this.flash(wasNew ? 'تمت إضافة الطلب #' + o.id : 'تم حفظ التعديلات');
+      },
+      e: { customer: e.customer, phone: e.phone, area: e.area, address: e.address, pay: e.pay, notes: e.notes, addrErr: addrErr, addrCls: addrErr ? 'input bad' : 'input', nameErr: nameErr, nameCls: nameErr ? 'input bad' : 'input', phoneErr: phoneErr, phoneCls: phoneErr ? 'input bad' : 'input' }, setE: setE,
+      areas: AREAS.map((a) => ({ id: a.id, label: a.name + (a.fee ? ' · ' + a.fee + ' ₪' : ' · مجاناً') })),
+      products: PRODUCTS.map((p) => ({ id: p.id, label: p.name + ' · ' + p.price + ' ₪' })),
+      addSel: s.addSel, setAddSel: (ev) => set({ addSel: ev.target.value }),
+      addLine: () => { const ex = s.edit.lines.find((l) => l[0] === s.addSel); set({ edit: Object.assign({}, s.edit, { lines: ex ? s.edit.lines.map((l) => (l[0] === s.addSel ? [l[0], l[1] + 1] : l)) : s.edit.lines.concat([[s.addSel, 1]]) }) }); },
+      advance: () => {
+        const ni = FLOW.indexOf(o.s) + 1; const ns = FLOW[ni];
+        this.upd(o.id, (x) => { x.s = ns; x.draft = false; if (ns === 'delivered') x.doneAt = 'الآن'; x.tl.push(T(NEXT_TL[ns], 'رنا', 'الآن', ns === 'delivered' ? 'done' : 'owner')); return x; });
+        this.flash('حالة الطلب الآن: ' + ST[ns][0]);
+      },
+      askCancel: () => set({ cancelOpen: true }), closeCancel: () => set({ cancelOpen: false }),
+      cancelOpen: s.cancelOpen, cancelReason: s.cancelReason, setCancelReason: (ev) => set({ cancelReason: ev.target.value }),
+      doCancel: () => {
+        const r = { customer: 'طلب العميل الإلغاء.', stock: 'المنتج غير متوفر.', area: 'لا نوصّل إلى هذه المنطقة.', other: 'سبب آخر.' }[s.cancelReason];
+        this.upd(o.id, (x) => { x.s = 'cancelled'; x.draft = false; x.cancelReason = r; x.tl.push(T('أُلغي الطلب: ' + r, 'رنا', 'الآن', 'cancel')); return x; });
+        set({ cancelOpen: false }); this.flash('أُلغي الطلب وأُرسل إشعار إلى العميل');
+      },
+      stop: (ev) => { if (ev && ev.stopPropagation) ev.stopPropagation(); },
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

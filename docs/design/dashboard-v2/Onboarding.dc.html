@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هُدهُد: إعداد الحساب</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="hodhod.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Tajawal:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="hd" style="font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif; color: #121A2E; background: #F7F8F4">
+
+<div class="rv" role="region" aria-label="أدوات المعاينة (ليست جزءاً من المنتج)" style="position: static">
+<b>معاينة</b><span>الحالة:</span>
+<div class="seg" role="group" aria-label="الحالة">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="3"><button type="button" class="{{v.cls}}" aria-pressed="{{v.aria}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for>
+</div>
+</div>
+
+<header class="ob-top">
+<span class="wordmark" style="font-size: 20px"><img src="/_blob/42cc7e2cd03a6fde924c98a24846265f" alt="" width="24" height="30">هُدهُد</span>
+<span class="grow"></span>
+<sc-if value="{{showSaveLater}}" hint-placeholder-val="{{true}}"><button type="button" class="btn btn-ghost btn-sm" onClick="{{saveLater}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6"></path></svg>احفظ وأكمل لاحقاً</button></sc-if>
+</header>
+
+<!-- ============ RESUME ============ -->
+<sc-if value="{{isResume}}" hint-placeholder-val="{{false}}">
+<main class="ob-center" id="main">
+<div class="card empty" style="max-width: 560px; margin: 0 auto">
+<span class="ic brand" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"></path></svg></span>
+<h1 style="font-size: 24px">أهلاً بعودتك يا رنا</h1>
+<p class="muted">أكملت {{doneCount}} من 8 خطوات. حفظنا كل ما أدخلته، ويمكنك المتابعة من حيث توقفت.</p>
+<div class="bar" style="width: 100%; max-width: 360px" role="progressbar" aria-label="نسبة الإكمال" aria-valuenow="{{pct}}" aria-valuemin="0" aria-valuemax="100"><span style="{{pctStyle}}"></span></div>
+<button type="button" class="btn btn-primary" onClick="{{resume}}">تابع: {{curTitle}}</button>
+</div>
+</main>
+</sc-if>
+
+<!-- ============ SUCCESS ============ -->
+<sc-if value="{{isLive}}" hint-placeholder-val="{{false}}">
+<main class="ob-center" id="main">
+<div class="card empty" style="max-width: 600px; margin: 0 auto; padding: 48px 24px">
+<span class="ic brand" style="display: grid; place-items: center; width: 80px; height: 80px; border-radius: 24px"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>
+<h1 style="font-size: 26px">هُدهُد يعمل الآن!</h1>
+<p class="muted">سيرد على رسائل عملائك على الرقم <span class="ltr num">+970 59 812 3344</span>، وستجد الطلبات والحجوزات وما يحتاج تدخلك في لوحة التحكم.</p>
+<div class="row" style="gap: 8px; flex-wrap: wrap; justify-content: center"><a class="btn btn-primary" href="Main.dc.html">اذهب إلى لوحة التحكم</a><a class="btn btn-secondary" href="AISettings.dc.html">عدّل إعدادات هُدهُد</a></div>
+<p class="subtle">نصيحة: أرسل رسالة من رقم آخر إلى واتساب نشاطك لترى هُدهُد يعمل.</p>
+</div>
+</main>
+</sc-if>
+
+<!-- ============ WIZARD ============ -->
+<sc-if value="{{isWizard}}" hint-placeholder-val="{{true}}">
+<div class="ob">
+<nav class="ob-steps" aria-label="خطوات الإعداد">
+<p class="subtle" style="margin-bottom: 4px">{{doneCount}} من 8 خطوات مكتملة</p>
+<div class="bar" style="margin-bottom: 14px" aria-hidden="true"><span style="{{pctStyle}}"></span></div>
+<ol>
+<sc-for list="{{steps}}" as="st" hint-placeholder-count="8">
+<li><button type="button" class="{{st.cls}}" onClick="{{st.go}}" aria-current="{{st.current}}" disabled="{{st.locked}}"><span class="ob-n" aria-hidden="true">{{st.mark}}</span><span class="col" style="gap: 0; align-items: flex-start"><span>{{st.title}}</span><sc-if value="{{st.hasNote}}" hint-placeholder-val="{{false}}"><span class="subtle" style="font-size: 12px; font-weight: 500">{{st.note}}</span></sc-if></span></button></li>
+</sc-for>
+</ol>
+</nav>
+
+<main class="ob-main" id="main">
+<div class="ob-prog" aria-hidden="true"><div class="row" style="justify-content: space-between; font-size: 13px"><b>الخطوة {{stepNo}} من 8</b><span class="subtle">{{curTitle}}</span></div><div class="bar"><span style="{{stepStyle}}"></span></div></div>
+
+<div class="ob-head"><span class="subtle">الخطوة {{stepNo}} من 8</span><h1>{{curHeading}}</h1><p class="muted">{{curSub}}</p></div>
+
+<!-- 1 type -->
+<sc-if value="{{s1}}" hint-placeholder-val="{{true}}">
+<fieldset style="border: 0; padding: 0; margin: 0"><legend class="sr-only">نوع النشاط</legend>
+<div class="ob-types">
+<sc-for list="{{types}}" as="t" hint-placeholder-count="6"><label class="{{t.cls}}"><input type="radio" name="btype" class="sr-only" checked="{{t.on}}" onChange="{{t.pick}}"><span class="ic brand" style="display: grid; place-items: center"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{t.icon}}"></path></svg></span><b>{{t.label}}</b><span class="subtle">{{t.ex}}</span></label></sc-for>
+</div>
+</fieldset>
+<sc-if value="{{typeErr}}" hint-placeholder-val="{{false}}"><p class="err" role="alert" style="margin-top: 10px">اختر نوع نشاطك للمتابعة</p></sc-if>
+<sc-if value="{{hasType}}" hint-placeholder-val="{{true}}">
+<fieldset class="field" style="border: 0; padding: 0; margin: 20px 0 0"><legend class="lbl" style="margin-bottom: 8px">ماذا تقدّم لعملائك؟ <span class="opt">(اختر كل ما ينطبق)</span></legend>
+<div class="row" style="gap: 8px; flex-wrap: wrap"><sc-for list="{{offers}}" as="o" hint-placeholder-count="3"><label class="{{o.cls}}"><input type="checkbox" checked="{{o.on}}" onChange="{{o.toggle}}"><span>{{o.label}}</span></label></sc-for></div>
+<span class="hint">نعرض لك الخطوات التي تناسب نشاطك فقط.</span>
+</fieldset>
+</sc-if>
+</sc-if>
+
+<!-- 2 info -->
+<sc-if value="{{s2}}" hint-placeholder-val="{{false}}">
+<div class="card card-body col" style="gap: 16px">
+<div class="field"><label for="o-name">اسم النشاط <span class="req" aria-hidden="true">*</span></label><input id="o-name" class="{{nameCls}}" value="{{f.name}}" onChange="{{setF.name}}" placeholder="مثلاً: مركز لمسة للتجميل" aria-required="true"><sc-if value="{{nameErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب اسم النشاط</span></sc-if></div>
+<div class="grid-2" style="gap: 12px">
+<div class="field"><label for="o-city">المدينة</label><select id="o-city" class="input" value="{{f.city}}" onChange="{{setF.city}}"><sc-for list="{{cities}}" as="c" hint-placeholder-count="6"><option>{{c}}</option></sc-for></select></div>
+<div class="field"><label for="o-phone">رقم الهاتف <span class="req" aria-hidden="true">*</span></label><input id="o-phone" class="{{phoneCls}}" type="tel" inputmode="tel" dir="ltr" value="{{f.phone}}" onChange="{{setF.phone}}" placeholder="+970 59 123 4567" aria-required="true"><sc-if value="{{phoneErr}}" hint-placeholder-val="{{false}}"><span class="err">اكتب رقماً صحيحاً</span></sc-if></div>
+</div>
+<div class="field"><label for="o-addr">العنوان <span class="opt">(اختياري)</span></label><input id="o-addr" class="input" value="{{f.addr}}" onChange="{{setF.addr}}" placeholder="الشارع، المبنى، أقرب معلم"></div>
+<div class="field"><label for="o-desc">وصف قصير <span class="opt">(اختياري)</span></label><textarea id="o-desc" class="input" value="{{f.desc}}" onChange="{{setF.desc}}" placeholder="ماذا تقدّم؟ وما الذي يميّزك؟"></textarea><span class="hint">يستخدمه هُدهُد عند التعريف بنشاطك. يمكنك تعديله لاحقاً.</span></div>
+</div>
+</sc-if>
+
+<!-- 3 hours -->
+<sc-if value="{{s3}}" hint-placeholder-val="{{false}}">
+<div class="card">
+<div class="card-body row" style="gap: 8px; flex-wrap: wrap"><span class="subtle">اختيار سريع:</span><sc-for list="{{presets}}" as="p" hint-placeholder-count="3"><button type="button" class="chip sm" onClick="{{p.apply}}">{{p.label}}</button></sc-for></div>
+<ul>
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="7">
+<li class="row" style="gap: 12px 16px; padding: 10px 20px; border-top: 1px solid #E6E9F0; flex-wrap: wrap">
+<div class="row" style="flex: 0 0 130px; gap: 12px"><button type="button" class="{{h.swCls}}" role="switch" aria-checked="{{h.aria}}" aria-label="{{h.swLabel}}" onClick="{{h.toggle}}"></button><b>{{h.day}}</b></div>
+<sc-if value="{{h.on}}" hint-placeholder-val="{{true}}"><div class="row t-row" style="gap: 8px"><label class="sr-only" for="{{h.fid}}">من</label><input id="{{h.fid}}" class="input t-in" type="time" value="{{h.from}}" onChange="{{h.setFrom}}"><span class="muted">إلى</span><label class="sr-only" for="{{h.tid}}">إلى</label><input id="{{h.tid}}" class="input t-in" type="time" value="{{h.to}}" onChange="{{h.setTo}}"></div></sc-if>
+<sc-if value="{{h.off}}" hint-placeholder-val="{{false}}"><span class="muted">مغلق</span></sc-if>
+</li>
+</sc-for>
+</ul>
+</div>
+</sc-if>
+
+<!-- 4 catalog -->
+<sc-if value="{{s4}}" hint-placeholder-val="{{false}}">
+<div class="card">
+<div class="card-head"><div><h2>{{catTitle}}</h2><span class="subtle">أضف الأهم الآن، والباقي لاحقاً من صفحة المنتجات والخدمات</span></div></div>
+<ul>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="3">
+<li class="ob-row">
+<div class="field" style="flex: 1 1 200px"><label class="sr-only" for="{{r.nid}}">الاسم</label><input id="{{r.nid}}" class="input" value="{{r.name}}" onChange="{{r.setName}}" placeholder="{{r.ph}}"></div>
+<div class="row" style="gap: 6px"><label class="sr-only" for="{{r.pid}}">السعر بالشيكل</label><input id="{{r.pid}}" class="input ltr" inputmode="decimal" value="{{r.price}}" onChange="{{r.setPrice}}" placeholder="0" style="width: 84px"><span class="muted">₪</span></div>
+<sc-if value="{{r.isSvc}}" hint-placeholder-val="{{false}}"><div><label class="sr-only" for="{{r.did}}">المدة</label><select id="{{r.did}}" class="input" value="{{r.dur}}" onChange="{{r.setDur}}" style="width: 120px"><option value="30">30 دقيقة</option><option value="45">45 دقيقة</option><option value="60">ساعة</option><option value="90">ساعة ونصف</option><option value="120">ساعتان</option></select></div></sc-if>
+<button type="button" class="ib sm danger" onClick="{{r.remove}}" aria-label="{{r.removeLabel}}"><svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</li>
+</sc-for>
+</ul>
+<div class="card-foot" style="justify-content: space-between"><span class="row" style="gap: 6px; flex-wrap: wrap"><sc-for list="{{addBtns}}" as="b" hint-placeholder-count="2"><button type="button" class="btn btn-soft btn-sm" onClick="{{b.add}}">{{b.label}}</button></sc-for></span><button type="button" class="btn-link" onClick="{{importFile}}">أو ارفع ملف Excel</button></div>
+</div>
+</sc-if>
+
+<!-- 5 delivery -->
+<sc-if value="{{s5}}" hint-placeholder-val="{{false}}">
+<sc-if value="{{delivNA}}" hint-placeholder-val="{{false}}">
+<div class="card empty"><span class="ic neutral" style="display: grid; place-items: center"><svg class="i i-xl" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7M4 4l16 16"></path></svg></span><h2>لا تحتاج إلى هذه الخطوة</h2><p class="muted">لم تختر «توصيل» في الخطوة الأولى، لذا سيخبر هُدهُد العملاء بأن الاستلام من المحل فقط.</p><button type="button" class="btn btn-secondary btn-sm" onClick="{{enableDeliv}}">أريد إضافة التوصيل</button></div>
+</sc-if>
+<sc-if value="{{delivOn}}" hint-placeholder-val="{{true}}">
+<div class="card">
+<div class="card-head"><div><h2>المناطق التي توصل إليها</h2><span class="subtle">اختر المناطق واكتب رسوم كل منها</span></div></div>
+<ul>
+<sc-for list="{{zones}}" as="z" hint-placeholder-count="6">
+<li class="ob-row">
+<label class="row grow" style="gap: 10px; min-height: 40px; cursor: pointer"><input type="checkbox" checked="{{z.on}}" onChange="{{z.toggle}}" style="width: 18px; height: 18px; accent-color: #0B7F58"><b style="font-weight: 600">{{z.name}}</b></label>
+<sc-if value="{{z.on}}" hint-placeholder-val="{{true}}"><div class="row" style="gap: 6px"><label class="sr-only" for="{{z.fid}}">رسوم التوصيل إلى {{z.name}}</label><input id="{{z.fid}}" class="input ltr" inputmode="decimal" value="{{z.fee}}" onChange="{{z.setFee}}" style="width: 72px"><span class="muted">₪</span></div></sc-if>
+</li>
+</sc-for>
+</ul>
+<div class="card-foot" style="justify-content: flex-start"><label class="row" style="gap: 8px; font-size: 14px" for="o-free">توصيل مجاني للطلبات فوق<input id="o-free" class="input ltr" inputmode="decimal" value="{{freeOver}}" onChange="{{setFree}}" style="width: 84px">₪</label></div>
+</div>
+</sc-if>
+</sc-if>
+
+<!-- 6 faq -->
+<sc-if value="{{s6}}" hint-placeholder-val="{{false}}">
+<div class="col" style="gap: 12px">
+<sc-for list="{{faqs}}" as="q" hint-placeholder-count="4">
+<div class="{{q.cls}}">
+<label class="row" style="gap: 10px; cursor: pointer; min-height: 32px"><input type="checkbox" checked="{{q.on}}" onChange="{{q.toggle}}" style="width: 18px; height: 18px; accent-color: #0B7F58"><b>{{q.q}}</b></label>
+<sc-if value="{{q.on}}" hint-placeholder-val="{{true}}"><div class="field" style="margin-top: 10px"><label class="sr-only" for="{{q.id}}">الجواب</label><textarea id="{{q.id}}" class="input" value="{{q.a}}" onChange="{{q.setA}}" style="min-height: 70px"></textarea></div></sc-if>
+</div>
+</sc-for>
+<p class="hint">كتبنا أجوبة مقترحة من المعلومات التي أدخلتها. عدّلها كما تشاء.</p>
+</div>
+</sc-if>
+
+<!-- 7 whatsapp -->
+<sc-if value="{{s7}}" hint-placeholder-val="{{false}}">
+<div class="card card-body col" style="gap: 16px">
+<sc-if value="{{waIdle}}" hint-placeholder-val="{{true}}">
+<ol class="col" style="gap: 10px; padding-inline-start: 0">
+<li class="row" style="gap: 10px; align-items: flex-start"><span class="count brand">1</span><span>سجّل الدخول بحساب فيسبوك الذي يدير نشاطك.</span></li>
+<li class="row" style="gap: 10px; align-items: flex-start"><span class="count brand">2</span><span>اختر رقم واتساب للأعمال، أو أضف رقماً جديداً.</span></li>
+<li class="row" style="gap: 10px; align-items: flex-start"><span class="count brand">3</span><span>أدخل رمز التحقق الذي يصلك على الرقم.</span></li>
+</ol>
+<div class="alert info"><span>إذا كان الرقم مستخدماً في تطبيق واتساب العادي، ستحتاج إلى نقله إلى واتساب للأعمال أولاً. <a href="FAQ.dc.html">كيف أفعل ذلك؟</a></span></div>
+<button type="button" class="btn btn-primary" onClick="{{waStart}}" style="align-self: flex-start"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"></path></svg>تابع مع Meta</button>
+</sc-if>
+<sc-if value="{{waBusy}}" hint-placeholder-val="{{false}}"><div class="row" style="gap: 12px" aria-live="polite"><span class="spin dk"></span><span>جارٍ الاتصال بحسابك في Meta…</span></div></sc-if>
+<sc-if value="{{waPick}}" hint-placeholder-val="{{false}}">
+<fieldset class="col" style="gap: 8px; border: 0; padding: 0; margin: 0"><legend class="lbl" style="margin-bottom: 8px">اختر الرقم الذي سيرد منه هُدهُد</legend>
+<sc-for list="{{numbers}}" as="n" hint-placeholder-count="2"><label class="{{n.cls}}"><input type="radio" name="wanum" checked="{{n.on}}" onChange="{{n.pick}}"><span><b class="ltr" style="text-align: right">{{n.num}}</b><span class="subtle">{{n.desc}}</span></span></label></sc-for>
+</fieldset>
+<button type="button" class="btn btn-primary" onClick="{{waSendCode}}" style="align-self: flex-start">أرسل رمز التحقق</button>
+</sc-if>
+<sc-if value="{{waCode}}" hint-placeholder-val="{{false}}">
+<div class="field" style="max-width: 320px"><label for="o-code">رمز التحقق المرسل إلى <span class="ltr num">+970 59 812 3344</span></label><input id="o-code" class="{{codeCls}}" inputmode="numeric" autocomplete="one-time-code" dir="ltr" maxlength="6" value="{{code}}" onChange="{{setCode}}" placeholder="••••••" style="letter-spacing: 8px; font-size: 20px; text-align: center"><sc-if value="{{codeErr}}" hint-placeholder-val="{{false}}"><span class="err">{{codeErrText}}</span></sc-if><span class="hint">لم يصلك؟ يمكنك طلب رمز جديد بعد 0:42. (للتجربة: أي 6 أرقام عدا 000000)</span></div>
+<button type="button" class="btn btn-primary" onClick="{{waVerify}}" style="align-self: flex-start">تحقّق</button>
+</sc-if>
+<sc-if value="{{waDone}}" hint-placeholder-val="{{false}}">
+<div class="alert success"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span><b>تم ربط واتساب.</b> الرقم <span class="ltr num">+970 59 812 3344</span> جاهز. لن يبدأ هُدهُد بالرد قبل أن تفعّله في الخطوة الأخيرة.</span></div>
+</sc-if>
+</div>
+</sc-if>
+
+<!-- 8 test & activate -->
+<sc-if value="{{s8}}" hint-placeholder-val="{{false}}">
+<div class="grid-2" style="gap: 16px; align-items: start">
+<section class="card" aria-labelledby="sm-h">
+<div class="card-head"><h2 id="sm-h">ملخص الإعداد</h2></div>
+<ul>
+<sc-for list="{{summary}}" as="x" hint-placeholder-count="7"><li class="row" style="gap: 10px; padding: 10px 20px; border-top: 1px solid #E6E9F0"><span class="{{x.ic}}" aria-hidden="true">{{x.mark}}</span><span class="grow">{{x.title}}</span><sc-if value="{{x.canFix}}" hint-placeholder-val="{{false}}"><button type="button" class="btn-link" onClick="{{x.go}}">{{x.fix}}</button></sc-if></li></sc-for>
+</ul>
+</section>
+<section class="card" aria-labelledby="tt-h">
+<div class="card-head"><div><h2 id="tt-h">جرّب هُدهُد</h2><span class="subtle">تجربة فقط، لا تُحفظ</span></div></div>
+<div class="chat" style="background: #EFEAE2; padding: 14px; min-height: 200px">
+<sc-for list="{{chat}}" as="m" hint-placeholder-count="2"><div class="{{m.cls}}"><sc-if value="{{m.ai}}" hint-placeholder-val="{{false}}"><div class="who">هُدهُد</div></sc-if>{{m.text}}</div></sc-for>
+</div>
+<div class="card-body row" style="gap: 6px; flex-wrap: wrap"><sc-for list="{{tests}}" as="t" hint-placeholder-count="3"><button type="button" class="chip sm" onClick="{{t.send}}">{{t.text}}</button></sc-for></div>
+</section>
+</div>
+<sc-if value="{{cantActivate}}" hint-placeholder-val="{{false}}"><div class="alert warning" role="alert" style="margin-top: 16px"><span>يجب ربط واتساب قبل التفعيل. <button type="button" class="btn-link" onClick="{{goWa}}">اربط واتساب الآن</button></span></div></sc-if>
+</sc-if>
+
+<div class="ob-foot">
+<sc-if value="{{hasBack}}" hint-placeholder-val="{{false}}"><button type="button" class="btn btn-secondary" onClick="{{back}}">السابق</button></sc-if>
+<span class="grow"></span>
+<sc-if value="{{canSkip}}" hint-placeholder-val="{{false}}"><button type="button" class="btn btn-ghost" onClick="{{skip}}">{{skipLabel}}</button></sc-if>
+<button type="button" class="btn btn-primary" onClick="{{next}}" style="min-width: 140px">{{nextLabel}}</button>
+</div>
+</main>
+</div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+<div class="toast ok" role="status" aria-live="polite"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>{{toast}}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startStep":{"editor":"enum","options":["1","2","3","4","5","6","7","8"],"default":"1"},"startView":{"editor":"enum","options":["wizard","resume","live"],"default":"wizard"},"$preview":{"width":1440,"height":1000}}'>
+const TYPES = [
+  ['salon', 'صالون أو مركز تجميل', 'شعر، أظافر، عناية بالبشرة', 'M6 3l12 12M18 3L6 15M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z', { products: true, services: true, delivery: false }],
+  ['food', 'مطعم أو مخبز', 'وجبات، حلويات، طلبات خارجية', 'M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 0-3 3-3 6s1 4 3 4v8', { products: true, services: false, delivery: true }],
+  ['clothes', 'متجر ملابس', 'ملابس، أحذية، إكسسوارات', 'M8 3l-5 4 3 4 2-1v11h8V10l2 1 3-4-5-4a4 4 0 0 1-8 0z', { products: true, services: false, delivery: true }],
+  ['clinic', 'عيادة', 'طب أسنان، علاج طبيعي، تغذية', 'M12 4v16M4 12h16', { products: false, services: true, delivery: false }],
+  ['tech', 'متجر إلكترونيات', 'هواتف، إكسسوارات، صيانة', 'M7 2h10v20H7zM11 18h2', { products: true, services: true, delivery: true }],
+  ['other', 'نشاط آخر', 'أي نشاط يتواصل مع عملائه عبر واتساب', 'M12 5v14M5 12h14', { products: true, services: false, delivery: false }]
+];
+const STEPS = [
+  ['type', 'نوع النشاط', 'ما نوع نشاطك؟', 'نجهّز لك الخطوات والأسئلة المناسبة لنشاطك.'],
+  ['info', 'معلومات النشاط', 'عرّفينا بنشاطك', 'يستخدم هُدهُد هذه المعلومات عند الحديث مع عملائك.'],
+  ['hours', 'أوقات العمل', 'متى تعمل؟', 'لن يحجز هُدهُد مواعيد خارج هذه الأوقات، وسيخبر العملاء بها عند السؤال.'],
+  ['catalog', 'المنتجات والخدمات', 'ماذا تقدّم؟', 'يجيب هُدهُد عن الأسعار من هذه القائمة فقط، ولا يخترع أسعاراً.'],
+  ['delivery', 'التوصيل', 'إلى أين توصل؟', 'يحسب هُدهُد رسوم التوصيل ويخبر بها العميل قبل تأكيد الطلب.'],
+  ['faq', 'الأسئلة الشائعة', 'أسئلة يطرحها عملاؤك كثيراً', 'اختر الأسئلة التي تنطبق على نشاطك وراجع أجوبتها.'],
+  ['wa', 'ربط واتساب', 'اربط رقم واتساب للأعمال', 'يستغرق الربط نحو 5 دقائق عبر حسابك في Meta.'],
+  ['go', 'التجربة والتفعيل', 'جرّب هُدهُد ثم فعّله', 'راجع الملخص وجرّب بعض الأسئلة، ثم فعّل الردود التلقائية.']
+];
+const CITIES = ['رام الله والبيرة', 'نابلس', 'الخليل', 'بيت لحم', 'جنين', 'طولكرم', 'قلقيلية', 'أريحا', 'سلفيت', 'طوباس', 'غزة'];
+const DAYS = ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+const ZONES = [['رام الله والبيرة', true, '15'], ['بيتونيا', true, '15'], ['نابلس', false, '25'], ['بيت لحم', false, '25'], ['الخليل', false, '30'], ['جنين', false, '30']];
+const FAQS = [
+  ['hours', 'ما هي أوقات العمل؟', 'نستقبلكم من السبت إلى الخميس، من 9 صباحاً حتى 7 مساءً. يوم الجمعة عطلة.', true],
+  ['loc', 'أين يقع المحل؟', 'في رام الله، شارع الإرسال، عمارة الريان، الطابق الثاني، فوق صيدلية الشفاء.', true],
+  ['walkin', 'هل تستقبلون زبونات بدون موعد مسبق؟', 'نعم إذا توفر وقت، لكن ننصح بالحجز المسبق لضمان موعدك.', true],
+  ['women', 'هل المركز مخصّص للنساء فقط؟', 'نعم، المركز نسائي بالكامل، وجميع العاملات فيه من السيدات.', false]
+];
+const PHONE = /^\+?[\d][\d\s\-()]{7,18}$/;
+const clone = (x) => JSON.parse(JSON.stringify(x));
+const H0 = DAYS.map((d, i) => ({ on: i < 6, from: '09:00', to: '19:00' }));
+
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    const step = Math.max(1, Math.min(8, parseInt(this.props.startStep || '1', 10)));
+    const pre = step > 1;
+    this.state = {
+      view: this.props.startView || 'wizard', step: step, maxStep: step, typeErr: false, touched: false,
+      type: pre ? 'salon' : '', offers: pre ? clone(TYPES[0][4]) : { products: true, services: false, delivery: false },
+      f: pre ? { name: 'مركز لمسة للتجميل', city: CITIES[0], phone: '+970 59 812 3344', addr: 'شارع الإرسال، عمارة الريان، الطابق الثاني', desc: '' } : { name: '', city: CITIES[0], phone: '', addr: '', desc: '' },
+      hours: clone(H0),
+      rows: [{ kind: 'svc', name: 'قص وتصفيف', price: '60', dur: '45' }, { kind: 'svc', name: 'صبغة شعر', price: '150', dur: '120' }, { kind: 'prod', name: 'زيت أرغان للشعر 100 مل', price: '45', dur: '' }],
+      zones: ZONES.map((z) => ({ name: z[0], on: z[1], fee: z[2] })), freeOver: '200',
+      faqs: FAQS.map((q) => ({ k: q[0], q: q[1], a: q[2], on: q[3] })),
+      wa: step > 7 ? 'done' : 'idle', waNum: 0, code: '', codeErr: '', skipped: {},
+      chat: [], toast: ''
+    };
+  }
+  flash(t) { clearTimeout(this._t); this.setState({ toast: t }); this._t = setTimeout(() => this.setState({ toast: '' }), 3200); }
+  go(n) { this.setState({ step: n, maxStep: Math.max(this.state.maxStep, n), touched: false, typeErr: false }); }
+  validate() {
+    const s = this.state;
+    if (s.step === 1 && !s.type) { this.setState({ typeErr: true }); return false; }
+    if (s.step === 2 && (!s.f.name.trim() || !PHONE.test(s.f.phone.trim()))) { this.setState({ touched: true }); return false; }
+    return true;
+  }
+  stepDone(i) {
+    const s = this.state;
+    if (s.skipped[i]) return false;
+    if (i === 7) return s.wa === 'done';
+    if (i === 8) return false;
+    return s.maxStep > i;
+  }
+  answer(t) {
+    if (/أوقات|متى/.test(t)) return 'نستقبلكم من السبت إلى الخميس، من 9 صباحاً حتى 7 مساءً. يوم الجمعة عطلة.';
+    if (/سعر|كم/.test(t)) return 'سعر صبغة الشعر 150 ₪، وتستغرق نحو ساعتين. هل تودّ حجز موعد؟';
+    return 'يسعدنا ذلك! لدينا غداً موعد متاح الساعة 10:30 صباحاً للقص والتصفيف. هل يناسبك؟';
+  }
+  renderVals() {
+    const s = this.state; const set = (p) => this.setState(p);
+    const st = STEPS[s.step - 1];
+    const deliv = !!s.offers.delivery;
+    const svc = !!s.offers.services, prod = !!s.offers.products;
+    const done = [1, 2, 3, 4, 5, 6, 7, 8].filter((i) => this.stepDone(i) || (i === 5 && !deliv && s.maxStep > 5)).length;
+    const nameErr = s.touched && !s.f.name.trim();
+    const phoneErr = s.touched && !PHONE.test(s.f.phone.trim());
+    const setF = {}; ['name', 'city', 'phone', 'addr', 'desc'].forEach((k) => { setF[k] = (e) => this.setState({ f: Object.assign({}, this.state.f, { [k]: e.target.value }) }); });
+    const updRow = (i, p) => set({ rows: s.rows.map((r, k) => (k === i ? Object.assign({}, r, p) : r)) });
+    const visibleRows = s.rows.map((r, i) => ({ r: r, i: i })).filter((x) => (x.r.kind === 'svc' ? svc : prod));
+    const nextLabels = { 7: s.wa === 'done' ? 'التالي' : 'التالي', 8: 'فعّل هُدهُد' };
+    return {
+      views: [['wizard', 'المعالج'], ['resume', 'العودة لاحقاً'], ['live', 'تم التفعيل']].map((v) => ({ label: v[1], cls: s.view === v[0] ? 'on' : '', aria: s.view === v[0] ? 'true' : 'false', pick: () => {
+        if (v[0] === 'resume') set({ view: 'resume', step: Math.max(s.step, 4), maxStep: Math.max(s.maxStep, 4), type: s.type || 'salon', offers: s.type ? s.offers : clone(TYPES[0][4]), f: s.f.name ? s.f : { name: 'مركز لمسة للتجميل', city: CITIES[0], phone: '+970 59 812 3344', addr: '', desc: '' } });
+        else set({ view: v[0] });
+      } })),
+      isWizard: s.view === 'wizard', isResume: s.view === 'resume', isLive: s.view === 'live', showSaveLater: s.view === 'wizard',
+      saveLater: () => { set({ view: 'resume' }); this.flash('حُفظ تقدّمك. يمكنك المتابعة في أي وقت'); },
+      resume: () => set({ view: 'wizard' }),
+      doneCount: done, pct: Math.round(done / 8 * 100), pctStyle: 'width: ' + Math.round(done / 8 * 100) + '%',
+      stepNo: s.step, stepStyle: 'width: ' + Math.round(s.step / 8 * 100) + '%',
+      curTitle: st[1], curHeading: st[2], curSub: st[3],
+      steps: STEPS.map((x, k) => { const i = k + 1; const na = i === 5 && !deliv; const isDone = this.stepDone(i); const cur = s.step === i;
+        return { title: x[1], cls: 'ob-step' + (cur ? ' cur' : isDone ? ' done' : '') + (na ? ' na' : ''), current: cur ? 'step' : 'false', locked: i > s.maxStep && !cur, mark: isDone && !cur ? '✓' : String(i),
+          hasNote: na || !!s.skipped[i], note: na ? 'لا تنطبق على نشاطك' : 'تخطّيتها، يمكنك العودة إليها', go: () => this.go(i) }; }),
+      s1: s.step === 1, s2: s.step === 2, s3: s.step === 3, s4: s.step === 4, s5: s.step === 5, s6: s.step === 6, s7: s.step === 7, s8: s.step === 8,
+      types: TYPES.map((t) => ({ label: t[1], ex: t[2], icon: t[3], on: s.type === t[0], cls: 'ob-type' + (s.type === t[0] ? ' on' : ''), pick: () => set({ type: t[0], offers: clone(t[4]), typeErr: false }) })),
+      typeErr: s.typeErr, hasType: !!s.type,
+      offers: [['products', 'منتجات للبيع'], ['services', 'خدمات بمواعيد'], ['delivery', 'توصيل']].map((o) => ({ label: o[1], on: !!s.offers[o[0]], cls: 'check' + (s.offers[o[0]] ? ' on' : ''), toggle: () => set({ offers: Object.assign({}, s.offers, { [o[0]]: !s.offers[o[0]] }) }) })),
+      f: s.f, setF: setF, cities: CITIES, nameErr: nameErr, phoneErr: phoneErr, nameCls: 'input' + (nameErr ? ' bad' : ''), phoneCls: 'input' + (phoneErr ? ' bad' : ''),
+      presets: [['السبت–الخميس، 9–7', [0, 1, 2, 3, 4, 5], '09:00', '19:00'], ['كل الأيام، 10–10', [0, 1, 2, 3, 4, 5, 6], '10:00', '22:00'], ['الأحد–الخميس، 8–4', [1, 2, 3, 4, 5], '08:00', '16:00']].map((p) => ({ label: p[0], apply: () => set({ hours: DAYS.map((d, i) => ({ on: p[1].indexOf(i) >= 0, from: p[2], to: p[3] })) }) })),
+      hours: s.hours.map((h, i) => ({ day: DAYS[i], on: h.on, off: !h.on, from: h.from, to: h.to, fid: 'hf' + i, tid: 'ht' + i, swCls: 'sw' + (h.on ? ' on' : ''), aria: h.on ? 'true' : 'false', swLabel: 'يوم عمل: ' + DAYS[i],
+        toggle: () => set({ hours: s.hours.map((x, k) => (k === i ? Object.assign({}, x, { on: !x.on }) : x)) }),
+        setFrom: (e) => set({ hours: s.hours.map((x, k) => (k === i ? Object.assign({}, x, { from: e.target.value }) : x)) }),
+        setTo: (e) => set({ hours: s.hours.map((x, k) => (k === i ? Object.assign({}, x, { to: e.target.value }) : x)) }) })),
+      catTitle: svc && prod ? 'خدماتك ومنتجاتك' : svc ? 'خدماتك' : 'منتجاتك',
+      rows: visibleRows.map((x) => ({ name: x.r.name, price: x.r.price, dur: x.r.dur, isSvc: x.r.kind === 'svc', ph: x.r.kind === 'svc' ? 'اسم الخدمة' : 'اسم المنتج', nid: 'rn' + x.i, pid: 'rp' + x.i, did: 'rd' + x.i,
+        setName: (e) => updRow(x.i, { name: e.target.value }), setPrice: (e) => updRow(x.i, { price: e.target.value.replace(/[^\d.]/g, '') }), setDur: (e) => updRow(x.i, { dur: e.target.value }),
+        remove: () => set({ rows: s.rows.filter((r, k) => k !== x.i) }), removeLabel: 'حذف ' + (x.r.name || 'السطر') })),
+      addBtns: [].concat(svc ? [{ label: '+ خدمة', add: () => set({ rows: s.rows.concat([{ kind: 'svc', name: '', price: '', dur: '60' }]) }) }] : [], prod ? [{ label: '+ منتج', add: () => set({ rows: s.rows.concat([{ kind: 'prod', name: '', price: '', dur: '' }]) }) }] : []),
+      importFile: () => this.flash('رفع الملفات متاح من صفحة المنتجات والخدمات'),
+      delivNA: !deliv, delivOn: deliv, enableDeliv: () => set({ offers: Object.assign({}, s.offers, { delivery: true }) }),
+      zones: s.zones.map((z, i) => ({ name: z.name, on: z.on, fee: z.fee, fid: 'zf' + i, toggle: () => set({ zones: s.zones.map((x, k) => (k === i ? Object.assign({}, x, { on: !x.on }) : x)) }), setFee: (e) => set({ zones: s.zones.map((x, k) => (k === i ? Object.assign({}, x, { fee: e.target.value.replace(/[^\d]/g, '') }) : x)) }) })),
+      freeOver: s.freeOver, setFree: (e) => set({ freeOver: e.target.value.replace(/[^\d]/g, '') }),
+      faqs: s.faqs.map((q, i) => ({ q: q.q, a: q.a, on: q.on, id: 'fq' + i, cls: 'card card-body' + (q.on ? '' : ' faq-off'), toggle: () => set({ faqs: s.faqs.map((x, k) => (k === i ? Object.assign({}, x, { on: !x.on }) : x)) }), setA: (e) => set({ faqs: s.faqs.map((x, k) => (k === i ? Object.assign({}, x, { a: e.target.value }) : x)) }) })),
+      waIdle: s.wa === 'idle', waBusy: s.wa === 'busy', waPick: s.wa === 'pick', waCode: s.wa === 'code', waDone: s.wa === 'done',
+      waStart: () => { set({ wa: 'busy' }); setTimeout(() => this.setState({ wa: 'pick' }), 1100); },
+      numbers: [['+970 59 812 3344', 'مركز لمسة للتجميل · واتساب للأعمال'], ['+970 56 700 2190', 'رقم جديد · لم يُستخدم في واتساب']].map((n, i) => ({ num: n[0], desc: n[1], on: s.waNum === i, cls: 'radio-card' + (s.waNum === i ? ' on' : ''), pick: () => set({ waNum: i }) })),
+      waSendCode: () => set({ wa: 'code', code: '', codeErr: '' }),
+      code: s.code, setCode: (e) => set({ code: e.target.value.replace(/\D/g, '').slice(0, 6), codeErr: '' }),
+      codeErr: !!s.codeErr, codeErrText: s.codeErr, codeCls: 'input' + (s.codeErr ? ' bad' : ''),
+      waVerify: () => { if (s.code.length !== 6) { set({ codeErr: 'الرمز مكوّن من 6 أرقام' }); return; } if (s.code === '000000') { set({ codeErr: 'الرمز غير صحيح. تحقّق منه أو اطلب رمزاً جديداً' }); return; } set({ wa: 'done', skipped: Object.assign({}, s.skipped, { 7: false }) }); this.flash('تم ربط واتساب'); },
+      summary: STEPS.slice(0, 7).map((x, k) => { const i = k + 1; const na = i === 5 && !deliv; const ok = na || this.stepDone(i);
+        return { title: x[1] + (na ? ' (لا تنطبق)' : ''), mark: ok ? '✓' : '!', ic: 'count ' + (ok ? 'brand' : 'warm'), canFix: !ok, fix: i === 7 ? 'اربط الآن' : 'أكملها', go: () => this.go(i) }; }),
+      chat: s.chat.map((m) => ({ cls: m.k === 'in' ? 'msg in' : 'msg ai', ai: m.k === 'ai', text: m.text })),
+      tests: ['ما هي أوقات العمل؟', 'كم سعر الصبغة؟', 'بدي أحجز قص بكرا'].map((t) => ({ text: t, send: () => set({ chat: s.chat.concat([{ k: 'in', text: t }, { k: 'ai', text: this.answer(t) }]).slice(-6) }) })),
+      cantActivate: s.step === 8 && s.wa !== 'done' && s.touched, goWa: () => this.go(7),
+      hasBack: s.step > 1, back: () => this.go(s.step - 1),
+      canSkip: [3, 4, 5, 6, 7].indexOf(s.step) >= 0 && !(s.step === 5 && !deliv) && !(s.step === 7 && s.wa === 'done'),
+      skipLabel: s.step === 7 ? 'سأربطه لاحقاً' : 'تخطَّ الآن',
+      skip: () => { set({ skipped: Object.assign({}, s.skipped, { [s.step]: true }) }); this.go(s.step + 1); },
+      nextLabel: s.step === 8 ? 'فعّل هُدهُد' : 'التالي',
+      next: () => {
+        if (!this.validate()) return;
+        if (s.step === 8) { if (s.wa !== 'done') { set({ touched: true }); return; } set({ view: 'live' }); return; }
+        set({ skipped: Object.assign({}, s.skipped, { [s.step]: false }) });
+        this.go(s.step + 1);
+      },
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>
