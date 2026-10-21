@@ -134,6 +134,8 @@ export function waDTO(w: typeof schema.whatsappConnections.$inferSelect | undefi
     quality: w.quality,
     lastReplyAt: iso(w.lastReplyAt),
     isStub: w.isStub,
+    provider: w.provider === 'wasender' ? 'wasender' : 'stub',
+    lastInboundAt: iso(w.lastInboundAt),
   };
 }
 

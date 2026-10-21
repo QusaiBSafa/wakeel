@@ -5,6 +5,7 @@ import { PLAN } from '@/lib/constants';
 import type { BusinessRow } from '../business';
 import { businessInfoDTO, waDTO } from '../dto';
 import { monthSum } from '../stats';
+import { waProvider } from '../wa/pairing';
 import { membersFor } from './shared';
 
 const { whatsappConnections, catalogItems } = schema;
@@ -21,6 +22,7 @@ export async function loadAccount(business: BusinessRow) {
   return {
     info: businessInfoDTO(business),
     wa: waDTO(wa),
+    waProvider: waProvider(),
     members,
     plan: { ...PLAN },
     usage: { conversations, members: members.length, items: items?.n ?? 0 },

@@ -77,17 +77,26 @@ export default function AccountWhatsApp({ data, state, onChanged }: { data: Acco
               <dt>الاسم الظاهر للعملاء</dt>
               <dd>{wa.displayName}</dd>
               <dt>نوع الحساب</dt>
-              <dd>واتساب للأعمال · عبر Meta</dd>
+              <dd>{wa.provider === 'wasender' ? 'جهاز مرتبط · ربط تجريبي' : 'واتساب للأعمال · عبر Meta'}</dd>
               {wa.connectedAt && (
                 <>
                   <dt>متصل منذ</dt>
                   <dd>{fullDate(wa.connectedAt)}</dd>
                 </>
               )}
-              <dt>جودة الرقم</dt>
-              <dd>
-                <span className="bdg success">جيدة</span> <span className="subtle">لا توجد بلاغات أو حظر من العملاء</span>
-              </dd>
+              {wa.provider === 'wasender' ? (
+                <>
+                  <dt>آخر رسالة مستلمة</dt>
+                  <dd>{wa.lastInboundAt ? fullDate(wa.lastInboundAt) : <span className="subtle">لم تصل رسائل بعد</span>}</dd>
+                </>
+              ) : (
+                <>
+                  <dt>جودة الرقم</dt>
+                  <dd>
+                    <span className="bdg success">جيدة</span> <span className="subtle">لا توجد بلاغات أو حظر من العملاء</span>
+                  </dd>
+                </>
+              )}
               <dt>رسائل هذا الشهر</dt>
               <dd className="num">
                 {data.messagesThisMonth.toLocaleString('en-US')} رسالة <span className="subtle">(أعداد فقط، لا تُحفظ النصوص)</span>
@@ -151,12 +160,14 @@ export default function AccountWhatsApp({ data, state, onChanged }: { data: Acco
               <button type="button" className="btn btn-primary" onClick={() => setConnecting(true)}>
                 اربط رقم واتساب
               </button>
-              <span className="subtle">ستحتاج إلى حسابك في فيسبوك، ورقم يمكنه استقبال رمز تحقق.</span>
+              <span className="subtle">{data.waProvider === 'wasender' ? 'ستحتاج إلى هاتفك الذي يعمل عليه واتساب لمسح رمز الربط.' : 'ستحتاج إلى حسابك في فيسبوك، ورقم يمكنه استقبال رمز تحقق.'}</span>
             </>
           )}
           {connecting && (
             <div style={{ width: '100%', maxWidth: 520, textAlign: 'start' }}>
               <WhatsAppConnect
+                provider={data.waProvider}
+                defaultPhone={data.info.phone}
                 onConnected={() => {
                   toast('رُبط رقم واتساب');
                   onChanged();

@@ -14,4 +14,6 @@ export const teamPatchSchema = z.object({ role: z.enum(['admin', 'staff', 'book'
 
 export const waVerifySchema = z.object({ phone: requiredLine(30), code: z.string().regex(/^\d{6}$/, { message: 'الرمز مكوّن من 6 أرقام' }) }).strict();
 
+export const waPairSchema = z.object({ phone }).strict();
+
 export { uuid };

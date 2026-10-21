@@ -1,7 +1,9 @@
+import { assertStub } from '@/lib/server/wa/pairing';
 import { handler, json, requireBusiness } from '@/lib/server/api';
 
 /** STUB: pretends to sign in to Meta and lists two numbers. Nothing is contacted. */
 export const POST = handler(async () => {
+  assertStub();
   const { business } = await requireBusiness();
   return json({
     numbers: [

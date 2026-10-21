@@ -3,12 +3,20 @@
 import { useState } from 'react';
 import { Icon } from '@/components/ui/Icon';
 import { api, ApiError } from '@/lib/client/api';
+import WhatsAppQrConnect from './WhatsAppQrConnect';
 
 type Phase = 'idle' | 'busy' | 'pick' | 'code' | 'done';
 type Num = { phone: string; desc: string };
 
-/** STUB of the Meta connect flow: start → pick a number → code → done. Used by onboarding step 7 and the account page. */
-export default function WhatsAppConnect({ connectedPhone, onConnected }: { connectedPhone?: string | null; onConnected?: (phone: string) => void }) {
+type Props = { connectedPhone?: string | null; defaultPhone?: string; provider?: 'stub' | 'wasender'; onConnected?: (phone: string) => void };
+
+/** Used by onboarding step 7 and the account page. With the wasender provider: the QR flow; otherwise the stub. */
+export default function WhatsAppConnect({ provider = 'stub', ...props }: Props) {
+  return provider === 'wasender' ? <WhatsAppQrConnect {...props} /> : <StubConnect {...props} />;
+}
+
+/** STUB of the Meta connect flow: start → pick a number → code → done. */
+function StubConnect({ connectedPhone, onConnected }: Props) {
   const [phase, setPhase] = useState<Phase>(connectedPhone ? 'done' : 'idle');
   const [numbers, setNumbers] = useState<Num[]>([]);
   const [pick, setPick] = useState(0);

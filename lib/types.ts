@@ -165,6 +165,8 @@ export type WhatsAppDTO = {
   quality: string;
   lastReplyAt: string | null;
   isStub: boolean;
+  provider: 'stub' | 'wasender';
+  lastInboundAt: string | null;
 };
 
 export type BusinessInfoDTO = {

@@ -409,7 +409,41 @@ export const whatsappConnections = pgTable('whatsapp_connections', {
   quality: text('quality').notNull().default('good'),
   lastReplyAt: timestamp('last_reply_at', { withTimezone: true }),
   isStub: boolean('is_stub').notNull().default(true),
+  // 'stub' (fake connect flow) or 'wasender' (linked device through WasenderAPI). Secrets are encrypted (lib/server/crypto.ts).
+  provider: text('provider').notNull().default('stub'),
+  externalId: text('external_id'),
+  apiKeyEnc: text('api_key_enc'),
+  webhookSecretEnc: text('webhook_secret_enc'),
+  hookTokenHash: text('hook_token_hash').unique(),
+  lastInboundAt: timestamp('last_inbound_at', { withTimezone: true }),
 });
+
+// A linked-device pairing in progress (QR shown, not scanned yet). Becomes a whatsapp_connections row once connected.
+export const waPairings = pgTable('wa_pairings', {
+  businessId: uuid('business_id')
+    .primaryKey()
+    .references(() => businesses.id, { onDelete: 'cascade' }),
+  provider: text('provider').notNull(),
+  externalId: text('external_id').notNull(),
+  phone: text('phone').notNull(),
+  webhookSecretEnc: text('webhook_secret_enc'),
+  hookTokenHash: text('hook_token_hash').notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Inbound event ids seen from the provider, for de-duplication and the daily conversation count. Metadata only:
+// `cust` is a keyed hash of the sender, never the number or the message.
+export const waEvents = pgTable(
+  'wa_events',
+  {
+    businessId: businessRef(),
+    externalId: text('external_id').notNull(),
+    cust: text('cust').notNull(),
+    day: date('day').notNull(),
+    receivedAt: timestamp('received_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.businessId, t.externalId] }), index('wa_events_cust_day_idx').on(t.businessId, t.cust, t.day)],
+);
 
 export type Business = typeof businesses.$inferSelect;
 export type CatalogItem = typeof catalogItems.$inferSelect;

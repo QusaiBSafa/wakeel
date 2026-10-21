@@ -4,6 +4,7 @@ import { db, schema } from '@/lib/db';
 import type { BusinessRow } from '../business';
 import { businessInfoDTO, hoursDTO, waDTO } from '../dto';
 import { catalogFor } from './shared';
+import { waProvider } from '../wa/pairing';
 
 const { businessHours, deliveryAreas, faqs, whatsappConnections } = schema;
 
@@ -26,6 +27,7 @@ export async function loadOnboarding(business: BusinessRow | null) {
       zones: areas.map((a) => ({ id: a.id, name: a.name, feeMinor: a.feeMinor, eta: a.eta })),
       faqs: faqRows.map((f) => ({ id: f.id, key: f.templateKey, question: f.question, answer: f.answer, enabled: f.enabled })),
       wa: waDTO(wa),
+      waProvider: waProvider(),
       catalog,
     },
   };

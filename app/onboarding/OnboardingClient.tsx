@@ -365,7 +365,7 @@ export default function OnboardingClient({ business, firstName }: { business: Bi
             {step === 4 && <StepCatalog rows={s.rows} offers={s.offers} onChange={(r) => set({ rows: r })} onImport={() => toast('رفع الملفات متاح من صفحة المنتجات والخدمات')} />}
             {step === 5 && <StepDelivery applicable={deliv} zones={s.zones} freeOver={s.freeOver} onZones={(z) => set({ zones: z })} onFree={(v) => set({ freeOver: v })} onEnable={() => set({ offers: { ...s.offers, delivery: true } })} />}
             {step === 6 && <StepFaq rows={faqRows} touched={touched} onChange={(r) => set({ faqs: r })} />}
-            {step === 7 && <WhatsAppConnect connectedPhone={waPhone} onConnected={(p) => setWaPhone(p)} />}
+            {step === 7 && <WhatsAppConnect provider={business?.waProvider} defaultPhone={s.f.phone} connectedPhone={waPhone} onConnected={(p) => setWaPhone(p)} />}
             {step === 8 && (
               <>
                 <div className="grid-2" style={{ gap: 16, alignItems: 'start' }}>
